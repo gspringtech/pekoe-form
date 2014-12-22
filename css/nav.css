@@ -1,0 +1,100 @@
+#template_nav_panel {
+    /* This style really belongs in the document as the remaining styles are for _any_ expanding list. */
+    padding: 5px 0px 20px 0px; /* top right bottom left -- one day it will sink in */
+    margin: 0px;
+    height: 12em; /* the list will fill this height and scroll if it's taller */
+    }
+    
+/*
+    The height of the list is governed by the container (above), the number of top-level elements, and the line-height.
+    
+    
+*/
+ul.hiernav {
+    border: solid #CFC8BA 4px;
+}
+ul.hiernav, ul.hiernav ul {
+  /* This box-element must be wide enough to contain all its children (including sub-lists). */
+    color: inherit; /*colour is overridden */
+    background-color:inherit;
+    margin: 0px;
+    line-height: 1.5em; /* ---------------------------- LINE HEIGHT ----------------------- */
+/*    height: 100%;  (automatic. Will be used to determine parent height by expandonav.js)*/ 
+
+    }
+ul.hiernav {
+    position: relative; /* A) this top-level list is placed in normal position...  (B) */
+    margin-left: 1.5em;  /* left margin of first list only */ 
+    padding: 0px;
+    overflow:auto;
+    }
+ul.hiernav ul {
+    position: absolute; /* B) ... and its children are absolutely-positioned relative to it. */
+    top: 0px;
+    padding: 0px;
+/*    border-left: 2px solid #E9DF96;*/
+    margin-left: 14.2em; /* This is the width of the parent-LI from its origin (13em w + 1em padding + 0.4em border) */
+    }
+ul.hiernav ul.list-highlight {
+    /* the newly revealed sublist */
+    color: inherit;
+    background-color:#E9DF96;
+    border-right: #DCA65A solid 1px;
+   }
+
+ul.hiernav li { /* ------------------------------------ TOP LEVEL LIST appearance ------------- */
+
+    margin: 0px;
+    width: 12.8em;
+    padding: 2px 1em 2px 1em;
+    color: black;
+    background-color:white; 
+    }
+    
+ul.hiernav li.here {
+    color: black;
+    background: url(graphics/nav_arrow.gif) no-repeat center right;
+    background-color: #DCA65A;
+    }
+
+ul.hiernav li a {
+    display: block;
+    color: #8d8c87;
+    text-decoration: none;
+    }
+ul li.sublist {
+    list-style-type: none;
+    }
+li.item{
+/*  list-style-image: url(graphics/iconooowrit.gif);*/
+  list-style-type: disc;
+  list-style-position: inside;
+  }
+
+
+ul > li.sublist.isactive {
+
+    
+    background-color: #E9DF96;
+    /* ----------------------------------------------------------- FOR EXPERIMENTAL PURPOSES !!! ------------------- */
+/*    border-top: 0.3em solid white; */ 
+/*    border-bottom: 0.3em solid white;*/
+    border-right: solid red 0.4em;
+    background-image: url(graphics/flat-gradient.png); /* I'm using a mask only   */
+    background-position: 0 100%;
+    background-repeat:repeat;
+    }
+
+li.item.isactive {
+    color: black;
+    background-color: #E9DF96;
+    }
+li.isactive li { /* ensure the children aren't affected */
+    color: black;
+    font-weight:normal;
+    background-color: inherit;
+    }
+    
+ li.sublist.isactive {
+        color: blue;
+    }

@@ -1,0 +1,28 @@
+#nav-wrapper, #controls, #footer, #bag {
+    display:none;
+}
+#content {
+position:relative;
+left: 0px;
+top: 0px;
+background:none;
+}
+#work-area {
+    height: auto;
+    overflow:visible;
+    position:absolute;
+    top: 0;
+    left:0;
+    width: 100%;
+    background:none;
+}
+#work-area * {
+    background:none;
+}
+#work-area ul li.header {
+display:table-header-group;
+}
+.ui-tabs-nav , .tDiv { display:none;}
+.ui-tabs { border:none;}
+table { font-size: smaller; width: auto; margin:0;}
+td {width: auto;}

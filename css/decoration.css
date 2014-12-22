@@ -1,0 +1,309 @@
+.app-bg {
+    background-color:#cfc8ba;
+    color:black;
+}
+:focus {
+    outline: 0;
+}
+
+.work-bg {
+     background-color:#e8de96;
+     color:black;
+}
+
+div#appname{
+    background-color:inherit;
+    color:#91131C;
+    font-family:fantasy;
+    font-size:1.6em;
+    background-image: url(graphics/flat-gradient.png);
+    background-position:left;
+    background-repeat:repeat-y;
+    padding-top:8px;
+}
+
+#app-description{
+    background-color:inherit;
+    color:#620D13;
+    font-size:1.2em;
+    position:relative;
+    float:left;
+    padding-left: 1.2em;
+    padding-top: 0.2em;
+    padding-right:0.5em;
+    height: 100%;
+    opacity:0.75;
+    background-image: url(graphics/flat-gradient-r.png);
+    background-position:right;
+    background-repeat:repeat-y;
+}
+
+
+ol.template-list a {
+     color: white;
+     text-decoration:none;
+     background-color:inherit;}
+
+.has-help {
+     cursor: help;
+     }
+.placeholder {
+     color: green;
+     background-color:inherit;
+}
+#work td{
+    border:solid 1px red;
+}
+
+      
+ /* ------------------------ other parts ----------------- */
+     #files {
+/*         background-color: #8fae3b;
+         color: blue;*/
+     }
+     #templates {
+   /*      background-color:#d6eb5b;
+         color: black;*/
+     }
+     
+#dragmark {
+ /*visibility:hidden;*/
+position:absolute;
+top: 100px;
+left: 100px;
+}
+
+.tx-controls input, .tx-controls select {
+font-size: small;
+}
+.tx-controls  div.row {
+  clear: both;
+  padding-top: 5px;
+  vertical-align:bottom;
+  }
+
+.tx-controls div label {
+  float: left;
+  width: 25%;
+  text-align: right;
+  }
+
+.tx-controls div span {
+  width: 70%;
+  text-align: left;
+  } 
+
+#controls >div{padding-left:10px;}
+
+#current-data span { 
+cursor:auto;
+}
+.task-completed {
+    text-decoration:line-through;
+    color:green;
+    background-color:inherit;
+}
+.task-cancelled {
+    text-decoration:line-through;
+
+}
+.task-partial {
+    color:purple;
+    background-color:inherit;
+}
+.task-immediate {
+    color:red;
+    background-color:inherit;
+    font-weight:bold;
+}
+
+.waiting {
+    background: url(graphics/wait-antialiased.gif) left no-repeat;
+}
+
+.loaded { 
+color: black;
+background-image: none;
+background-color: green;
+}
+
+
+span.element-tip {
+    padding-left: 3px;
+    padding-right: 3px;
+    background-color:inherit;
+    font-weight: bold;
+    color: red;
+}
+#loginsurround {
+    position: absolute;
+    top: 105px;
+    left: 0px;
+    height: 100%;
+    width: 100%;
+    color: black;
+    background-color: #BB573D;
+    z-index:100000;
+}
+#loginpanel {
+    position: relative;
+    content: "."; 
+    z-index:1000;
+    left: 27%;
+    width: 400px;
+    padding: 0.5em;
+    height: auto;
+    display: block;
+    background-color: #BB573D;
+    color:inherit;
+    vertical-align: top;
+}
+
+#loginpanel * {
+  margin: 0;
+  padding-left: 0.5em;
+  position: relative;
+  background-color: #DC6F30;
+  color: inherit;
+}
+
+.panel-head {
+  font-size: large;
+  background-color: #663333;
+  color:inherit;
+}
+
+
+
+/*.anchor_button {
+display: table-cell;
+text-align:center;
+padding-left: 1.5em;
+padding-right: 1.5em;
+padding-top: 0.5em;
+
+font-size: 1em;
+}*/
+#navListHeader {
+    display: table-cell;
+    text-align:center;
+    padding-left: 1.5em;
+    padding-right: 1.5em;
+    padding-top: 0.5em;
+    width: 100%;
+    color:#336699;
+    background-color:inherit;
+
+}
+#navList_txInfo {
+    font-weight: bold;
+}
+
+.bluedown { 
+ border-width: 100px 50px 0px;
+ border-color: blue white white; 
+}
+
+#tx-list ul {
+display:table;
+list-style-type:none;
+padding-left: 0px;
+margin-left:0px;
+margin-top:0px;
+background-color:white;
+color:inherit;
+}
+#tx-list li {
+display: table-row;
+border: 1px solid  #CFC8BA;
+
+}
+#tx-list li:first-child {
+/*border-top:1px solid #CFC8BA;*/
+}
+#tx-list li { 
+
+/*border:1px solid #CFC8BA;*/
+/*border-top:0;*/
+
+}
+#tx-list li.txhere { 
+color: #91131C;
+background-color: #E8DE96;
+}
+
+#tx-list li span { 
+    display: table-cell;
+    border:1px solid #CFC8BA;
+    padding: 0 0.5em 0 0.5em;
+}
+#tx-list li.header span {
+    font-variant: small-caps;
+    text-transform:capitalize;
+    font-size: 110%;
+    font-weight: bold; 
+    color: white;
+    background-color: maroon;
+    vertical-align:bottom;
+}
+
+.ascending {
+       background: #FFDB9D url(graphics/icons/arrow_up.png) no-repeat right;
+}
+.descending {
+    background:  #FFDB9D url(graphics/icons/arrow_down.png) no-repeat right;
+}
+
+#tx-files-list li { 
+    /*margin-left: 20px;*/
+    line-height: 1.3em;
+    list-style-position:outside;
+    /*border-bottom: solid black 1px;*/
+    /*list-style-image: url(graphics/document-icon.gif);*/
+    font-size:small;
+}
+
+#tx-files-list li.ooocalc { 
+list-style-image: url(graphics/iconooocalc.gif);
+
+
+}
+#tx-files-list li.ooowrit { 
+list-style-image: url(graphics/iconooowrit.gif);
+
+}
+#tx-files-list li.pdf { 
+list-style-image: url(graphics/pdficon_small.gif);
+}
+#tx-files-list li.docx { 
+list-style-image: url(graphics/docx.jpg);
+}
+
+#client-folder-block >ul>li {
+outline : 1px solid #91131C;
+font-weight: bold;
+}
+
+.hidden-event { 
+  display:none;
+}
+
+
+.preferences, #configSaver {
+
+}
+
+.user-list {
+    background-color: maroon;
+    color:inherit;
+}
+
+div#status {
+	position: absolute;
+	top:0; left:0;
+    text-align: center;
+    width: 100%;
+}
+.error_message { color: red; background-color: yellow; padding: 4px; }
+.status_message { color: blue; background-color: yellow; padding: 4px; }
+

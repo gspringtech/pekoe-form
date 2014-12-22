@@ -1,0 +1,91 @@
+
+/* transaction data in hierarchical list */
+div#tx-trees {
+    position: relative;
+/*    overflow-y:scroll;*/
+}
+.tree-root { 
+	cursor: ns-resize;
+}
+#tx-trees li {
+	cursor:auto;
+    margin-left: 1em;
+}
+
+#tx-trees li.hide {
+    color:inherit;
+    background-color:#99ffcc;
+}
+#tx-trees li.hide b:after {
+    content: "...";
+}
+
+
+#tx-trees li.hide li {
+    display:none;
+}
+
+#current-data {
+    background-color:white;
+    color:inherit;
+    width: 45%;
+}
+#current-data li.non-match-highlight {
+    background-color: #CCCCFF;
+}
+div#other-data {
+    background-color:#EEEEEE;
+    color:inherit;
+    position:absolute;
+    top: 0px; left: 50%;
+    width: 45%;
+    height: auto;
+    padding-bottom: 40px;
+}
+#other-data a {
+    color: blue;
+    
+}
+li.tx-branch {
+    border-style:dotted;
+    border-width: 2px;
+    border-color: white;
+    padding: 2px;
+}
+div#other-data li.tx-branch {
+    border-color:#EEEEEE;
+}
+
+div#other-data li.tx-branch.active {
+    border-style:dotted;
+    border-width: 2px;
+    border-color: blue;
+}
+li.tx-branch.chosen, div#other-data li.tx-branch.chosen {
+    border-style:solid;
+    border-width: 2px;
+    border-color: blue;
+}
+
+#current-data .matching {
+background-color: #CCFFCC;
+}
+/*li.tx-branch b{
+cursor:move;
+}*/
+li.tx-leaf {
+  list-style-type:none;
+}
+li.deleted {color: gray; background-color:inherit;}
+li.tx-leaf:first-letter {
+  text-transform:uppercase;
+}
+span.tx-value {
+  color:#91131C;
+  background-color: #CCFFFF;
+}
+
+div#tx-trees div.title {
+    color: blue;
+    
+}

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>The Template Bureau</title>
+    <link rel='stylesheet' href='/pekoe-common/dist/css/bootstrap.css' />
+    <link rel='stylesheet' href='/pekoe-common/list/list-items.css' />
+    <link rel='stylesheet' href='/pekoe-common/dist/font-awesome/css/font-awesome.min.css' />
+    <link rel="stylesheet" href="css/bag-nav.css"/>
+    <script type='text/javascript' src='/pekoe-common/jquery/dist/jquery.js' ></script>
+    <script type='text/javascript' src='/pekoe-common/dist/js/bootstrap.min.js' ></script>
+    <script type='text/javascript' src='/pekoe-common/list/pekoe-list-widget.js'></script>
+
+    <script src="bureau-a-gradin.js"></script>
+    <script type="application/javascript">
+        jQuery(function () {
+            //var templatesManager = new gs.Pekoe.TemplateManager("templates.xql"); // will get a list of templates from the server
+            var templateSelector = new gs.Pekoe.BureauAG("#bagNav");
+            gs.bag = templateSelector;
+            //gs.templates = templatesManager;
+//		jQuery("#bag").hide();
+            // this should be a jQuery deferred WHEN...
+            jQuery.get("/exist/pekoe-app/templates.xql?get=list", function (d) {
+                console.log('got somethnig',d);
+                templateSelector.init(d);
+            });
+//		templatesManager.addUpdateListener(function () {
+//				templateSelector.init(templatesManager.getList());  // this doesn't get "updated", merely loaded.
+//		});
+            //templatesManager.load("");  // load the full list of templates
+//            jQuery("#bag").hide();
+//		console.log("Created and installed the Bureau");
+
+        });
+    </script>
+</head>
+<body>
+<div id="bag" class='ui-corner-top'><!-- ******************* New Template Panel *********************** -->
+    <div id="bagHomeRow">
+        <div id="bagstart" class='folder' style='float: left; width: 64.4em;'>Templates</div>
+    </div>
+
+    <div id="bagNav" style='clear:both;'></div><!-- clear the floats above -->
+    <div id="templateItems"></div>
+
+</div>
+</body>
+</html>

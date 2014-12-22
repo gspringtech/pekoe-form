@@ -1,0 +1,213 @@
+#bag {
+    border: 2px solid #CCCCCC;
+    position: relative;
+    height: auto;
+    background-color:#ECE5D7;
+    color:inherit;
+    line-height:1.6em;
+    overflow:hidden;
+    width: 65em;
+    font-size: 14px;
+}
+
+#bagHomeRow { 
+/*    width: 100%; */
+    margin-bottom: 2px; 
+}
+#bagHomeRow .ips_wrapper {
+    margin:0;
+}
+
+#bagHomeRow div#bagstart {
+ /*    width:82.8em;  -- currently applied to the element 9x9em width + (9 x 0.1 x 2) padding
+     This should be set within the code.
+     7 x 9em + (7 x0.1 x2) = 64.4em
+ */
+    outline: 2px solid #CCFFEE;
+    background-color: #CCEEEE;
+    color:inherit;
+    font-family: sans-serif;
+    text-align: center;
+    background-position: left;
+    background-repeat: no-repeat;
+    background-image: url(graphics/icons/folder_go.png);
+    
+}
+#bagOptions {
+    /* span showing the options button */
+    float:right;
+    line-height:1.6em;
+    
+}
+#bagHomeRow div#bagstart:hover {
+    outline-color: #999999;
+    background-image: url(graphics/icons/folder_magnify.png);
+}
+
+div[id^="bagS"] div {
+   /*  display: none; */
+/*    width: 100%;*/
+}
+div[id^="bagS"] div span{
+    display: table-cell;
+    width: 9em;
+    padding: 0.1em;
+    outline: 1px solid #CCFFEE;
+    text-align: center;
+    font-family:sans-serif;
+    background-position: left;
+    background-repeat: no-repeat;
+     background-image: url(graphics/icons/folder.png);
+}
+/*div[id^="bagS"] div span.active {
+    border-color:#336655;
+}*/
+
+div[id^="bagS"] div span:hover { /* ANY bag Sublist */
+    outline-color: #999999;
+    outline-width: 2px;
+    padding: 0.1em;
+    background-image: url(graphics/icons/folder_magnify.png);
+}
+
+
+
+#bagS1 span{             
+    background-color: #EEEEEE;
+    color:inherit;
+}
+#bag span.spacer{             
+/*    background-color: #ECE5D7;
+    color:inherit;*/
+    background-image: none;
+}
+
+div#bagS1 span.active {   
+    background-color: #CCCCCC;
+    color:inherit;
+}
+
+#bagS2 span
+{   
+    background-color: #CCCCCC;
+    color:inherit;
+}
+
+/*#bagS2 span.spacer {   
+    background-color: #DDDDDD;
+    color:inherit;
+}*/
+div#bagS2 span.active {             
+    background-color: #AAAAAA;
+    color:inherit;
+}
+
+#bagS3 span {             
+    background-color: #AAAAAA;
+    color:inherit;
+}
+/*#bagS3 span.spacer{             
+    background-color: #BBBBBB;
+    color:inherit;
+}*/
+div#bagS3 span.active{             
+    background-color: #888888;
+    color:white; /*background is getting dark, so lighten the text*/
+}
+#bagS4 span {
+    background-color: #888888;
+    color:white; /*bg is getting dark, so lighten the text*/
+}
+/*#bagS4 span.spacer{             
+background-color: #999999;
+color:inherit;
+}*/
+
+
+#bagNav span.active { 
+    color: blue;
+    background-color:inherit;
+    background-image: url(graphics/icons/folder_go.png);
+    
+}
+
+#templateItems div span {
+    float:left;
+    font-family:sans-serif;
+    margin-bottom:3px;
+    margin-right:4px;
+    outline-color:#ECE5D7;
+    outline-style:solid;
+    outline-width:1px;
+    padding:2px;
+    text-align:center;
+    vertical-align:middle;
+    width:20.8em;
+}
+
+#templateItems div span:hover {
+    outline-color: #999999;
+    outline-width: 2px;
+   
+}
+#templateItems div span.active {
+    outline-color: #00AAFF;
+    font-weight: bold;
+    color: blue;
+    background-color:#CEDDA2;
+}
+#templateItems div { 
+    /* display:none; */
+}
+#templateItems, #templateItemsHeader {
+/*     height:100%; */
+    display:block;
+/*    border-bottom:4px groove #CCCCCC;*/
+    padding: 0.2em;
+}
+#templateItems {
+    border-top:4px groove #CCCCCC;
+    margin-top:2px;
+}
+
+#templateItems span {
+    background-position: center left;
+    background-repeat:no-repeat;
+}
+
+
+#templateItems #templateItems span.odt{
+    background-image:url(graphics/Galaxy_OOo3_writer-doc_16.png);
+    background-color:#5FA1FF;
+    color:inherit;
+}
+
+#youAreHere .ods {color: #5DC841; background-color:inherit;}
+#templateItems span.ods{
+    background-image:url(graphics/Galaxy_OOo3_calc-doc_16.png);
+    background-color: #5DC841;
+    color:inherit;
+}
+#youAreHere .docx {color: #99FFFF; background-color:inherit;}
+#templateItems span.docx{
+    background-image:url(graphics/docx.jpg);
+    background-color: #99FFFF;
+    color:inherit;
+}
+#youAreHere .xql {color: orange; background-color:inherit;}
+#templateItems span.xql{
+    background-color: orange;
+    color:inherit;
+}
+
+#youAreHere .txt {color: white;}
+#templateItems span.txt{
+    background-color: wheat;
+    background-image: url(graphics/icons/page_white_text.png);
+    color: black;
+}
+
+#templateItems span.irrelevant {
+	background-color:#DDDDDD;
+	color:#AAAAAA;
+}

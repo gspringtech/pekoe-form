@@ -1,0 +1,209 @@
+.form-controls {
+    padding-top: 5px;
+    background-color: #CEDDA2;
+    color:inherit;
+    margin-top:4px;
+    border: 2px solid #CCCCCC;
+}
+.form-controls>div {
+    background-color:inherit;
+}
+div>form>fieldset>fieldset>legend, div>form>fieldset>label {
+    color:black;
+    background-color:inherit;
+}
+
+fieldset.hidden-fieldset-children > *:nth-child(n+3) { display: none; }
+fieldset.hidden-fieldset-children > legend span.btn  { display: none; }
+
+
+fieldset {
+    clear: both;
+    color:black;
+    background-color:#CEDDA2;
+    padding-bottom: 2px;
+    padding-right: 2px;
+    border-bottom: 1px solid black;
+    border-left: 1px solid black;
+    margin-bottom: 5px;
+}
+
+fieldset fieldset {
+    color:inherit;
+    background-color:#CEDDBB;
+}
+
+fieldset fieldset fieldset {
+    color:inherit;
+    background-color:#BCD4B8;
+}
+fieldset fieldset fieldset fieldset {
+    color: inherit;
+    background-color: #96C28E;
+}
+fieldset fieldset fieldset fieldset fieldset {
+    color: inherit;
+    background-color: #85B37C;
+}
+fieldset fieldset fieldset fieldset fieldset fieldset {
+    color: inherit;
+    background-color: #0AC28E;
+}
+fieldset fieldset fieldset fieldset fieldset fieldset fieldset {
+    color: inherit;
+    background-color: #0BC28E;
+}
+form legend {
+/*    color:black;
+    background-color: red;*/
+}
+
+.count-0 {
+/*    color: black;
+    background-color: yellow;*/
+}
+.count-1 {
+/*color: black;
+background-color:white;*/
+}
+
+
+
+span.disabled-text-input {
+ border: 1px inset black;
+ padding: 1px;
+}
+
+.new-field{ 
+    
+    border:red dashed 2px !important; 
+}
+.default-field {
+     color:inherit;
+     background-color:#CFC8BA;
+ }
+ .default-field fieldset {
+     color:inherit;
+     background-color:inherit;
+ }
+ 
+legend {color:blue; 
+background-color:inherit;
+}
+.date-stamp { 
+    margin-left: 1em; 
+    margin-right: 0.5em;
+/*    font-size: 75%; */
+    color: #336600;
+    background-color:inherit;
+}
+
+
+
+.form-controls label, .form-controls span.label{
+float: left;
+border: 1px solid #999;
+margin: 0 15px 5px 0;
+}
+label:first-letter, span:first-letter { 
+text-transform:uppercase;
+}
+fieldset.copyFrom {
+    border-color:blue;
+
+}
+legend {
+    border: 1px solid #999999;
+    padding:3px;
+    text-transform:uppercase;
+    margin-top: 10px;
+    
+    
+}
+legend span {
+padding-left: 3px;
+padding-right: 3px;
+}
+legend span.btn {
+   color:inherit;
+/*   background-color:#DC6F30;*/
+   border:1px solid #BB573D;
+   margin-right:2px;
+
+}
+legend:hover {
+    border: 1px solid red;
+    background-color: #FFF2D4;
+    color: inherit;
+    cursor: pointer;
+}  
+fieldset.hovered {background-color: #FFFF00; border: 1px solid red;}
+
+span.btn:hover {
+    border: 1px solid red;
+    background-color: #91131C;
+    color: white;
+    cursor: pointer;
+} 
+
+/*  I'd like a method for affecting a parent element. 
+I want the fieldset to highlight when hovering over the legend. */
+
+
+div[onclick] {
+ cursor:pointer;
+}
+:focus {
+	/*outline: 1px dotted gray; */
+}
+div.read-only {
+    background-color: white;
+    color: inherit;
+    font-family: serif;
+    
+}
+.dt-stamp {
+    color: blue;
+    background-color:white;
+    font-family: sans-serif;
+    padding-right: 1em;
+}
+.tool-icon {
+    vertical-align:bottom;
+}
+.rt-box {
+	background-color: #CCCCCD;
+	margin-bottom: 5px;
+	margin-right: 5px;
+	float: right; 
+	width: 50%;
+}
+.rt-box label {
+	background-image: url(graphics/icons/application_edit.png);
+	background-color: #99AABB;
+	background-repeat: no-repeat;
+	background-position:  left center;
+	padding-left: 18px;
+}
+.rt-box label:hover {
+	background-color: #BB99AA;
+}
+.rt-box div {
+	margin-top: 24px;
+}
+.rt-box textarea { width: 100%; }
+
+.fragment-autocompleter, .autocompleter {
+	background-image: url(graphics/icons/arrow_down.png);
+	background-position: right center;
+	background-repeat: no-repeat;
+}
+.item-description {
+    font-size: smaller;
+    color:brown;
+/*    line-height:1.1em;*/
+}
+.ui-menu-item {
+    font-size: smaller;
+    line-height: 1.1;
+}
