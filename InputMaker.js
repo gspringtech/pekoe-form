@@ -140,7 +140,7 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 		return; 
 	}
 	var $inp = jQuery($fieldDef.find("input")[0]); // INSTANCE - NO This is NOT an instance - this is a SPEC item
-	var options = optionManager($inp.find("options").text()); // INSTANCE -
+	var options = optionManager($fieldDef.find("options").text());
 	var $enhancement = $inp.find("enhancement");
 	var isEnhanced = $enhancement.length > 0 && $enhancement.text() !== "";
 
@@ -421,7 +421,18 @@ This _could_ be an accessor:
 			.click(function () {
 				mergerUtilities.replicateElement(pekoeNode,formEl);
 			}).appendTo(formEl);
-	}
+	} else if (options.has("field-choice")) {
+		  jQuery("<img src='css/graphics/icons/delete.png' class='tool-icon' />")
+			  .click(function () {
+				  if (confirm("Do you want to delete this element?")) {
+					  jQuery(formEl).hide('slow',function () {
+						  jQuery(formEl).trigger("dirty").remove();
+						  //TODO  this shouldn't be a straight remove - it should be a "field-choice" added back here.
+						  jQuery(pekoeNode).remove();
+					  });
+				  }
+			  }).appendTo(formEl);
+	  }
 	
 	if (pekoeNode.nw) {jQuery(formEl).addClass('new-field');} // .nw added by displayTemplateContent if the field or fs is not in the tree. 
 	if (pekoeNode.defaultField) {jQuery(formEl).addClass('default-field');}
@@ -730,7 +741,6 @@ jQuery("#jw").wysiwyg({"initialContent":content});
 	function fieldChoiceInput(  ) {
 		formEl = document.createElement("label");
 		formEl.textContent = makeLabelText(pekoeNode);
-		//showDS(formEl,pekoeNode);
 		formEl.appendChild(document.createElement("br"));
 		var select = document.createElement("select");
 		var uniqueName =  $fieldDef.attr("path") + "-" + gs.Pekoe.nodeId;
@@ -743,20 +753,12 @@ jQuery("#jw").wysiwyg({"initialContent":content});
 				return;
 			}
 			console.log('wish to replace ',pekoeNode.nodeName, 'with', e.target.value);
-			// This is close, but not correct.
-			// It adds a field, but doesn't enhance or display it and there's no ph definition.
-			// What I must do is compare to the pekoeForm "display" method - which adds an element and sets it up completely.
-			// an alternative (for the short term) is to add the element and then refresh the page !!!!!!!!!!!
-			// look it up!
-			// is it a fragment or a simple field? The schema isn't telling me.
 			var pkn = pekoeNode;
 			var od = pkn.ownerDocument;
 			var newNodeName = e.target.value;
-			//var nn = od.createElement(e.target.value);
-			// Now work out what the field definition is and add it to the ph attribute.
+			e.target.value = ""; // reset
 
 
-			//nn.ph = ???
 			var de = od.documentElement;
 			var myPath = function(n) {
 				if (n === de) { return '/' + n.nodeName; }
@@ -768,6 +770,9 @@ jQuery("#jw").wysiwyg({"initialContent":content});
 			console.log('looking for path ',path);
 			var schema = gs.schemas[doctype];
 			var field = schema.getFieldDefByPath(path);
+			// now - check the options to see whether to replace this choice-element, or insert-before.
+			// I have created the delete buttons - just need to work out how to replace the field with _this_ field-choice again.
+			console.log('REPLACE CHOICE?',options.has('only-one-of'));
 			var fragment = schema.getTemplateFragment('/fragments/' + newNodeName);
 			if (fragment) { // if there is a fragment for this, then use it.
 				console.log('Do Fragment',fragment);
@@ -781,13 +786,14 @@ jQuery("#jw").wysiwyg({"initialContent":content});
 				jQuery(newFS).hide();
 
 				var parentN = formEl.parentNode;
-				parentN.appendChild(newFS);
+				var parentN = formEl.parentNode.insertBefore(newFS,formEl);
+				//parentN.appendChild(newFS);
 
 				//applyEnhancements(newFS);
 				jQuery(newFS).show('slow');
 
 			} else if (field !== "") {
-				var nn = od.createElement(e.target.value);
+				var nn = od.createElement(newNodeName);
 				pkn.parentNode.insertBefore(nn,pkn);
 				nn.ph = field;
 				// make a simple input

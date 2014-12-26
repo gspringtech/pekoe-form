@@ -60,16 +60,20 @@ gs.Pekoe.merger.Utility = function () {
 				if (this.fieldDefsByPath[f]) { 
 					return this.fieldDefsByPath[f]; 
 				} else {
-					var pathParts = f.split("/");
+					var pathParts = f.split("/"); //",schema,field,input,list"
 //					pathParts.splice(0,2); // changes original array
 					var last_two_steps = pathParts.slice(-2); // doesn't change original array
-					
+					// this doesn't allow a fragment to be a single step.
 					var fragmentName = last_two_steps.join("/");
 
  					
 					if (this.fieldDefsByPath[fragmentName]) { 
 						return this.fieldDefsByPath[fragmentName];
-					} else {
+					} else if (this.fieldDefsByPath[last_two_steps[1]]) {
+						console.log("found single-step field",last_two_steps[1]);
+						return this.fieldDefsByPath[last_two_steps[1]];
+					}
+					else{
 						console.warn("ad-hoc field:",fragmentName);
 						return jQuery(gs.defaultField).attr("path",f).attr("default",true).get(0);
 					}
@@ -248,7 +252,7 @@ mergerUtils.replicateElement = function (pkn, formEl) {
 		} else {
 			parentN.appendChild(newFS);
 		}	
-		jQuery(el).show('slow');
+		jQuery(el).show('slow').find('input').focus();
         // now need to check if there are any enhancements.
         // problem with the
 		if (jQuery(el).find('input').is('.autocompleter')) { jQuery(el).find('input').pekoeLookup(); } // any other enhancements that should be applied?
@@ -416,7 +420,7 @@ function duplicate(source, dest) {
 
 mergerUtils.addMeInTheRightPartOfTheTree = addMeInTheRightPartOfTheTree;
     /*
-
+	OUT OF DATE
      gs.schemas["schema"].fragmentsTree.firstChild
      <fragments> NOTE that copy from console doesn't include all of the xml ...
          <field path="" fieldType="">
@@ -632,7 +636,6 @@ mergerUtils.loadSchema = function (doctype) {
  // this SHOULD be a server-side function - performed when the schema is updated - or on request with caching.
 
  	
-		var isFragment = /^[^///].+/; // we only want the fragments (a field with path not beginning with '/')
 		var $schema = jQuery(data);  // no longer E4X.
 		thisSchema.schema = $schema;
 			
@@ -650,8 +653,9 @@ mergerUtils.loadSchema = function (doctype) {
 				<event></event>
 			</events>
 		 */
-	 // NOTE. both fields and fragment-refs can be Absolute or Relative paths. A Relative path indicates that the element is a "fragment"
-		$schema // now process each full field to make the sampleTree
+	 	// NOTE. both fields and fragment-refs can be Absolute or Relative paths. A Relative path indicates that the element is a "fragment"
+	 	// now process each full field (absolute path) to make the sampleTree
+		$schema
 			.find("field,fragment-ref")
 			.filter(function () { return jQuery(this).attr("path").indexOf("/") === 0; }) // these are absolute paths
 			.each(function () {
@@ -686,8 +690,9 @@ mergerUtils.loadSchema = function (doctype) {
 				</event>
 			</fragments>
 		 */
-			
-		$schema // now process only fragment Fields
+	 var isFragment = /^[^///].+\/.+/; // the string does not begin with a /  BUT DOES CONTAIN A / - which means a relative path - a "fragment"
+
+	 $schema // now process only fragment Fields
 			.find("field,fragment-ref")
 			.filter(function () { return isFragment.test(jQuery(this).attr("path")); }) 
 			.each(function () {
@@ -698,19 +703,26 @@ mergerUtils.loadSchema = function (doctype) {
 				if (defaultValue.length === 1) { 
 					dV = jQuery(defaultValue.get(0)).text();
 				}
-//				p.isFragment = true;
 				var selectStmt =  "/fragments/"  + $p.attr("path");
+			    // before adding the fragment to the fragments tree, check to see if it is a fragment reference. (But wouldn't it be a fragment-ref?)
+			 // I am suspicious of this bit...
 				var child = thisSchema.getTemplateFragment(selectStmt);
 				if ((child.nodeType == Node.DOCUMENT_FRAGMENT_NODE)|| (child.nodeType == Node.ELEMENT_NODE)) { // why would it be a document_fragment ???
+					console.log('got TemplateFragment of',selectStmt);
 					// if there is a child, then it will replace the leaf on this path
 					selectStmt = selectStmt.split("/");
 					selectStmt.pop();// if we're going to append a child-fragment, then remove the leaf node name from the path
 					selectStmt = selectStmt.join("/"); 
 					child = child.cloneNode(true);
 				} 
-				
+				console.log('construct tree for',selectStmt);
+			 // I don't want to add input/list to input. I just want a definition for it.
+			 	if ($p.find("options").text().indexOf("field-choice") >=0) {
+					console.warn("FIELD CHOICE FOR ",selectStmt);
+					return;
+				}
 				var theNode = constructTreeFromPaths(thisSchema.fragmentsTree,selectStmt,child);
-				if (dV) {
+				if (dV) { // default value
 					jQuery(theNode).text(dV);
 				}
 		});

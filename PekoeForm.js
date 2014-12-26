@@ -238,7 +238,7 @@ getData : function () {
         var fieldpath = $item.attr("path"); // ...  to a field like /txo/property/address or /schema/field-or-fragmentRef
         var field = fieldpath.split('?')[0]; // strip off params ?output=address-on-one-line
         if (field === "") { // this should never happen. The Link IS the path
-            console.warn("Can't process link without path");
+            console.warn("Can't process link without path",key,item);
             return;
         }
         var fieldDefinition = that.schema.getFieldDefByPath(field); // will automatically return a basic input if no schema definition exists
@@ -527,9 +527,11 @@ gs.Pekoe.fragmentNodeForm = function () {
 		jQuery('<select name="frag"><option>-</option><option>Frag1</option><option>Frag2</option></select>').appendTo(formEl);
 		return formEl[0];
 	}
-	var isRepeating = jQuery(fragmentNode.ph).find("input options:contains('repeating')").length > 0;
-	var hideEmpty = jQuery(fragmentNode.ph).find("input options:contains('initially-closed')").length > 0;
-	var pathToHere = gs.Utility.getElementTreeXPath(fragmentNode);
+    var options = jQuery(fragmentNode.ph).find("options").text();
+	var isRepeating = options.indexOf("repeating") !== -1; //jQuery(fragmentNode.ph).find("options:contains('repeating')").length > 0;
+	var hideEmpty = options.indexOf("initially-closed") !== -1; //jQuery(fragmentNode.ph).find("options:contains('initially-closed')").length > 0;
+    var fieldChoice = options.indexOf("field-choice") !== -1;
+    var pathToHere = gs.Utility.getElementTreeXPath(fragmentNode);
 	var re = /\[[\d]+\]$/; // match the position filter (e.g. "[2]") at the end of the path.  
 	var t = (isRepeating) ? pathToHere : pathToHere.replace(re,""); // remove it if this is a non-repeating field (for the title attribute)
 	var fieldIndex = re.exec(t) || ""; // get that position filter and use it after the nodename as the text of the legend...
@@ -590,11 +592,16 @@ gs.Pekoe.fragmentNodeForm = function () {
 			.attr("title", "Copy values from this '" + fragmentNode.nodeName +"'")
 			.click(function () {gs.Pekoe.GlobalCopy.copyMe(legend[0]);})
 			.appendTo(legend);			
-	}
+	} else if (fieldChoice) {
+        jQuery("<span class='btn'><img src='css/graphics/icons/delete.png' class='tool-icon' /></span>")
+            .attr("title", "Delete this '" + fragmentNode.nodeName +"'")
+            .click(function () {gs.Pekoe.merger.Utility.deleteMe(formEl[0]);})
+            .appendTo(legend);
+    }
 
 	// Does this fragment have a lookup script?
 	// Maybe it has more than one? Is that useful? 
-	// if so, then merger-utils.applyenhancements will be used
+	// if so, then merger-utils.apply enhancements will be used
 	var $lookup = (jQuery(fragmentNode.ph).find("input").attr("source") == "lookup") ? jQuery(fragmentNode.ph).find("input lookup") : null;
 	if ($lookup !== null) {
 		formEl.addClass("fragment-lookup");
