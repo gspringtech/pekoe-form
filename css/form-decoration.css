@@ -105,6 +105,11 @@ float: left;
 border: 1px solid #999;
 margin: 0 15px 5px 0;
 }
+span.label.repeating {
+    clear:left;
+    float:none;
+    display:block;
+}
 label:first-letter, span:first-letter { 
 text-transform:uppercase;
 }

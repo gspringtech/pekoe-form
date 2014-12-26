@@ -201,7 +201,6 @@ gs.Pekoe.BureauAG.prototype = { // christ its a fucking prototype based thing. B
 		if (template && template.contains('/templates')) {
 			jQuery("#templateItems .active").removeClass("active");
 			jQuery("#templateItems div").hide();
-//			console.log("SHOW BAG TEMPLATE: ",jQuery("#templateItems [title='"+template+"']").show().addClass("active").parent().show());
 			jQuery("#bagNav div").hide();
 			jQuery('#bagNav [title=templateRoot]').show().parent().show(); // because otherwise they will remain hidden
 
@@ -212,7 +211,7 @@ gs.Pekoe.BureauAG.prototype = { // christ its a fucking prototype based thing. B
 			    var p = pathParts.join("/");
 			    jQuery("#bag span[title='" + p + "']").addClass('active').parent().show().parent().show();
 			}
-			jQuery("#templateItems").find('span[title="' + template + '"]').parent().show();
+			jQuery("#templateItems").find('span[title="' + template + '"]').click().parent().show();
 		} else {console.warn('bad template path',template);}
 	},
 	
@@ -227,6 +226,5 @@ gs.Pekoe.BureauAG.prototype = { // christ its a fucking prototype based thing. B
 		// find the first span having class doctype, call reveal for its template, then show it.
 		var f = jQuery("#templateItems").find('span.' + doctype).first();
 		this.reveal(f.attr('title'));
-		//f.parent().show();
 	}
 };

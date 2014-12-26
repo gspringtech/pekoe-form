@@ -61,7 +61,6 @@
 
             gs.service = (function (){
                 var s = {};
-
                 if (window.parent !== window) { // must be a child frame
                     s = window.parent.AuthService;
                 } else {
@@ -69,13 +68,9 @@
                         return document.cookie;
                     }
                 }
-                // console.log('service is',s);
-                // who uses it?
                 return s;
-
-
-
             })();
+
             var bagLoaded = new $.Deferred();
             var templateSelector = new gs.Pekoe.BureauAG("#bagNav");
             gs.bag = templateSelector;
@@ -92,7 +87,6 @@
 
             var panel = $("<div></div>").attr("id","formDiv").appendTo('#workarea');
             var args = gs.Utility.getArgs();
-//            console.log('GOT ARGS:',args);
             panel.pekoeForm({bag:bagLoaded}).pekoeForm("setFile",gs.Pekoe.pekoeFile({"href":args.job}));
 
             window.pekoeClose = function () { // See TabsService.

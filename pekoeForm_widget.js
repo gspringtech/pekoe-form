@@ -171,7 +171,8 @@
 			$.when(f.req, this.options.bag).then(function () {
 				var doctype = f.getDoctype();
 				gs.bag.filter(doctype);
-				var previousTemplate;
+				// I need to store the template title and then use it to select the span and activate ti
+				var previousTemplate; 	// TODO save the previousTemplate as a cookie
 				if (previousTemplate) {
 
 				} else {
