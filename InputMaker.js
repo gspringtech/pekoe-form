@@ -421,18 +421,7 @@ This _could_ be an accessor:
 			.click(function () {
 				mergerUtilities.replicateElement(pekoeNode,formEl);
 			}).appendTo(formEl);
-	} else if (options.has("field-choice")) {
-		  jQuery("<img src='css/graphics/icons/delete.png' class='tool-icon' />")
-			  .click(function () {
-				  if (confirm("Do you want to delete this element?")) {
-					  jQuery(formEl).hide('slow',function () {
-						  jQuery(formEl).trigger("dirty").remove();
-						  //TODO  this shouldn't be a straight remove - it should be a "field-choice" added back here.
-						  jQuery(pekoeNode).remove();
-					  });
-				  }
-			  }).appendTo(formEl);
-	  }
+	}
 	
 	if (pekoeNode.nw) {jQuery(formEl).addClass('new-field');} // .nw added by displayTemplateContent if the field or fs is not in the tree. 
 	if (pekoeNode.defaultField) {jQuery(formEl).addClass('default-field');}
@@ -775,7 +764,7 @@ jQuery("#jw").wysiwyg({"initialContent":content});
 			console.log('REPLACE CHOICE?',options.has('only-one-of'));
 			var fragment = schema.getTemplateFragment('/fragments/' + newNodeName);
 			if (fragment) { // if there is a fragment for this, then use it.
-				console.log('Do Fragment',fragment);
+
 				var nn = od.importNode(fragment,true);
 				pkn.parentNode.insertBefore(nn,pkn);
 				nn.ph = field;
@@ -783,6 +772,31 @@ jQuery("#jw").wysiwyg({"initialContent":content});
 				gs.Pekoe.merger.Utility.enhanceSubtree(schema, nn, newNodeName);
 				nn.toForm = gs.Pekoe.fragmentNodeForm;
 				var newFS = nn.toForm();
+				// if options only-one-of then the select must go away.
+				// my naming is wrong.
+				// the options are
+				// a sequence optionally containing...
+				// only-one-of-these-options
+				// as many as you like
+				// now the 'as many' option is easy because we simply enable the field to have a plus button
+				// so the field itself is repeating.
+				// the one-of-these option means removing the SELECT
+				// somehow, I think that the OPTION should be removed or disabled. but I'm not sure WHEN or WHY or how to SAY IT.
+				if (options.has("only-one-of")) {
+					console.log('ONLY ONE OF FOR THIS ELEMENT',path);
+					jQuery("<img src='css/graphics/icons/delete.png' class='tool-icon' />")
+						.click(function () {
+							if (confirm("Do you want to delete this element?")) {
+								jQuery(newFS).hide('slow',function () {
+									jQuery(newFS).trigger("dirty").remove();
+									//TODO  this shouldn't be a straight remove - it should be a "field-choice" added back here.
+									// only problem is - I don't know which 'field-choice' it is.
+									// now it's getting complicated.
+									jQuery(nn).remove();
+								});
+							}
+						}).appendTo(newFS);
+				}
 				jQuery(newFS).hide();
 
 				var parentN = formEl.parentNode;

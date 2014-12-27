@@ -715,7 +715,7 @@ mergerUtils.loadSchema = function (doctype) {
 					selectStmt = selectStmt.join("/"); 
 					child = child.cloneNode(true);
 				} 
-				console.log('construct tree for',selectStmt);
+				//console.log('construct tree for',selectStmt);
 			 // I don't want to add input/list to input. I just want a definition for it.
 			 	if ($p.find("options").text().indexOf("field-choice") >=0) {
 					console.warn("FIELD CHOICE FOR ",selectStmt);

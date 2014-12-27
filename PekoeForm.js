@@ -203,7 +203,6 @@ getData : function () {
 // bad name. This is more about constructing a tree and creating pekoeNodes
 
     display : function (markers) {
-//	displayTemplateContent : function () {
 	// 1) create the NEW Tree. (Any fields referenced by the placeholders that 
 	//	are not already in the tree will be added)
 	// 2) for each of the fields of interest, attach INPUT behaviour info
@@ -247,73 +246,98 @@ getData : function () {
             return;
         }
         // capture the node definition for later use. // but WHY add it to another list? we already have a list
+
         fields[field] = fieldDefinition; // will be defined once for unique field
+        var $el = $(fieldDefinition);
+        console.log('fieldDevi',fieldDefinition);
+        var fieldChoice = $el.find('input').attr('type') === 'field-choice';
+        if (fieldChoice) {
+            var optionalFields = $el.find('list').text().trim().split('\n');
+            var pathbase = field.split('/');
+            pathbase.pop();
+            pathbase = pathbase.join('/');
+            console.log('pathbase is',pathbase);
+            for (var i=0; i< optionalFields.length; i++) {
+                var fieldOption = pathbase + '/' + optionalFields[i];
+                var fd = that.schema.getFieldDefByPath(fieldOption);
+                console.log('got fd',fd);
+                if (fd) {
+                    fields[fieldOption] = fd;
+                    fields[fieldOption].optional = true;
+                }
+
+            }
+        }
+
+
+        //console.log(path, "possible elements", possibleElements);
+        // the fields are then path.split('/').pop() + possibleElements[i].join('/');
+        // if the fieldDefinition shows this to be a field-choice element, then
+        // add the optional fields, but mark them as optional.
+        // later, these fields can be handled IFF they are already present.
     });
 
-    for (var field in fields) {
+        // Somewhere here I need to add paths for top-level choice options.
+        // These need to be marked so that I can later say "only render this if it exists in the tree"
+        /*
+
+         // Maybe this is where I check for the field-choice elements.
+         var fieldChoice = $el.find('input').attr('type') === 'field-choice';
+         var possibleElements = fieldChoice? $el.find('list').text().trim().split('\n') : []; // [field, fragment-ref]
+
+         console.log(path, "possible elements", possibleElements);
+         // the fields are then path.split('/').pop() + possibleElements[i].join('/');
+
+         // now that I know the Possible elements, what do I do? Look for them?
+         // If I add them as paths, they'll be rendered as though they were in the template list. I think.
+         // YES. if the fields are added here, they'll be automatically added to the Job - which is what I'm trying to avoid.
+         // Okay - fine. Not the right place maybe to deal with this ?
+         // Also, what about sub-fields like input/source-option (list,lookup,calculation)
+
+         // and remember, that was another option for creating the choice - use a sequence of items in the path
+
+
+         */
+
+    for (var path in fields) { // key is the field path
         atLeastOneDefinedField = true;
-        var path = field;
-        var fieldDefinition = fields[field]; // that.schema.getFieldDefByPath(path); // all the extra info
+        var fieldDefinition = fields[path]; // that.schema.getFieldDefByPath(path); // all the extra info
         var isDefault = jQuery(fieldDefinition).attr("default") === true; //NOTE: these are ad-hoc, non-schema fields.
         // TODO "default" fields are  LOST (I used to have a setting that ensured a field would always be shown, even when it was not needed by the template.   ***************************
 
         var selectStmt = path;
         // this is all about CREATING and PATCHING-UP the tree
 
-        // fix the selectStmt for jQuery (change XPath into CSS-style paths (" > "). Remove @ref.
+        // there is a special case: if the 'field' is of type 'field-choice' then I need to see if any of its element options have been selected.
+        // this is, of course, another nasty hack.
+
+
+        // Fix the path for jQuery (change XPath into CSS-style paths (" > "). Remove @ref.
         // remove leading / replace @ then replace remaining / with " > ".
         var sourcePath = path.replace(/^\//,"").replace(/\/@.*/,"").replace(/\//g," > ");
 
         /*
-        NOTE: I've removed the absolute-path test.
-        is there a fragment for the leaf-node of this path?
-        ((why bother to check when the user has said yes or no!))
-        Why not check in the field-def to see if this is a fragment-reference?
-        This is all dummy checking for schema errors...
 
-        Look for the fragment in the fragments-tree...
-        the path is unnecessarily complicated here. We end up search for /fragments/leaf-node by cutting out the middle.
-        probably would be easier to follow without the "/fragments/" here...
-
-         * How did this work before?
-         * I used to do some automatic fragment referencing - checking the leaf node.
-         * I also used placeholder names to lookup fields - but don't do that any more.
-         * perhaps I should store fragments by name.
-         *
-         * Current problem is that some fragments aren't being recognized. /txo/property/vendor/person is
-         * a defined field - a fragmentRef,
-         * but we're not getting its subfragments. They are there:
-         * fragments-person-address is there as is fragments-address
-         * USE these______________________________________________
+         * USE these for TESTING _________________________________
          * jQuery(gs.schemas["txo"].fragmentsTree).find("person");
          * jQuery(gs.thedocument).find("txo > property > address")
          * _______________________________________________________
-         *
-         * Options:
-         * - Generate the fragments tree (or the whole tree) on the server (when the schema is modified) and
-         * deliver to the client complete.
-         *
-         * Now I'm getting lots of stuff that I didn't ask for.
-         *  WHY do this if it ISN'T a fragment?
-         */
-        // TODO change this. The element in the schema should be 'fragment-ref' instead of 'field'.
-        var $el = jQuery(fieldDefinition);
 
-        //var isFragmentRef = (fieldDefinition && jQuery(fieldDefinition).attr("fieldType") == 'fragmentRef');
-        var elName = fieldDefinition.nodeName;
-        var isFragmentRef = elName === 'fragment-ref';
-        console.log('nodeName',elName, 'for path',path);
+         */
+
+        var $el = jQuery(fieldDefinition);
+        var isFragmentRef = fieldDefinition.nodeName === 'fragment-ref';
         var fragment;
         if (isFragmentRef) {
-            console.log('GOT FRAGMENT-REF',path);
             // **** looking for the leaf of this path under the root of the fragmentsTree ****
             fragment = this.schema.getTemplateFragment("/fragments/" + selectStmt);
+            if (fragment === "") {
+                console.warn("The fragment hasn't been defined for", selectStmt);
+                return;
+            }
         }
 
-        if (isFragmentRef && fragment === "") {
-            console.warn("The fragment hasn't been defined for", selectStmt);
-            return;
-        }
+
 
         var countExistingFields = 0;
         var isAttribute = selectStmt.indexOf("@") > -1;
@@ -337,7 +361,7 @@ getData : function () {
         }
 // 		 	console.log("Looking for field using sourcepath:",sourcePath); // this is the field provided by the ph-links file. (the placeholder-to-field link)
 
-        if (countExistingFields === 0) { // this happens when the field is not found in the document.
+        if (countExistingFields === 0 && !fieldDefinition.optional) { // this happens when the field is not found in the document.
             // This situation occurs when the user chooses a template with MORE DETAIL.
             // Or a template with a non-schema field. (ad-hoc). ad-hoc fields will be "first".
             var child;
@@ -592,11 +616,11 @@ gs.Pekoe.fragmentNodeForm = function () {
 			.attr("title", "Copy values from this '" + fragmentNode.nodeName +"'")
 			.click(function () {gs.Pekoe.GlobalCopy.copyMe(legend[0]);})
 			.appendTo(legend);			
-	} else if (fieldChoice) {
-        jQuery("<span class='btn'><img src='css/graphics/icons/delete.png' class='tool-icon' /></span>")
-            .attr("title", "Delete this '" + fragmentNode.nodeName +"'")
-            .click(function () {gs.Pekoe.merger.Utility.deleteMe(formEl[0]);})
-            .appendTo(legend);
+    //} else if (fieldChoice) {
+    //    jQuery("<span class='btn'><img src='css/graphics/icons/delete.png' class='tool-icon' /></span>")
+    //        .attr("title", "Delete this '" + fragmentNode.nodeName +"'")
+    //        .click(function () {gs.Pekoe.merger.Utility.deleteMe(formEl[0]);})
+    //        .appendTo(legend);
     }
 
 	// Does this fragment have a lookup script?
