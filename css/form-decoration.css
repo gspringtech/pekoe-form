@@ -105,7 +105,7 @@ float: left;
 border: 1px solid #999;
 margin: 0 15px 5px 0;
 }
-span.label.repeating {
+span.repeating {
     clear:left;
     float:none;
     display:block;
@@ -211,4 +211,11 @@ div.read-only {
 .ui-menu-item {
     font-size: smaller;
     line-height: 1.1;
+}
+
+.sortable-placeholder{
+    border: dotted orange 2px;
+    background-color: #e6b900;
+    height: 3em;
+    display:block;
 }

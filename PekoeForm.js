@@ -546,13 +546,14 @@ gs.Pekoe.fragmentNodeForm = function () {
 	var fragmentNode = this;
 	if (fragmentNode.getAttribute("deleted")) return null; // TODO is this used?
 	var formEl = jQuery("<fieldset />"); // this will contain the fields
-	if (jQuery(fragmentNode.ph).attr('optional') === 'yes') {
-		console.log("OPTIONAL field", formEl); 
-		jQuery('<select name="frag"><option>-</option><option>Frag1</option><option>Frag2</option></select>').appendTo(formEl);
-		return formEl[0];
-	}
+	//if (jQuery(fragmentNode.ph).attr('optional') === 'yes') {
+	//	console.log("OPTIONAL field", formEl);
+	//	jQuery('<select name="frag"><option>-</option><option>Frag1</option><option>Frag2</option></select>').appendTo(formEl);
+	//	return formEl[0];
+	//}
     var options = jQuery(fragmentNode.ph).find("options").text();
 	var isRepeating = options.indexOf("repeating") !== -1; //jQuery(fragmentNode.ph).find("options:contains('repeating')").length > 0;
+    if (isRepeating) formEl.addClass('repeating');
 	var hideEmpty = options.indexOf("initially-closed") !== -1; //jQuery(fragmentNode.ph).find("options:contains('initially-closed')").length > 0;
     var fieldChoice = options.indexOf("field-choice") !== -1;
     var pathToHere = gs.Utility.getElementTreeXPath(fragmentNode);
@@ -615,7 +616,8 @@ gs.Pekoe.fragmentNodeForm = function () {
 		jQuery("<span class='btn'><img src='css/graphics/icons/pencil_add.png' class='tool-icon' /></span>")
 			.attr("title", "Copy values from this '" + fragmentNode.nodeName +"'")
 			.click(function () {gs.Pekoe.GlobalCopy.copyMe(legend[0]);})
-			.appendTo(legend);			
+			.appendTo(legend);
+        jQuery("<i class='fa fa-sort pull-right' title='this item can be re-ordered among its peers.'></i>").appendTo(legend);
     //} else if (fieldChoice) {
     //    jQuery("<span class='btn'><img src='css/graphics/icons/delete.png' class='tool-icon' /></span>")
     //        .attr("title", "Delete this '" + fragmentNode.nodeName +"'")
@@ -806,8 +808,10 @@ gs.Pekoe.GlobalCopy = {
 	
 		
 		var copyToFS = leg.parentNode; // the fs 
-	// WHY NOT copy the xml subtree?.
-		// Done well, the same code could be used to copy parts of the tree.
+	    // TODO WHY NOT copy the xml subtree?.
+		// currently, this is trying to copy the field values. It doesn't work correctly.
+        // instead, why not copy the subtree and then replicate?
+        // also, this is not going to be able to copy to another form. (Pekoe v2 could do that because the forms were all in the same Document)
 		if (this.copyFrom != copyToFS) {
 
 			// TODO - rewrite this to copy the XML subtree and then re-render at the destination (this is a Clone operation)

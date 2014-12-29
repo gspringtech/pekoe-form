@@ -417,7 +417,7 @@ This _could_ be an accessor:
 					}
 				}).appendTo(formEl);
 		
-		jQuery("<img src='css/graphics/icons/add.png' class='tool-icon' />")
+		jQuery("<img src='css/graphics/icons/add.png' class='tool-icon add' />")
 			.click(function () {
 				mergerUtilities.replicateElement(pekoeNode,formEl);
 			}).appendTo(formEl);
@@ -434,11 +434,11 @@ This _could_ be an accessor:
         }
 	}
 	
-	function textInput(  ) {
+	function textInput() {
 		var $formEl = jQuery("<span class='label'></span>").text(makeLabelText(pekoeNode));
 		formEl = $formEl.get(0);
 		showDS(formEl,pekoeNode);
-		$formEl.append("<br />");
+		$formEl.append("<br />")
 		
 		var inp = document.createElement("input");
 		inp.setAttribute("type","text");
@@ -446,6 +446,9 @@ This _could_ be an accessor:
 		var uniqueName = pth + "-" + gs.Pekoe.nodeId; // this makes the id unique		
 		if ((options.has('singleUse') === true) && (currentValue()  !== "")) {
 			jQuery(inp).attr("disabled","disabled");
+		}
+		if (options.has("repeating")) {
+			inp.setAttribute('title','shift-enter to add another');
 		}
 		
 		formEl.appendChild(inp);
@@ -487,7 +490,7 @@ This _could_ be an accessor:
 		var uniqueName = $fieldDef.attr("path") + "-" + gs.Pekoe.nodeId; // this makes the id unique
 		var size = $inp.attr("size"); // this check should be performed elsewhere and should apply to all field types.
 		
-		var $i = jQuery("<input type='text' />")
+		var $i = jQuery("<input type='date' />")
 			.attr("id",uniqueName)
 			.attr("name",uniqueName)
 			.attr("size", size || "10")

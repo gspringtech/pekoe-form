@@ -198,7 +198,7 @@ gs.Pekoe.BureauAG.prototype = { // christ its a fucking prototype based thing. B
 	reveal : function(template) {
 		// get the templateItems div
 		// TODO - this doesn't show the templates. Why not?
-		if (template && template.contains('/templates')) {
+		if (template && template.indexOf('/templates') > -1) {
 			jQuery("#templateItems .active").removeClass("active");
 			jQuery("#templateItems div").hide();
 			jQuery("#bagNav div").hide();
