@@ -628,8 +628,9 @@ gs.Pekoe.fragmentNodeForm = function () {
 	// Does this fragment have a lookup script?
 	// Maybe it has more than one? Is that useful? 
 	// if so, then merger-utils.apply enhancements will be used
-	var $lookup = (jQuery(fragmentNode.ph).find("input").attr("source") == "lookup") ? jQuery(fragmentNode.ph).find("input lookup") : null;
+	var $lookup = (jQuery(fragmentNode.ph).find("lookup").length > 0) ? jQuery(fragmentNode.ph).find("lookup") : null;
 	if ($lookup !== null) {
+        console.log('got lookup',fragmentNode);
 		formEl.addClass("fragment-lookup");
 	}
 //		var $help = jQuery(this.ph).find("input help");

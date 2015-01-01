@@ -356,7 +356,7 @@ This _could_ be an accessor:
 	// -------------- Add the replicator to the form-element's label if fieldDef.replicate is true
 
 
-	if ($inp.attr("source") == "calculation") {
+	if ($inp.find("calculation").length > 0) {
 		// this should be called in response to a trigger - rather than a click
         // perhaps a "listen to" field - like Applies To
 		var $updateButton = jQuery("<img src='css/graphics/icons/cog.png' />").click(updateCalculation);
@@ -470,7 +470,7 @@ This _could_ be an accessor:
 		}
 		inp.setAttribute("value",currentValue());
 
-		if ($inp.attr("source") === "lookup") {
+		if ($inp.find("lookup").length > 0) {
             if (isAttribute) console.log('applying autocompleter to ATTRIBUTE',pekoeNodeName);
             jQuery(inp).addClass("autocompleter");
         }
