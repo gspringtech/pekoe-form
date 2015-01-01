@@ -96,7 +96,7 @@
 	
 	var _prepareAjaxPath = function (path) {
 		var p = path || "";
-		return "/exist/pekoe-files" + p; // any other testing needed here?
+		return "/exist/pekoe-files/" + p; // any other testing needed here?
 	};
 	
 	var _processAjaxResponse = function (xmlData) {
@@ -206,7 +206,7 @@
 
 			/*
 			 field (@path)
-			 field/input @source = lookup | calculation | list; // ... this is where I need optional fragments 
+			 field/input @source = lookup | calculation | list; // ... this is where I need optional fragments
 			 field/input/lookup 
 			 	@type = xquery | javascript | url-params; 
 			 	@one-shot = 1 | 0 (ajax request once only); 
