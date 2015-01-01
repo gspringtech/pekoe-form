@@ -398,7 +398,7 @@ This _could_ be an accessor:
 	// working on the assumption that the only deletable fields are repeating. (but the input checkbox doesn't indicate this) 
 	// the key issue with "deletable" is that there must be one item left 
 	// TODO if "singleUse" then it shouldn't be deletable after being saved.
-	  if (options.has('repeating') && !isAttribute) { // Can't replicate an Attribute.
+ 	 if (options.has('repeating') && !isAttribute) { // Can't replicate an Attribute.
 	  	jQuery(formEl).addClass("repeating");
 	  	// Sortable??? - Would require these elements to be within a container.
 	  	// At the same time, change the appearance so they're in a vertical list, and hide the LABEL on all but the first.
@@ -421,6 +421,22 @@ This _could_ be an accessor:
 			.click(function () {
 				mergerUtilities.replicateElement(pekoeNode,formEl);
 			}).appendTo(formEl);
+	} else if (options.has('deletable') && !options.has('singleUse')) {
+
+		 jQuery("<img src='css/graphics/icons/delete.png' class='tool-icon' />")
+			 .click(function () {
+				 if (confirm("Do you want to delete this element?")) {
+					 jQuery(formEl).hide('slow',function () {
+						 jQuery(formEl).trigger("dirty").remove();
+						 //TODO  this shouldn't be a straight remove - it should be a "field-choice" added back here.
+						 // only problem is - I don't know which 'field-choice' it is.
+						 // now it's getting complicated.
+						 jQuery(pekoeNode).remove();
+					 });
+				 }
+			 }).appendTo(formEl);
+
+
 	}
 	
 	if (pekoeNode.nw) {jQuery(formEl).addClass('new-field');} // .nw added by displayTemplateContent if the field or fs is not in the tree. 
@@ -832,60 +848,7 @@ jQuery("#jw").wysiwyg({"initialContent":content});
 			else  {
 				console.warn('Neither field nor fragment for',path);
 				return;
-				//var fragment = schema.getTemplateFragment("/fragments/" + nn.nodeName);
-				//if (fragment) {
-				//	nn.ph = fragment;
-				//	// make a fragment
-				//	enhanceSubtree(schema, nn, nn.nodeName);
-				//	nn.toForm = gs.Pekoe.fragmentNodeForm;
-                //
-				//} else {
-				//
-				//}
-
 			}
-
-			//if (pkn.ph) {
-			//	newNode.ph = pkn.ph; // copy the placeholder info
-			//	if (jQuery(newNode.ph).attr("fieldType") == "fragmentRef") {
-			//		newNode.toForm = gs.Pekoe.fragmentNodeForm;
-			//
-			//	} else {
-			//		newNode.toForm = gs.Pekoe.pekoeNodeForm;
-			//	}
-			//}
-
-
-			//if (field == "") {console.warn("No field found for stopping"); return;}
-
-			//newNode = od.importNode(fragment,true);
-			//enhanceSubtree(schema,newNode, pkn.nodeName);
-			//if (pkn.ph) {
-			//	newNode.ph = pkn.ph; // copy the placeholder info
-			//	if (jQuery(newNode.ph).attr("fieldType") == "fragmentRef") {
-			//		newNode.toForm = gs.Pekoe.fragmentNodeForm;
-            //
-			//	} else {
-			//		newNode.toForm = gs.Pekoe.pekoeNodeForm;
-			//	}
-			//}
-
-
-
-			//var newFS = document.createDocumentFragment();
-            //console.log('fieldChoiceInput calling InputMaker for',nn.nodeName);
-			//gs.Pekoe.merger.InputMaker(newFS,nn);
-			//// created a fragment - the contents.
-			//var el = newFS.firstChild;
-			//jQuery(el).hide();
-			//// if the element is a repeater, then insert before it. Otherwise replace it.
-			////sib = formEl.nextSibling;
-			//var parentN = formEl.parentNode.insertBefore(newFS,formEl);
-			//jQuery(el).show('slow');
-			// now need to check if there are any enhancements.
-			// problem with the
-			//if (jQuery(el).find('input').is('.autocompleter')) { jQuery(el).find('input').pekoeLookup(); } // any other enhancements that should be applied?
-			//jQuery(el).find('.rte').each(applyRTE);
 		};
 		select.pekoeNode = pekoeNode;
 		formEl.appendChild(select);

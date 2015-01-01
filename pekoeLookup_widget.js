@@ -244,7 +244,7 @@
 					// construct the path and data
 					var queryData = _prepareAjaxDataFn($params, pekoeNode, script, qType)(); // get and call this one-shot to return {_query: ,_howmany: }
 					var fullpath = _prepareAjaxPath(path);
-					console.log("queryData", queryData);
+					//console.log("queryData", queryData);
 					$.ajax({
 						url: fullpath,
 						data: queryData, 

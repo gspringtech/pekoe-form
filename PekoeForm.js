@@ -618,11 +618,11 @@ gs.Pekoe.fragmentNodeForm = function () {
 			.click(function () {gs.Pekoe.GlobalCopy.copyMe(legend[0]);})
 			.appendTo(legend);
         jQuery("<i class='fa fa-sort pull-right' title='this item can be re-ordered among its peers.'></i>").appendTo(legend);
-    //} else if (fieldChoice) {
-    //    jQuery("<span class='btn'><img src='css/graphics/icons/delete.png' class='tool-icon' /></span>")
-    //        .attr("title", "Delete this '" + fragmentNode.nodeName +"'")
-    //        .click(function () {gs.Pekoe.merger.Utility.deleteMe(formEl[0]);})
-    //        .appendTo(legend);
+    } else if (fieldChoice) {
+        jQuery("<span class='btn'><img src='css/graphics/icons/delete.png' class='tool-icon' /></span>")
+            .attr("title", "Delete this '" + fragmentNode.nodeName +"'")
+            .click(function () {gs.Pekoe.merger.Utility.deleteMe(formEl[0]);})
+            .appendTo(legend);
     }
 
 	// Does this fragment have a lookup script?
