@@ -1,3 +1,17 @@
+/*
+    I should be using sass here.
+    The width calculation is based on the div[id^="bagS"] di span { width: }
+    The number of top-level items is set in bureau-a-gradin.js (currently 10) ($slots)
+    I want the items a little wider than 9em. Make it 10.
+    $slots * width + ($slots * (0.1*2))
+    10 * 10em + (10 * 0.2) = 102em;
+
+    width:82.8em;  -- currently applied to the element 9x9em width + (9 x 0.1 x 2) padding
+    This should be set within the code.
+    7 x 9em + (7 x0.1 x2) = 64.4em
+
+    102em / 5 templates = 20
+*/
 #bag {
     border: 2px solid #CCCCCC;
     position: relative;
@@ -6,8 +20,8 @@
     color:inherit;
     line-height:1.6em;
     overflow:hidden;
-    width: 65em;
-    font-size: 14px;
+    width: 102em;
+    font-size: 12px;
 }
 
 #bagHomeRow { 
@@ -19,10 +33,7 @@
 }
 
 #bagHomeRow div#bagstart {
- /*    width:82.8em;  -- currently applied to the element 9x9em width + (9 x 0.1 x 2) padding
-     This should be set within the code.
-     7 x 9em + (7 x0.1 x2) = 64.4em
- */
+
     outline: 2px solid #CCFFEE;
     background-color: #CCEEEE;
     color:inherit;
@@ -50,7 +61,7 @@ div[id^="bagS"] div {
 }
 div[id^="bagS"] div span{
     display: table-cell;
-    width: 9em;
+    width: 10em;
     padding: 0.1em;
     outline: 1px solid #CCFFEE;
     text-align: center;
@@ -142,7 +153,7 @@ color:inherit;
     padding:2px;
     text-align:center;
     vertical-align:middle;
-    width:20.8em;
+    width:19.4em; /* another trial and error value - should be sass. Divide main width by the number of items across, then reduce a little for padding. 102/5 */
 }
 
 #templateItems div span:hover {
@@ -176,38 +187,33 @@ color:inherit;
 }
 
 
-#templateItems #templateItems span.odt{
+.odt{
     background-image:url(graphics/Galaxy_OOo3_writer-doc_16.png);
     background-color:#5FA1FF;
     color:inherit;
 }
 
-#youAreHere .ods {color: #5DC841; background-color:inherit;}
-#templateItems span.ods{
+.ods{
     background-image:url(graphics/Galaxy_OOo3_calc-doc_16.png);
     background-color: #5DC841;
     color:inherit;
 }
-#youAreHere .docx {color: #99FFFF; background-color:inherit;}
-#templateItems span.docx{
+
+.docx{
     background-image:url(graphics/docx.jpg);
     background-color: #99FFFF;
     color:inherit;
 }
-#youAreHere .xql {color: orange; background-color:inherit;}
-#templateItems span.xql{
-    background-color: orange;
-    color:inherit;
-}
 
-#youAreHere .txt {color: white;}
-#templateItems span.txt{
+
+
+.txt{
     background-color: wheat;
     background-image: url(graphics/icons/page_white_text.png);
     color: black;
 }
 
-#templateItems span.irrelevant {
+.irrelevant {
 	background-color:#DDDDDD;
 	color:#AAAAAA;
 }

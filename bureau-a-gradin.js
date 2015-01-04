@@ -29,7 +29,7 @@ if (!gs.Pekoe.BureauAG) { gs.Pekoe.BureauAG = function (navPanelId) {
 		this.topList = null;
 		this.maxLevel = 0;
 		this.BAGPREFIX = "bagS"; // this must match the CSS div names
-		this.MAXLIST = 7; //gs.Pekoe.Config.get("BAG.MAXLIST");
+		this.MAXLIST = 10; //gs.Pekoe.Config.get("BAG.MAXLIST");
 //		this.observers = gs.Pekoe.Accessories.EventManager();
 }; }
 
