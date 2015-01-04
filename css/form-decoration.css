@@ -47,11 +47,11 @@ fieldset fieldset fieldset fieldset fieldset {
 }
 fieldset fieldset fieldset fieldset fieldset fieldset {
     color: inherit;
-    background-color: #0AC28E;
+    background-color: #74a16b;
 }
 fieldset fieldset fieldset fieldset fieldset fieldset fieldset {
     color: inherit;
-    background-color: #0BC28E;
+    background-color: #68955f;
 }
 form legend {
 /*    color:black;
@@ -105,7 +105,7 @@ float: left;
 border: 1px solid #999;
 margin: 0 15px 5px 0;
 }
-span.repeating {
+.repeating {
     clear:left;
     float:none;
     display:block;
@@ -218,4 +218,8 @@ div.read-only {
     background-color: #e6b900;
     height: 3em;
     display:block;
+}
+
+.field-choice{
+    background-color: orange;
 }

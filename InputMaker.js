@@ -140,6 +140,7 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 		return; 
 	}
 	var $inp = jQuery($fieldDef.find("input")[0]); // INSTANCE - NO This is NOT an instance - this is a SPEC item
+	var defaultValue = $fieldDef.find("defaultValue").text();
 	var options = optionManager($fieldDef.find("options").text());
 	var $enhancement = $inp.find("enhancement");
 	var isEnhanced = $enhancement.length > 0 && $enhancement.text() !== "";
@@ -481,13 +482,13 @@ This _could_ be an accessor:
 				console.log(pekoeNodeName," field too small",discrepancy);
 			}
 		} else {
-			var defaultVal = $inp.attr("defaultValue");
-			currentValue(defaultVal); // ? defaultVal : "";
+			//var defaultVal = $inp.attr("defaultValue");
+			currentValue(defaultValue); // ? defaultVal : "";
 		}
 		inp.setAttribute("value",currentValue());
 
 		if ($inp.find("lookup").length > 0) {
-            if (isAttribute) console.log('applying autocompleter to ATTRIBUTE',pekoeNodeName);
+            if (isAttribute) console.warn('applying autocompleter to ATTRIBUTE',pekoeNodeName);
             jQuery(inp).addClass("autocompleter");
         }
 
@@ -664,12 +665,29 @@ This _could_ be an accessor:
 			formEl.appendChild(inp);
 			inp.setAttribute("name", $fieldDef.attr("path") + "-" + gs.Pekoe.nodeId);
 			inp.setAttribute("id",  "te" + "-" + gs.Pekoe.nodeId);
-		
-			var rows = ($inp.attr("rows") == "")  ? "3" : $inp.attr("rows");
-			var size = ($inp.attr("size") == "") ? "30" : $inp.attr("size");
+			/*
+				Rows and cols. Size is cols. e.g. 60. A line break will possibly happen at 59 chars.
+				For each line, count the chars. Divide by 60. Add to the total. Use this as the number of rows
+			 */
+
+			var rows = ($inp.attr("rows"))  ? $inp.attr("rows") : 3;
+			var size = ($inp.attr("size")) ? $inp.attr("size") : 60;
+			var currentText = currentValue();
+
+
+			inp.textContent = currentText; // this has been extracted from the existing node or the default value
+			if (currentText.length > 0) {
+				var lc = 0;
+				var lines = currentText.split('\r');
+				for (var i = 0; i < lines.length; i++) {
+					lc += Math.ceil(lines[i].length / size);
+				}
+			}
+
+			console.log('size',size,'rows',rows,'lc',lc);
+			if (!rows || lc > rows) { rows = lc;}
 			inp.setAttribute("rows",rows);
 			inp.setAttribute("cols",size);
-			inp.textContent = currentValue(); // this has been extracted from the existing node or the default value
 			inp.onchange = updateTree;
 			inp.pekoeNode = pekoeNode;
 			
@@ -748,6 +766,7 @@ jQuery("#jw").wysiwyg({"initialContent":content});
 
 	function fieldChoiceInput(  ) {
 		formEl = document.createElement("label");
+		//jQuery(formEl).className('field-choice');
 		formEl.textContent = makeLabelText(pekoeNode);
 		formEl.appendChild(document.createElement("br"));
 		var select = document.createElement("select");
@@ -760,7 +779,7 @@ jQuery("#jw").wysiwyg({"initialContent":content});
 				console.warn('NO SUITABLE FIELD NAME for fieldChoice insertion');
 				return;
 			}
-			console.log('wish to replace ',pekoeNode.nodeName, 'with', e.target.value);
+			//console.log('wish to replace ',pekoeNode.nodeName, 'with', e.target.value);
 			var pkn = pekoeNode;
 			var od = pkn.ownerDocument;
 			var newNodeName = e.target.value;
@@ -775,12 +794,12 @@ jQuery("#jw").wysiwyg({"initialContent":content});
 
 			var doctype = de.nodeName;
 			var path = myPath(pkn.parentNode) + '/' + newNodeName;
-			console.log('looking for path ',path);
+			//console.log('looking for path ',path);
 			var schema = gs.schemas[doctype];
 			var field = schema.getFieldDefByPath(path);
 			// now - check the options to see whether to replace this choice-element, or insert-before.
 			// I have created the delete buttons - just need to work out how to replace the field with _this_ field-choice again.
-			console.log('REPLACE CHOICE?',options.has('only-one-of'));
+			//console.log('REPLACE CHOICE?',options.has('only-one-of'));
 			var fragment = schema.getTemplateFragment('/fragments/' + newNodeName);
 			if (fragment) { // if there is a fragment for this, then use it.
 
@@ -802,7 +821,7 @@ jQuery("#jw").wysiwyg({"initialContent":content});
 				// the one-of-these option means removing the SELECT
 				// somehow, I think that the OPTION should be removed or disabled. but I'm not sure WHEN or WHY or how to SAY IT.
 				if (options.has("only-one-of")) {
-					console.log('ONLY ONE OF FOR THIS ELEMENT',path);
+					//console.log('ONLY ONE OF FOR THIS ELEMENT',path);
 					jQuery("<img src='css/graphics/icons/delete.png' class='tool-icon' />")
 						.click(function () {
 							if (confirm("Do you want to delete this element?")) {
@@ -831,7 +850,7 @@ jQuery("#jw").wysiwyg({"initialContent":content});
 				nn.ph = field;
 				// make a simple input
 				var newFS = document.createDocumentFragment();
-				console.log('fieldChoiceInput calling InputMaker for',nn.nodeName);
+				//console.log('fieldChoiceInput calling InputMaker for',nn.nodeName);
 				gs.Pekoe.merger.InputMaker(newFS,nn);
 				// created a fragment - the contents.
 				var el = newFS.firstChild;

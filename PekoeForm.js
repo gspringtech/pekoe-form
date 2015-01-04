@@ -218,10 +218,10 @@ getData : function () {
 
     // make a copy of the transactionTree so we can revert if needed (?? is this likely ??)
     // the xTree is the Significant Object
-//		var newTree = false;
+    var newTree = false;
     // This will allow Undo - NYI - OR allow the transactionTree to be pruned before save/print
     that.xTree = jQuery.createEmptyDocument();
-    console.log('documentElement',this.options.file.doc.documentElement);
+    //console.log('documentElement',this.options.file.doc.documentElement);
     var newRoot = that.xTree.importNode(this.options.file.doc.documentElement,true); // I suspect it's the same job.
     that.xTree.appendChild(newRoot); // raw DOM method
 
@@ -233,11 +233,19 @@ getData : function () {
     var fields = {};
     // Once again. First process the Template Links to find the Fields needed for this Template. Collect the "definition" of these fields from the Schema
     jQuery.each(links,function(key,item) {
+
         var $item = jQuery(item); // a <link>
+        var isDefault = $item.parent().is("default-links"); // beautiful
         var fieldpath = $item.attr("path"); // ...  to a field like /txo/property/address or /schema/field-or-fragmentRef
         var field = fieldpath.split('?')[0]; // strip off params ?output=address-on-one-line
         if (field === "") { // this should never happen. The Link IS the path
             console.warn("Can't process link without path",key,item);
+            return;
+        }
+        if (field.indexOf('//') === 0) {
+            // it is possible that a link will be relative - e.g. //client/referrer.
+            // in this case, it can't be used as a field reference. It is only for output.
+            console.log('ignoring relative path',fieldpath);
             return;
         }
         var fieldDefinition = that.schema.getFieldDefByPath(field); // will automatically return a basic input if no schema definition exists
@@ -248,19 +256,20 @@ getData : function () {
         // capture the node definition for later use. // but WHY add it to another list? we already have a list
 
         fields[field] = fieldDefinition; // will be defined once for unique field
+        fields[field].isDefault = isDefault;
         var $el = $(fieldDefinition);
-        console.log('fieldDevi',fieldDefinition);
+        //console.log('fieldDevi',fieldDefinition);
         var fieldChoice = $el.find('input').attr('type') === 'field-choice';
         if (fieldChoice) {
             var optionalFields = $el.find('list').text().trim().split('\n');
             var pathbase = field.split('/');
             pathbase.pop();
             pathbase = pathbase.join('/');
-            console.log('pathbase is',pathbase);
+            //console.log('pathbase is',pathbase);
             for (var i=0; i< optionalFields.length; i++) {
                 var fieldOption = pathbase + '/' + optionalFields[i];
                 var fd = that.schema.getFieldDefByPath(fieldOption);
-                console.log('got fd',fd);
+                //console.log('got fd',fd);
                 if (fd) {
                     fields[fieldOption] = fd;
                     fields[fieldOption].optional = true;
@@ -302,8 +311,7 @@ getData : function () {
     for (var path in fields) { // key is the field path
         atLeastOneDefinedField = true;
         var fieldDefinition = fields[path]; // that.schema.getFieldDefByPath(path); // all the extra info
-        var isDefault = jQuery(fieldDefinition).attr("default") === true; //NOTE: these are ad-hoc, non-schema fields.
-        // TODO "default" fields are  LOST (I used to have a setting that ensured a field would always be shown, even when it was not needed by the template.   ***************************
+        var isAdHoc = jQuery(fieldDefinition).attr("ad-hoc") === true; //NOTE: these are ad-hoc, non-schema fields.
 
         var selectStmt = path;
         // this is all about CREATING and PATCHING-UP the tree
@@ -385,8 +393,9 @@ getData : function () {
                 if (!child) { console.warn("Child is null for",cname, "isFragReg:",isFragmentRef ); return;}
             }
 
-//				if (!newTree) {child.nw = true;} // in an existing tree: this field is new 
-            child.defaultField = isDefault; // jQuery can't get the attribute node. bugger.
+			if (!newTree) {child.nw = true;} // in an existing tree: this field is new
+            child.defaultField = fields[path].isDefault; // jQuery can't get the attribute node. bugger.
+            child.adHoc = isAdHoc;
             // SCHEMA ORDER IS BEST. This can be found using the sampleTree
             gs.Pekoe.merger.Utility.addMeInTheRightPartOfTheTree(that.xTree, this.schema, pathParts, child);
         } else { // if the existing field is a fragmentRef, make sure it has all the appropriate parts
@@ -397,7 +406,8 @@ getData : function () {
                         gs.Pekoe.mirrorNodes(fragment,this);  // make sure that the fragment has all its parts
                     }
                 }
-                this.defaultField = isDefault;
+                this.defaultField = fields[path].isDefault;
+                this.adHoc = isAdHoc;
             });
         }
         // have enhanced the tree - creating new leaves and fragments and patching existing ones.
@@ -569,8 +579,7 @@ gs.Pekoe.fragmentNodeForm = function () {
 	
 	// Hide everything if the fragment is unused. 
 	if (fragmentNode.pekoeEmpty === true && hideEmpty) {
-		// Automatically HIDE fragments whose children are empty
-		// TODO-pekoe: change this so that it checks the schema. May want this element to be visible regardless.
+		// Hide elements if they are empty and marked as "initially-closed"
 		formEl.addClass("hidden-fieldset-children"); // Also need "show-first-field-only" for fragment elision
 	}
 	// finally, want this to be used to change the background-color 
@@ -630,7 +639,7 @@ gs.Pekoe.fragmentNodeForm = function () {
 	// if so, then merger-utils.apply enhancements will be used
 	var $lookup = (jQuery(fragmentNode.ph).find("lookup").length > 0) ? jQuery(fragmentNode.ph).find("lookup") : null;
 	if ($lookup !== null) {
-        console.log('got lookup',fragmentNode);
+        //console.log('got lookup',fragmentNode);
 		formEl.addClass("fragment-lookup");
 	}
 //		var $help = jQuery(this.ph).find("input help");

@@ -75,7 +75,7 @@ gs.Pekoe.merger.Utility = function () {
 					}
 					else{
 						console.warn("ad-hoc field:",fragmentName);
-						return jQuery(gs.defaultField).attr("path",f).attr("default",true).get(0);
+						return jQuery(gs.defaultField).attr("path",f).attr("ad-hoc",true).get(0);
 					}
 				}
 			},
@@ -557,6 +557,7 @@ function addMeInTheRightPartOfTheTree(tree, schema, pathParts, child) {
 	var parentPath = pathParts.join(" > ");
 
 	// easier to use this recursive function than write a complex loop
+	// TODO except when it doesn't terminate
 	function precedent(n) {
 		 if (n.length) { // .prev returns an array
 			var nn = n.get(0).nodeName;
@@ -808,7 +809,7 @@ mergerUtils.loadSchema = function (doctype) {
 			 // I am suspicious of this bit...
 				var child = thisSchema.getTemplateFragment(selectStmt);
 				if ((child.nodeType == Node.DOCUMENT_FRAGMENT_NODE)|| (child.nodeType == Node.ELEMENT_NODE)) { // why would it be a document_fragment ???
-					console.log('got TemplateFragment of',selectStmt);
+					//console.log('got TemplateFragment of',selectStmt);
 					// if there is a child, then it will replace the leaf on this path
 					selectStmt = selectStmt.split("/");
 					selectStmt.pop();// if we're going to append a child-fragment, then remove the leaf node name from the path
