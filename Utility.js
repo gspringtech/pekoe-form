@@ -125,11 +125,15 @@ gs.Pekoe.merger.Utility = function () {
 					var preSib = ui.item.prev().get(0);
 
 					var nextSib = ui.item.next().get(0);
-					if (pkn && preSib && preSib.pekoeNode && preSib.pekoeNode.nodeName == nn) {
+					// the nodeName test is preventing me from sorting fragment, field, fragment-ref
+					// is there some way to find out what things could be here? I guess not without a proper schema.
+					if (pkn && preSib && preSib.pekoeNode) { // && preSib.pekoeNode.nodeName == nn) {
 						jQuery(preSib.pekoeNode).after(pkn);
-					} else if (pkn && nextSib && nextSib.pekoeNode && nextSib.pekoeNode.nodeName == nn) {
+					} else if (pkn && nextSib && nextSib.pekoeNode) { // && nextSib.pekoeNode.nodeName == nn) {
 						jQuery(nextSib.pekoeNode).before(pkn);
 					} else {
+						jQuery(this).sortable('cancel');
+						jQuery(this).effect('shake');
 						console.warn("Couldn't move pkn",pkn);
 					}
 				} else if (ui.item.is('span')) {
@@ -142,6 +146,8 @@ gs.Pekoe.merger.Utility = function () {
 					} else if (pkn && nextSib && nextSib.pekoeNode && nextSib.pekoeNode.nodeName == nn) {
 						jQuery(nextSib.pekoeNode).before(pkn);
 					} else {
+						jQuery(this).sortable('cancel');
+						jQuery(this).effect('shake');
 						console.warn("Couldn't move. pkn",pkn);
 					}
 				}
