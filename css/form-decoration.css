@@ -13,9 +13,11 @@ div>form>fieldset>fieldset>legend, div>form>fieldset>label {
     background-color:inherit;
 }
 
-fieldset.hidden-fieldset-children > *:nth-child(n+3) { display: none; }
-fieldset.hidden-fieldset-children > legend span.btn  { display: none; }
-
+.hidden-fieldset-children > *:nth-child(n+3) { display: none; }
+.hidden-fieldset-children > legend span.btn  { display: none; }
+.hidden-fieldset-children .fragmentName::after {
+    content: ' ...';
+}
 
 fieldset {
     clear: both;
