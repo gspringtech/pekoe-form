@@ -104,25 +104,9 @@
 						// but that brings me back to storing artefacts in the DB.
 						var path = o.template + "?job=" + o.file.getPath();
 						$.statusMessage("merge " +path);
-						window.location.href= "merge" + path; // THIS IS IT. AND ITS CRAP.
+						window.location.href= "merge" + path; // THIS IS IT. It doesn't handle server-side errors.
 					}
-					// WHAT ABOUT an IFRAME. This would allow me to display a message without losing the user's context if there's an error. 
-					// Set attributes as a second parameter
-					// perhaps the trick is to generate a frame saying "loading..." and then get it to load the document.
-					// maybe it could have a timeout that closes the window if there's no content - or maybe that could be here. 
-//					$('<iframe />', {
-//					    name: 'downloader',
-//					    id:   'downloader',
-//					    src: "merge"+o.template + "?job=" + o.file.getPath()
-//					    
-//					}).prependTo(o.controls);
-					
-//					var $f = jQuery("<form method='POST'/>").attr("action", "merge"+o.template);
-////					jQuery("<input type='hidden' name='template'   />").val(o.template).appendTo($f);
-//					jQuery("<input type='hidden' name='job'/>").val(o.file.getPath()).appendTo($f);
-//					o.controls.after($f);
-//					$f.submit();
-//					$f.remove();
+
 				});
 	    	self.options.savePrintButton = savePrintBtn; 
 	    	
@@ -152,8 +136,18 @@
 			self.options.controls.find(".site-control").remove();
 			// add custom commands associated with this doctype and template.
 			$(this.options.markers).find("command").each(function () {
-				
+
 				var $c = $(this);
+				// does $c have an attribute "applies-to"?
+				if ($c.attr("template-type")) {
+					console.log('applies-to?');
+					var templateType = self.options.template.replace(/^[^.]+\./,'');
+					if ($c.attr("template-type").split(',').indexOf(templateType) === -1) {
+						console.log('... no');
+						return;
+					}
+				}
+				// if so, does it match this template
 				var button = $("<button class='site-control'></button>")
 					.text($c.attr("name"))
 					.attr("title",$c.attr("description"))
