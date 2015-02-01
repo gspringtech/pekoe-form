@@ -184,7 +184,9 @@ gs.Pekoe.BureauAG.prototype = { // christ its a fucking prototype based thing. B
 	     
 	    jQuery.each(itemsNodeList, function (k,v) {
 	    	var $li = jQuery(v);
-	    	jQuery("<span/>").text($li.text()).attr("title",$li.attr("title")).addClass($li.attr("fileType")).appendTo(items);
+			var cell = jQuery("<span/>").text($li.text()).attr("title",$li.attr("title")).addClass($li.attr("fileType"));
+			if ($li.attr('default-for')) {cell.attr('default-for',$li.attr('default-for'));}
+			cell.appendTo(items);
 	    });
 
         for (var i = 0; i< postSpacerCount; i++) {
@@ -197,7 +199,6 @@ gs.Pekoe.BureauAG.prototype = { // christ its a fucking prototype based thing. B
 	
 	reveal : function(template) {
 		// get the templateItems div
-		// TODO - this doesn't show the templates. Why not?
 		if (template && template.indexOf('/templates') > -1) {
 			jQuery("#templateItems .active").removeClass("active");
 			jQuery("#templateItems div").hide();
@@ -216,15 +217,23 @@ gs.Pekoe.BureauAG.prototype = { // christ its a fucking prototype based thing. B
 	},
 	
 	filter : function (doctype) {
+		//console.log('filtering',doctype);
 		jQuery("#templateItems").find("span")
 			.addClass("irrelevant").removeClass("active").end()
 			.find("." + doctype)
 			.removeClass("irrelevant");
 	},
 
-	findFirst : function (doctype) {
+	findDefault : function (doctype) { // instead of 'find first' make this 'find default'
 		// find the first span having class doctype, call reveal for its template, then show it.
-		var f = jQuery("#templateItems").find('span.' + doctype).first();
-		this.reveal(f.attr('title'));
+		var query = 'span[default-for=' + doctype + ']';
+		var f = jQuery("#templateItems").find(query).first();
+		if (f.length > 0) {
+			this.reveal(f.attr('title'));
+		} else {
+			var f = jQuery("#templateItems").find('span.' + doctype).first();
+			this.reveal((f.attr('title')));
+		}
+
 	}
 };

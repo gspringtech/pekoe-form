@@ -52,10 +52,9 @@
 	
 	    
 	$.widget("gs.pekoeForm", { // as a widget, this needs to be an Object Literal
-		_create : function () {console.log("Created ui.pekoeForm widget");},
+		_create : function () {},
 		
 		_init: function () {
-            console.log('init pekoeForm');
 			var self = this;
 			//console.log('this is ',this);
 			var saveBtn = $("<button>Save</button>")
@@ -140,10 +139,10 @@
 				var $c = $(this);
 				// does $c have an attribute "applies-to"?
 				if ($c.attr("template-type")) {
-					console.log('applies-to?');
+					//console.log('applies-to?');
 					var templateType = self.options.template.replace(/^[^.]+\./,'');
 					if ($c.attr("template-type").split(',').indexOf(templateType) === -1) {
-						console.log('... no');
+						//console.log('... no');
 						return;
 					}
 				}
@@ -170,7 +169,7 @@
 				if (previousTemplate) {
 
 				} else {
-					gs.bag.findFirst(doctype);
+					gs.bag.findDefault(doctype);
 				}
 			});
 			this._loadThings();			
@@ -230,7 +229,7 @@
 				$.when(gs.Pekoe.merger.Utility.loadSchema(this.options.file.getDoctype()))
 					.then(function (){
 						self.options.schemaLoaded = true;
-						gs.bag.filter(self.options.file.getDoctype());
+						//gs.bag.filter(self.options.file.getDoctype()); // only relevant if the schema changes. Will not happen in pekoe4.
 						dfd.resolve();
 					});
 			}
@@ -240,7 +239,7 @@
 		
 		refresh : function () {
 			var doctype = this.options.file.getDoctype();
-			console.log('GOING TO REFRESH',doctype);
+			//console.log('GOING TO REFRESH',doctype);
 			gs.bag.filter(doctype); 
 		},
 		

@@ -15,7 +15,6 @@
     </script>
     <!--<link rel='stylesheet' href='/pekoe-common/dist/css/bootstrap.css' />-->
 
-    <!--<link rel="stylesheet" href="lib/ckeditor/contents.css"/> &lt;!&ndash; TODO this interferes with the page. is it needed? &ndash;&gt;-->
     <link rel='stylesheet' href='/pekoe-common/dist/font-awesome/css/font-awesome.min.css' />
     <link rel="stylesheet" href="/pekoe-common/jquery-ui-themes-1.11.0/themes/ui-lightness/jquery-ui.min.css" />
     <link rel="stylesheet" href="   lib/jquery-simple-context-menu/jquery.contextmenu.css"/>
@@ -80,11 +79,11 @@
 
             $("#templateItems").on("click", "span", function (e) {
                 var $span = $(this);
-
                 if ($span.hasClass("irrelevant")) {jQuery.statusMessage("that template doesn't apply to this file"); return; }
-                $span.addClass("active");
+
                 panel.pekoeForm("setTemplate",$span.attr("title"));
                 $span.siblings().removeClass("active");
+                $span.addClass("active");
             });
 
             var panel = $("<div></div>").attr("id","formDiv").appendTo('#workarea');
