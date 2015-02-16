@@ -96,7 +96,8 @@
 						if (thisDocType === "result") {
 							$.statusMessage("Can't open this item: " + $(d).text()); // probably locked.
 						} else {
-							$.statusMessage("Unexpectedly received: " + thisDocType + " containing "+ $(d).text());
+                            console.warn("Unexpectedly received: " + thisDocType + " instead of " + settings.doctype)
+							$.statusMessage("Unexpectedly received: " + thisDocType + " instead of " + settings.doctype);
 						}
 						return; 
 					}
