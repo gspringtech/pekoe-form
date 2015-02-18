@@ -557,8 +557,9 @@ function addMeInTheRightPartOfTheTree(tree, schema, pathParts, child) {
 	// Note - the sample tree consists of top-level elements only (ie first-children of root element)
 	// An ad-hoc field will be prepended to the existing parent. It is possible to change this behaviour (see below)
 //    console.log('addMeInTheRightPartOfTheTree',pathParts,child); // ['schema', 'fragment'] <fragment>
-	var fieldInSampleTree = jQuery(pathParts.join(" > "), schema.sampleTree); // <fragment>
-//    console.log('found fieldInSampleTree',fieldInSampleTree);
+
+	var fieldInSampleTree = jQuery(pathParts.join(" > "), schema.sampleTree); // <fragment>. (I would prefer an XPath.)
+
     pathParts.pop();
 	var parentPath = pathParts.join(" > ");
 
@@ -578,6 +579,10 @@ function addMeInTheRightPartOfTheTree(tree, schema, pathParts, child) {
 		return null; // no preceding sib
 	}
 	// --- use it...
+    if (fieldInSampleTree.length === 0) {
+        console.warn('field not found in sampletree',pathParts.join(' > '));
+        return null;
+    }
 	var prevSib = precedent(fieldInSampleTree.prev());
 	if (prevSib) { // did we find one?
 		jQuery(prevSib).after(child);
@@ -868,7 +873,7 @@ mergerUtils.loadSchema = function (doctype) {
                 collector.push(oElement);  // can't modify the subject of an iterator!!
             oElement = oResult.iterateNext();
         }
-        var od = theTree.ownerDocument;
+        var od = (theTree.nodeType === Node.DOCUMENT_NODE) ? theTree : theTree.ownerDocument;
 
         jQuery.map(collector,function(subjectNode){
             var markAllNotEmpty = function (p) {
@@ -883,15 +888,15 @@ mergerUtils.loadSchema = function (doctype) {
                 // not empty, walk up to the root, setting empty=false on all nodes on the path
                 markAllNotEmpty(parentN);
             } else {
-                // empty; walk up until finding "empty=false". Set empty=true on every node except the last
-                while (parentN !== od && parentN.pekoeEmpty === undefined) {
-                    if (parentN.hasAttributes() > 0 ) {
-                        markAllNotEmpty(parentN); // should take us up and out.
-                    }else {
-                    parentN.pekoeEmpty = true;
-                    parentN = parentN.parentNode;
-                    }
-                }
+				while (parentN !== od && parentN.pekoeEmpty === undefined) {
+					if (parentN.hasAttributes() > 0 ) {
+						markAllNotEmpty(parentN); // should take us up and out.
+					}else {
+						parentN.pekoeEmpty = true;
+						parentN = parentN.parentNode;
+					}
+				}
+				// empty; walk up until finding "empty=false". Set empty=true on every node except the last
             }
         });
         }
