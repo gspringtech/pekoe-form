@@ -643,7 +643,10 @@ gs.Pekoe.fragmentNodeForm = function () {
         //console.log('got lookup',fragmentNode);
 		formEl.addClass("fragment-lookup");
 	}
-//		var $help = jQuery(this.ph).find("input help");
+		var help = jQuery(fragmentNode.ph).find("help")[0];
+        if (help && $(help).text()) {
+            jQuery('<span>?</span>').attr('title',$(help).text()).appendTo(legend);
+        }
 		
 	
 	legend.appendTo(formEl);
