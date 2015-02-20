@@ -238,14 +238,15 @@ getData : function () {
         var isDefault = $item.parent().is("default-links"); // beautiful
         var fieldpath = $item.attr("path"); // ...  to a field like /txo/property/address or /schema/field-or-fragmentRef
         var field = fieldpath.split('?')[0]; // strip off params ?output=address-on-one-line
+        field = (field.indexOf('[') !== 0) ? field = field.replace(/\[[^[]*\]/g, '') : field; // strip off any filter expressions like [last()]
         if (field === "") { // this should never happen. The Link IS the path
             console.warn("Can't process link without path",key,item);
             return;
         }
-        if (field.indexOf('//') === 0) {
+        if (field.indexOf('//') === 0 || field.indexOf('/') !== 0) {
             // it is possible that a link will be relative - e.g. //client/referrer.
             // in this case, it can't be used as a field reference. It is only for output.
-            console.log('ignoring relative path',fieldpath);
+            console.log('ignoring descendant-axis path or missing context',fieldpath);
             return;
         }
         var fieldDefinition = that.schema.getFieldDefByPath(field); // will automatically return a basic input if no schema definition exists

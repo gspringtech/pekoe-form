@@ -684,7 +684,7 @@ This _could_ be an accessor:
 				}
 			}
 
-			console.log('size',size,'rows',rows,'lc',lc);
+			//console.log('size',size,'rows',rows,'lc',lc);
 			if (!rows || lc > rows) { rows = lc;}
 			inp.setAttribute("rows",rows);
 			inp.setAttribute("cols",size);
