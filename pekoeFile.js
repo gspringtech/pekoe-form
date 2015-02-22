@@ -81,16 +81,17 @@
 			// trigger something
 		} else {
 			// attach the promise to the pekoeFile object - it will be resolved when the doc is loaded. 
-			that.req = $.get(settings.path, 
+			that.req = $.get(settings.path,
 				{
-					"action": "capture"
+					"action": "capture",
+                    "doctype" : settings.doctype
 //					"path":   settings.path
-				},  
+				},
 				function (d,status, jqxhr) {
-					if (jqxhr.status === 201){ 
+					if (jqxhr.status === 201){
 						settings.path = jqxhr.getResponseHeader("Location");
 					}
-					that.doc = d; 
+					that.doc = d;
 					var thisDocType = d.documentElement.nodeName;
 					if (thisDocType !== settings.doctype) {
 						if (thisDocType === "result") {
@@ -99,11 +100,13 @@
                             console.warn("Unexpectedly received: " + thisDocType + " instead of " + settings.doctype)
 							$.statusMessage("Unexpectedly received: " + thisDocType + " instead of " + settings.doctype);
 						}
-						return; 
+						return;
 					}
-					that.captured = true; 
-					
-				});
+					that.captured = true;
+
+				}).fail(function() {
+                    $.statusMessage('Unable to load the document. Has it been moved?');
+                });
 		} // end of load
 		
 		function save() {
