@@ -253,7 +253,7 @@ gs.Pekoe.merger.Utility = function () {
 	    jQuery(".pekoe-enhancement", mform).each (function () {
 	    	var enhancement = jQuery.find("input enhancement",this.pekoeNode.ph)[0];
 	    	if (enhancement) {
-		    	var $field = this;
+		    	var $field = $(this);
 		    	try {
 		    		eval(jQuery(enhancement).text());
 		    	} catch (e) {console.warn("ENHANCEMENT ERROR:",e); }

@@ -464,6 +464,9 @@ This _could_ be an accessor:
 		if ((options.has('singleUse') === true) && (currentValue()  !== "")) {
 			jQuery(inp).attr("disabled","disabled");
 		}
+        if (options.has('no-direct-entry') === true) {
+            jQuery(inp).attr("disabled","disabled");
+        }
 		if (options.has("repeating")) {
 			inp.setAttribute('title','shift-enter to add another');
 		}
