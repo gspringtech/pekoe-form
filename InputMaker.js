@@ -308,7 +308,7 @@ This _could_ be an accessor:
 //	var showLookupValues = function (evt) {parameterisedXPath(true)};
 	var updateCalculation = function () {parameterisedXPath(false)}; // evt.preventDefault();
 	
-	// this looks like it should be a jQuery plugin
+	// Date Stamp
 	function showDS(formEl,pekoeNode){
 		// no point using this if the node IS an attribute!
 		if (pekoeNode.nodeType == Node.ATTRIBUTE_NODE) return;
@@ -444,6 +444,7 @@ This _could_ be an accessor:
 	if (pekoeNode.defaultField) {jQuery(formEl).addClass('default-field');}
 	
 	function makeLabelText (n) { // if the node is an attribute, get the parent-Element's name
+        if ($fieldDef.find('help')) {}
         if (isAttribute) {
             return parentElement.nodeName + "/@" + n.name;
         } else {
@@ -698,29 +699,9 @@ This _could_ be an accessor:
 		pekoeNode.formElement = inp;
 	 }
 
-
-	 /*
-	  *
-	  *
-	  * var $rte = jQuery("#rte-4");
-var content = $rte.html();
-$rte.html('<textarea id="jw" rows="5" cols="47"></textarea>');
-jQuery("#jw").wysiwyg({"initialContent":content});
-*/
-
-	 // Rich Text isn't CLOSING
-	 
 	 function richTextInput(  ) {
 
-         // Use CKEDITOR inline. See Utility.js - line 148 or thereabouts
-         // TODO fix namespace issue.
-         // TODO fix delete non-event issue
-         // TODO check dirty event
-         /*
-            I've sidestepped the Display problem by applying the CKEDITOR to everything regardless of whether the content
-            is editable. (SingleUse content should be display-only.)
-            I've simply turned off contenteditable for singleUse content.
-         */
+         // CKEDITOR is applied inline. See Utility.js - line 148 or thereabouts
 
          var $formEl = jQuery("<div class='rt-box' ></div>"); // Field wrapper
          var $display = jQuery("<div class='rte'></div>") // display the Rich Text Content
@@ -730,7 +711,6 @@ jQuery("#jw").wysiwyg({"initialContent":content});
          if (!options.has('singleUse') || ($display.text() === "")) {
              $display.attr("contenteditable","true");
          }
-
 
          jQuery("<label class='rte-button'></label>") // make the field LABEL be the active element
              .text(pekoeNodeName)

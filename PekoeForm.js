@@ -218,7 +218,7 @@ getData : function () {
 
     // make a copy of the transactionTree so we can revert if needed (?? is this likely ??)
     // the xTree is the Significant Object
-    var newTree = false;
+    var newTree = false; // TODO review this.
     // This will allow Undo - NYI - OR allow the transactionTree to be pruned before save/print
     that.xTree = jQuery.createEmptyDocument();
     //console.log('documentElement',this.options.file.doc.documentElement);
@@ -394,10 +394,14 @@ getData : function () {
                 if (!child) { console.warn("Child is null for",cname, "isFragReg:",isFragmentRef ); return;}
             }
 
-			if (!newTree) {child.nw = true;} // in an existing tree: this field is new
+            // this causes the "new-field" class to be added by the InputMaker.
+			if (!newTree) {child.nw = true;} // TODO  - fix this. It only made sense when the tree was constructed here.
+            // DO I have access to the URL? is it "new"
+            // this
             child.defaultField = fields[path].isDefault; // jQuery can't get the attribute node. bugger.
             child.adHoc = isAdHoc;
             // SCHEMA ORDER IS BEST. This can be found using the sampleTree
+
             gs.Pekoe.merger.Utility.addMeInTheRightPartOfTheTree(that.xTree, this.schema, pathParts, child);
         } else { // if the existing field is a fragmentRef, make sure it has all the appropriate parts
             jQuery(that.xTree).find(sourcePath).each(function () {
@@ -562,6 +566,18 @@ gs.Pekoe.fragmentNodeForm = function () {
 	//	jQuery('<select name="frag"><option>-</option><option>Frag1</option><option>Frag2</option></select>').appendTo(formEl);
 	//	return formEl[0];
 	//}
+
+    /* This has become even more confused.
+        I'm currently using 'repeating' to decide whether to show add, copy, duplicated, delete buttons AND whether the item is SORTABLE
+        The 'field-choice' option only gets the delete button (on the assumption that it can be added again if the field-choice field says so).
+        The problem stems from using 'field/input/@type' for field-choice, rather than having a separate type altogether.
+        Maybe I can define a field-choice element? It would have a path and some other variables, and
+        the InputMaker would know to create it as a select. (that would be the only type)
+
+        For now, set repeating on the individual fragment-refs of a field-choice
+
+     */
+
     var options = jQuery(fragmentNode.ph).find("options").text();
 	var isRepeating = options.indexOf("repeating") !== -1; //jQuery(fragmentNode.ph).find("options:contains('repeating')").length > 0;
     if (isRepeating) formEl.addClass('repeating');
@@ -636,17 +652,30 @@ gs.Pekoe.fragmentNodeForm = function () {
     }
 
 	// Does this fragment have a lookup script?
-	// Maybe it has more than one? Is that useful? 
+	// Maybe it has more than one? Is that useful? NO
 	// if so, then merger-utils.apply enhancements will be used
-	var $lookup = (jQuery(fragmentNode.ph).find("lookup").length > 0) ? jQuery(fragmentNode.ph).find("lookup") : null;
-	if ($lookup !== null) {
-        //console.log('got lookup',fragmentNode);
-		formEl.addClass("fragment-lookup");
-	}
-		var help = jQuery(fragmentNode.ph).find("help")[0];
-        if (help && $(help).text()) {
-            jQuery('<span>?</span>').attr('title',$(help).text()).appendTo(legend);
-        }
+    // TODO - improve this so that the fragment's lookup can be used OR overridden by the fragment-ref.
+    // just because the element exists, doesn't mean it's really a lookup.
+    // should have a test. or else set it on the ph
+
+	var $lookup = jQuery(fragmentNode.ph).find("lookup");
+    // a valid lookup has either a @path or script (possibly both)
+    var script = $lookup.find('script');
+    var path = $lookup.attr('path');
+    if (path || (script.length && script.text())) {
+        console.log('got lookup',$lookup);
+        formEl.addClass("fragment-lookup");
+    }
+
+	//if ($lookup !== null && ($lookup.attr('path')!=='' || $lookup.find('script').text() !== '')) {
+     //
+	//	formEl.addClass("fragment-lookup");
+	//}
+
+    var help = jQuery(fragmentNode.ph).find("help")[0];
+    if (help && $(help).text()) {
+        jQuery('<span>?</span>').attr('title',$(help).text()).appendTo(legend);
+    }
 		
 	
 	legend.appendTo(formEl);

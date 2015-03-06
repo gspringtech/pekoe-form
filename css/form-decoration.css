@@ -179,11 +179,12 @@ div.read-only {
     vertical-align:bottom;
 }
 .rt-box {
-	background-color: #CCCCCD;
+	background-color: white;
 	margin-bottom: 5px;
 	margin-right: 5px;
+    margin-top: 20px;
 	float: right; 
-	width: 50%;
+	width: 100%;
 }
 .rt-box label {
 	background-image: url(graphics/icons/application_edit.png);

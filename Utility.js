@@ -54,7 +54,8 @@ gs.Pekoe.merger.Utility = function () {
 			doctype: "", 
 			getDoctype : function () { return this.doctype; },
 			path: null, 
-			fieldDefsByPath : {}, 
+			fieldDefsByPath : {},
+            fragmentLookups : {}, // keep a list of the fragments by @name e.g. "person" or "jobowner"
 			getFieldDefByPath : function (f) { // will provide a default field if there's not one there.
 				// if the path goes INSIDE a fragment, we should try to find its schema there. 
 				if (this.fieldDefsByPath[f]) { 
@@ -114,6 +115,13 @@ gs.Pekoe.merger.Utility = function () {
 	// consider the possibility of dynamically adding .sortable to the parent of the click-handle. Then,
 	// the selected elements can be made more specific
 	function applyEnhancements(mform) {
+
+		/*
+		Here's an idea.
+		Why not link the option-click "close folds" to ordering. Turn on the dragger
+		OR
+		make the sorting dependent on the dragger - in which case only the peers of 'this' element can be sorted.
+		 */
 
 		jQuery("fieldset").sortable({
 			axis:'y',
@@ -283,13 +291,15 @@ gs.Pekoe.merger.Utility = function () {
 	}
 
     function applyRTE() {
-        var $this = jQuery(this); // remains necessary in jQuery 2.11
+        var $this = jQuery(this);
         var editor = $this.ckeditor({'entities_processNumerical':'force', placeholder:'Editable text...'}).editor;
-        // TODO change the pekoeNode into an Accessor
-        // EXCEPT that this is not a property setter...
         var $pekoeNode = jQuery($this.data("pekoeNode"));
+        // not receiving change after paste.
         editor.on('change', function (){
-            $pekoeNode.empty().append(jQuery(this.getData()).clone()); // This won't work without the .clone
+            console.log('got cke change');
+            $pekoeNode.empty().append(jQuery(this.getData()).clone());
+        }).on('paste',function () {
+            console.log('got cke paste');
         });
     }
 	
@@ -406,6 +416,7 @@ mergerUtils.addMe = function (fieldset, isCopy) {
 		if (pkn.ph) {
 			 newNode.ph = pkn.ph; // copy the placeholder info
 			 //if (jQuery(newNode.ph).attr("fieldType") == "fragmentRef") {
+			// TODO - does "choice" go here?
 			if (newNode.ph.nodeName === 'fragment-ref') {
 			 	newNode.toForm = gs.Pekoe.fragmentNodeForm;
 			 	
@@ -455,6 +466,7 @@ function duplicate(source, dest) {
 		 dest.ph = source.ph; // copy the placeholder info
 		 // what kind of node is this?
 		 //if (jQuery(dest.ph).attr("fieldType") == "fragmentRef") {
+		// TODO - does "choice" go here?
 		 if (dest.ph.nodeName === 'fragment-ref') {
 		 	dest.toForm = gs.Pekoe.fragmentNodeForm;
 		 } else {
@@ -750,15 +762,65 @@ mergerUtils.loadSchema = function (doctype) {
  	
 		var $schema = jQuery(data);  // no longer E4X.
 		thisSchema.schema = $schema;
-			
-		// here's the first problem - I get the ALL fields regardless of any other structure in the schema.
-		// (this makes sense because the schema is just a list of paths)
-		
-		$schema.find("field,fragment-ref").each(  // create a hash of the field/@paths for later retrieval
+
+
+     // make a list of all fragments with lookups.
+         $schema.find('fragment').each(
+             function() {
+                 var $fragment = $(this);
+                 // need to test whether the lookup has any useful content. HOW?  **********************
+                 if ($fragment.has('lookup')) {
+                     // possible that it has a lookup but no script or path
+                     // TODO - determine the best test for a non-empty lookup
+                     var $lookup = $fragment.find('lookup');
+                     var script = $lookup.find('script');
+                     var path = $lookup.attr('path');
+                     //var thescript = script.length ? script.text() : '';
+                     //console.log('fragment lookup?',$lookup,thescript,path);
+                     if (path || (script.length && script.text())) {
+                         console.log('adding fragmentLookup for',$fragment.attr('name'));
+                         thisSchema.fragmentLookups[$fragment.attr('name')] = $lookup.get(0);
+                     }
+
+                 }
+             }
+         );
+
+		$schema.find("field,fragment-ref,choice").each(  // create a hash of the field/@paths for later retrieval
 			function () {
 				var $field = jQuery(this);
 				thisSchema.fieldDefsByPath[  $field.attr("path") ] = this;
+                // now, somehow want to use the path to determine whether the fragment has a lookup
+                //first check for frag-ref...
+                if ($field.is('fragment-ref')) {
+                    //console.log('got fragment-ref with path',$field.attr('path'));
+                    // next, test to see if this frag-ref already has a lookup. THEY ALL DO.
+                    // need to test whether the lookup has useful content. How? (see above) ***************
+
+
+                    var $lookup = $field.find('lookup');
+                    var script = $lookup.find('script');
+                    var path = $lookup.attr('path');
+                    if (path || (script.length && script.text())) {
+                        console.log('FIELD lookup has content');
+
+                    } else {
+                        var fragName = $field.attr('path').split('/').pop();
+                        if (thisSchema.fragmentLookups[fragName]) {
+                            console.log('FOUND A FRGAMENT LOOKUP for',fragName);
+                            $field.get(0).appendChild(thisSchema.fragmentLookups[fragName].cloneNode(true));
+
+                        }
+                    }
+
+
+                    // one option is to copy the lookup element from the fragment. I'll try that. It might be a little expensive
+                    // but it saves some hacking elsewhere.
+                }
+                //console.log('thisElement',thisElement);
 			});
+
+
 			
 		/* SAMPLE tree is simple
 		 * <events>
@@ -768,7 +830,7 @@ mergerUtils.loadSchema = function (doctype) {
 	 	// NOTE. both fields and fragment-refs can be Absolute or Relative paths. A Relative path indicates that the element is a "fragment"
 	 	// now process each full field (absolute path) to make the sampleTree
 		$schema
-			.find("field,fragment-ref")
+			.find("field,fragment-ref,choice")
 			.filter(function () { return jQuery(this).attr("path").indexOf("/") === 0; }) // these are absolute paths
 			.each(function () {
 				var $p = jQuery(this);
@@ -804,8 +866,9 @@ mergerUtils.loadSchema = function (doctype) {
 		 */
 	 var isFragment = /^[^///].+\/.+/; // the string does not begin with a /  BUT DOES CONTAIN A / - which means a relative path - a "fragment"
 
+	 // TODO - how does the "fragment" element change this? (Should it?)
 	 $schema // now process only fragment Fields
-			.find("field,fragment-ref")
+			.find("field,fragment-ref,choice")
 			.filter(function () { return isFragment.test(jQuery(this).attr("path")); }) 
 			.each(function () {
 //				var p = this;
@@ -829,6 +892,7 @@ mergerUtils.loadSchema = function (doctype) {
 				} 
 				//console.log('construct tree for',selectStmt);
 			 // I don't want to add input/list to input. I just want a definition for it.
+			 // TODO - what if this was a "choice" element?
 			 	if ($p.find("options").text().indexOf("field-choice") >=0) {
 					console.warn("FIELD CHOICE FOR ",selectStmt);
 					return;
@@ -987,6 +1051,7 @@ mergerUtils.loadSchema = function (doctype) {
             else { // a phDef exists for this node
                 n.ph = phDef;
                 //if (jQuery(phDef).attr("fieldType") == 'fragmentRef') { // continue towards the leaves
+				// TODO - does "choice" go here?
 				if (phDef.nodeName === 'fragment-ref') {
                     n.toForm = gs.Pekoe.fragmentNodeForm;
                     enhanceSubtree(schema, n, n.nodeName);
@@ -1033,6 +1098,7 @@ mergerUtils.loadSchema = function (doctype) {
 //                    console.log("attachPlaceholderInfo",this.nodeName);
 
                     //if ($c.attr("fieldType") == 'fragmentRef') {
+						// TODO - does "choice" go here?
 					if (currentPlaceholder.nodeName === 'fragment-ref') {
                         this.ph = currentPlaceholder; // the subject node IS the pekoeNode.
     //					console.log("attaching fieldInfo to FRAG");

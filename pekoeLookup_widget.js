@@ -199,6 +199,7 @@
 		// any creation methods could go here
 
 		this.each(function () {
+            //console.log('got lookup on',this);
             var $element = $(this); // an input or fieldset ("formEl")
             var pekoeNode = this.pekoeNode; // this is my xml element OR MAYBE NOT - maybe it's an ATTRIBUTE - which IS NOT A NODE anymore. which means pekoeNode.nodeType IS NO GOOD.
 
@@ -222,9 +223,9 @@
 			//
 			var $ph = $(pekoeNode.ph); // the field definition
 			
-			var $lookup = $ph.find("input lookup"); // Shouldn't be here otherwise
+			var $lookup = $ph.find("lookup"); // Shouldn't be here otherwise
 			var selector = $lookup.attr("applies-to"); // if empty, it applies to the current input only (??).
-			
+
 			var script = $lookup.find("script").text();
 			var oneShot = ($lookup.attr("one-shot") == '1') || (script.indexOf("$0") == -1); // repeat Ajax request each time or once only
 			var qType = $lookup.attr("type"); // xquery | javascript | url-params;
@@ -235,7 +236,8 @@
 			var $params = $lookup.find("param"); // :not(:empty)"); // any param other than $element.val() will be evaluated once at the start. The user can't type into another field
 			// while using this - so there's no point updating.
 			var $applyTo = (selector) ? $element.find("[name^='" + selector + "']") : $element;
-			$applyTo.on("focus", function () {
+            //console.log('lookup found $lookup',$lookup,'selector',selector,'$applyTo',$applyTo);
+			$applyTo.addClass('fragment-autocompleter').on("focus", function () {
 				var valueChosen = false;
                 // "oneShot" means there's a fixed list (not too big) to retrieve from the server. Alternative is to lookup after each keystroke.
 				if (oneShot){ // Get the data and then apply Autocomplete

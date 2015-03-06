@@ -39,6 +39,7 @@
 	});
 
 	$.statusMessage = function (msg){
+        // TODO needs to be queued.
 		$("#status")
 			.hide()
 			.html("<span class='status_message'>" + msg + "</span>")
@@ -77,15 +78,6 @@
 				});
 			self.options.closeButton = closeBtn;
 
-			// PEKOE-TODO IS IT POSSIBLE to disable the button if the template.xql doesn't exist?
-	    	// This should be a separate method or methods. Want to put doctype- and template-specific Commands or options here.
-	    	
-	    	// Okay. Here's the tricky bit.
-	    	// I'm going to have variable commands here according to Site, Doctype, and Template.
-	    	// What about putting the button command script into Javascript????????
-	    	// that's radical and potentially risky but could it work?
-	    	
-	    	
 	    	
 	    	var savePrintBtn = $("<button>Get final document</button>")
 	    		.button({text: true, disabled: true}) // Consider changing the name according to the document type. (eg. Download/Open Word, View HTML.
@@ -100,7 +92,7 @@
 					if (o.template) {
 						// perhaps there's a way to ask for this and then get it when it works.
 						// send the original merge request via Ajax and then do the download when a positive response is received.
-						// but that brings me back to storing artefacts in the DB.
+						// but that brings me back to storing artifacts in the DB.
 						var path = o.template + "?job=" + o.file.getPath();
 						$.statusMessage("merge " +path);
 						window.location.href= "merge" + path; // THIS IS IT. It doesn't handle server-side errors.
@@ -161,7 +153,9 @@
 		
 		setFile : function (f) {
 			this.options.file = f;
+            console.log('setfile called with');
 			$.when(f.req, this.options.bag).then(function () {
+                console.log('when is now. f is',f);
 				var doctype = f.getDoctype();
 				gs.bag.filter(doctype);
 				// I need to store the template title and then use it to select the span and activate ti
@@ -181,6 +175,7 @@
 			o.file.setData(o.formThing.getData());
 			o.file.save();
 			o.saveButton.button("option","disabled",true);
+			console.log('save button?', o.saveButton);
 //			o.savePrintButton.button("option","disabled",true);
 		},
 
@@ -202,7 +197,7 @@
 					// if setTemplate is called, it can call formThing.display().
 				})
 				.fail(function () {
-					console.warn("Something went wrong -but what?");
+                    $.statusMessage("Unable to load the form. Has the file been moved?");
 				});
 		},
 		
