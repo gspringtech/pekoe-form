@@ -81,12 +81,15 @@
             templateSelector.load(bagLoaded);
 
             $("#templateItems").on("click", "span", function (e) {
+                // this really should be inside the BAG. The pekoeForm call should be a callback or listener.
+                // the reason is that I would like one function to display the current template name.
                 var $span = $(this);
                 if ($span.hasClass("irrelevant")) {jQuery.statusMessage("that template doesn't apply to this file"); return; }
-
-                panel.pekoeForm("setTemplate",$span.attr("title"));
+                var tPath = $span.attr('title');
+                panel.pekoeForm("setTemplate",tPath);
                 $span.siblings().removeClass("active");
                 $span.addClass("active");
+                $('#bagstart').html('Templates (current: <strong>' + tPath.substring(tPath.indexOf('/templates/') + '/templates/'.length) + '</stronghtt>)');
             });
 
             var panel = $("<div></div>").attr("id","formDiv").appendTo('#workarea');
