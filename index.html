@@ -101,11 +101,25 @@
                 }
             };
 
+            var bundleRE = /\/data\.xml$/;
+            if (bundleRE.test(args.job)) {
+                console.log('want to show files for ',args.job);
+                var coll = args.job.replace(bundleRE,'').split(':')[1];
+                coll = coll.replace('/exist/pekoe-files','');
+                $('#associatedFiles').css('height','400px');
+                $('<iframe/>').attr('src','/exist/pekoe-app/files.xql?collection=' + coll).css({"width":"100%","height":"100%"}).appendTo('#associatedFiles');
+                // want to pass the job as collection
+//                args.job.replace(bundleRE,'') : null;
+            }
+
+
+
         });
 
     </script>
 </head>
 <body>
+
 <div id="bag"><!-- ******************* New Template Panel *********************** -->
     <div id="bagHomeRow">
         <div id="bagstart" class='folder'>Templates</div>

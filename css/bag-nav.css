@@ -22,6 +22,7 @@
     overflow:hidden;
     width: 102em;
     font-size: 12px;
+    font-family: "Trebuchet MS", "Arial", "Helvetica", "Verdana", "sans-serif";
 }
 
 #bagHomeRow { 
@@ -37,7 +38,7 @@
     outline: 2px solid #CCFFEE;
     background-color: #CCEEEE;
     color:inherit;
-    font-family: sans-serif;
+    font-family:  "Trebuchet MS", "Arial", "Helvetica", "Verdana", "sans-serif";
     text-align: center;
     background-position: left;
     background-repeat: no-repeat;
@@ -65,7 +66,7 @@ div[id^="bagS"] div span{
     padding: 0.1em;
     outline: 1px solid #CCFFEE;
     text-align: center;
-    font-family:sans-serif;
+    font-family: "Trebuchet MS", "Arial", "Helvetica", "Verdana", "sans-serif";
     background-position: left;
     background-repeat: no-repeat;
      background-image: url(graphics/icons/folder.png);
@@ -144,7 +145,7 @@ color:inherit;
 
 #templateItems div span {
     float:left;
-    font-family:sans-serif;
+    font-family:  "Trebuchet MS", "Arial", "Helvetica", "Verdana", "sans-serif";
     margin-bottom:3px;
     margin-right:4px;
     outline-color:#ECE5D7;

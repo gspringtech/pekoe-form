@@ -270,7 +270,7 @@
 			}
 			// If a suitable template has not been used recently, then ask the User to pick one. (calling setTemplate below)
 			self.options.templatePromise = dfd; // promise will be kept by setTemplate
-			var message = "Please choose a template for '" + doctype + "'";
+			var message = "Loading template for '" + doctype + "'";
 			$(this.options.formArea).html("<h2>"+message+"</h2>");
 			return req; // we can resolve this using this.options.templatePromise
 		},

@@ -226,6 +226,11 @@ getData : function () {
     that.xTree.appendChild(newRoot); // raw DOM method
 
     gs.thedocument = that.xTree; // for debugging purposes
+    if (!$(that.xTree.documentElement).attr('edited')) {
+        $(that.xTree.documentElement).attr('edited',(new Date()).toISOString());
+        newTree = true;
+    }
+
 //		this is where we process the placeholders in the phtree
     var links = jQuery(markers).find("link");
     // only want to process unique fields - but must check that each ph-link marker HAS a field

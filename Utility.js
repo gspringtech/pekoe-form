@@ -102,7 +102,7 @@ gs.Pekoe.merger.Utility = function () {
 	    // ************************    POST RENDERING, Apply widgets  **************************************************
 	    // Enhancements are:
         //  - sortable fieldsets
-        //  - javascript enhancements from the schema (marked as .pekoe-enhancement)
+        //  - JAVASCRIPT enhancements from the schema (marked as .pekoe-enhancement)
         //  - Editable Rich Text
 
 	    // I want a "calculation" that can be triggered on field-change.
@@ -121,6 +121,9 @@ gs.Pekoe.merger.Utility = function () {
 		Why not link the option-click "close folds" to ordering. Turn on the dragger
 		OR
 		make the sorting dependent on the dragger - in which case only the peers of 'this' element can be sorted.
+
+
+		For some strange reason, an element can be dragged INSIDE another. (e.g. allowing a field to become a child of a field.)
 		 */
 
 		jQuery("fieldset").sortable({
@@ -769,10 +772,10 @@ mergerUtils.loadSchema = function (doctype) {
              function() {
                  var $fragment = $(this);
                  // need to test whether the lookup has any useful content. HOW?  **********************
-                 if ($fragment.has('lookup')) {
+                 if ($fragment.children('lookup').length > 0) { // this is scanning for any descendant. So it's wrong.
                      // possible that it has a lookup but no script or path
                      // TODO - determine the best test for a non-empty lookup
-                     var $lookup = $fragment.find('lookup');
+                     var $lookup = $fragment.children('lookup');
                      var script = $lookup.find('script');
                      var path = $lookup.attr('path');
                      //var thescript = script.length ? script.text() : '';
@@ -807,7 +810,7 @@ mergerUtils.loadSchema = function (doctype) {
                     } else {
                         var fragName = $field.attr('path').split('/').pop();
                         if (thisSchema.fragmentLookups[fragName]) {
-                            console.log('FOUND A FRGAMENT LOOKUP for',fragName);
+                            console.log('FOUND A FRAGMENT LOOKUP for',fragName);
                             $field.get(0).appendChild(thisSchema.fragmentLookups[fragName].cloneNode(true));
 
                         }
@@ -845,6 +848,8 @@ mergerUtils.loadSchema = function (doctype) {
 					jQuery(theNode).text(dV);
 				}
 		});
+
+	 // for some strange reason I'm constructing the fragments tree AFTER the sample tree
 		
 		/*
 		 * Now make the fragmentTree
