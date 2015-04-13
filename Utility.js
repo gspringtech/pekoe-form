@@ -301,8 +301,6 @@ gs.Pekoe.merger.Utility = function () {
         editor.on('change', function (){
             console.log('got cke change');
             $pekoeNode.empty().append(jQuery(this.getData()).clone());
-        }).on('paste',function () {
-            console.log('got cke paste');
         });
     }
 	
