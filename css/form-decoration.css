@@ -28,6 +28,12 @@ fieldset {
     border-bottom: 1px solid black;
     border-left: 1px solid black;
     margin-bottom: 5px;
+    padding-left: 7px;
+}
+
+fieldset > fieldset:hover {
+    padding-left: 4px;
+    border-left: solid 4px red;
 }
 
 fieldset fieldset {

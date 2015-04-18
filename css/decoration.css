@@ -118,7 +118,7 @@ cursor:auto;
 }
 
 .waiting {
-    background: url(graphics/wait-antialiased.gif) left no-repeat;
+    background: url(graphics/wait-antialiased.gif) center no-repeat;
 }
 
 .loaded { 
