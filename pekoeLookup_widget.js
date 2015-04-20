@@ -63,8 +63,10 @@
 
 		// In the url-params case, there is NO query.
 		var data = {"_howmany": 100 ,"_wrap": "yes"}; // When is _wrap=no??
-		// simple closure/curry. Not hugely useful.		
+		// simple closure/curry. Not hugely useful.
+
 		if (lookupType === "url-params") {
+			//for each use of $i in the script, replace it with a value
 			// Oh tricky dicky. I'm going to make data["schoolname"] = "$0". So how do I "replace term" 
 			//split the script on &
 //			data["_wrap"] = "no";
@@ -116,6 +118,7 @@
 				item.data = this;
 			} else {
 				item.value = $this.text();
+
 				if ($this.attr("description")) {item.desc = $this.attr("description");} 
 			}
 
@@ -136,15 +139,17 @@
 	};
 	
 
-	var _complexInsertion = function (item,pkn,formEl) {  // ui.item is the chosen object containing {value, data}
+	var _complexInsertion = function (item,pkn,formEl,$applyTo) {  // ui.item is the chosen object containing {value, data}
 
 		var doc = pkn.ownerDocument;
 		var schema = gs.schemas[doc.documentElement.nodeName];
 
 		if (!item.hasChildren) {  // simple list
-			$(formEl).val(item.value.trim()); // and that's it!
-			formEl.trigger("change");
-			formEl.trigger("dirty");
+			// if the lookup is applied to an attribute, then this is wrong. OR it was always wrong
+			$applyTo.val(item.value.trim()); // and that's it!
+			console.log('triggering change on',$applyTo); // this is the fieldset, not the element!
+			$applyTo.trigger("change");
+			$applyTo.trigger("dirty");
 
 		} else { 
 			var e = item.data; // assuming complex
@@ -225,9 +230,12 @@
 			
 			var $lookup = $ph.find("lookup"); // Shouldn't be here otherwise
 			var selector = $lookup.attr("applies-to"); // if empty, it applies to the current input only (??).
-
+			// TODO - Is this applicable?
+			var isRecyclable = $lookup.attr("recycle") == "1"; // show the recycle button - it will be "this" link with an action='recycle'
+			// recycle might also be added to a stack which can be sent if the job is not saved
 			var script = $lookup.find("script").text();
 			var oneShot = ($lookup.attr("one-shot") == '1') || (script.indexOf("$0") == -1); // repeat Ajax request each time or once only
+
 			var qType = $lookup.attr("type"); // xquery | javascript | url-params;
 			var allowUserInput = $lookup.attr("allow-other-values") == 1; // Allows user-input as result (rather than selected result)
 			var path = $lookup.attr("path"); // path in /db/pekoe/ to the resource. Query will be appended to path
@@ -247,6 +255,7 @@
 					var queryData = _prepareAjaxDataFn($params, pekoeNode, script, qType)(); // get and call this one-shot to return {_query: ,_howmany: }
 					var fullpath = _prepareAjaxPath(path);
 					//console.log("queryData", queryData);
+					// TODO why is there no METHOD ?
 					$.ajax({
 						url: fullpath,
 						data: queryData, 
@@ -259,7 +268,7 @@
 								minLength: 0,
 								select: function (event, ui) {
 									valueChosen = true;
-									_complexInsertion(ui.item, pekoeNode, $element);
+									_complexInsertion(ui.item, pekoeNode, $element, $applyTo);
 								},
 								close : function (event,ui) {
 								}

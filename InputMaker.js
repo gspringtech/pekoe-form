@@ -185,6 +185,7 @@ This _could_ be an accessor:
 
 	var updateTree = function() { // INSTANCE - METHOD
 //		// this is a fairly hefty closure...
+		console.log('Update Tree',this.value,currentValue());
 		if (currentValue() == this.value) {
 			return;
 		}
@@ -203,8 +204,9 @@ This _could_ be an accessor:
         }
 
 	};
-	
-	var generateLookupQuery = function () { // TODO - Is this cruft?
+
+	// It appears that all lookups are handled by PekoeLookup_widget.
+	var generateLookupQuery = function () { // TODO - Is this cruft? Probably.
 		var emptyLine = /^[\s]*$/; 
 		/* First line is the path, following lines are variables. pekoeNode is the context
 		  collection("pekoe/postcodes")/post-codes/pc[locality &= $1 and state=$2] 
@@ -254,7 +256,7 @@ This _could_ be an accessor:
 		return xp;
 	};
 	
-	// another complex system. Can this be simplified?
+	// This appears to be only for "input calculation"
 	var parameterisedXPath = function (showLookup) {
 		console.log("You called parameterisedXPath");
 		var xp = generateLookupQuery();
@@ -492,7 +494,7 @@ This _could_ be an accessor:
 		inp.setAttribute("value",currentValue());
 
 		if ($inp.find("lookup").length > 0) {
-            if (isAttribute) console.warn('applying autocompleter to ATTRIBUTE',pekoeNodeName);
+            //if (isAttribute) console.warn('applying autocompleter to ATTRIBUTE',pekoeNodeName);
             jQuery(inp).addClass("autocompleter");
         }
 
@@ -747,22 +749,36 @@ This _could_ be an accessor:
 		pekoeNode.formElement = null;
 	 }
 
+
+	// TODO: lookup for newly added field not working
+	// TODO: field-choice must not repeat unless asked - hide it.
+	// TODO: field-choice with a single option should be a button
+
 	function fieldChoiceInput(  ) {
 		formEl = document.createElement("label");
-		//jQuery(formEl).className('field-choice');
 		formEl.textContent = makeLabelText(pekoeNode);
 		formEl.appendChild(document.createElement("br"));
 		var select = document.createElement("select");
 		var uniqueName =  $fieldDef.attr("path") + "-" + gs.Pekoe.nodeId;
 		select.setAttribute("name",uniqueName);
-
+		// TODO remove this field choice if it is not repeating.
+		// e.g. output-or-xquery - only want one xquery and NO output
+		// but if output is chosen, it is a repeating fragment.
+		// only problem with this is there's no going back. No UNDO.
 		select.onchange = function (e) {
-			jQuery.statusMessage("Choose field " + e.target.value);
+			//jQuery.statusMessage("Choose field " + e.target.value);
 			if (e.target.value === '') { // TODO incorporate check for field definition before inserting.
 				console.warn('NO SUITABLE FIELD NAME for fieldChoice insertion');
 				return;
 			}
-			//console.log('wish to replace ',pekoeNode.nodeName, 'with', e.target.value);
+
+			// NOT A SOLUTION YET:
+			//if (!options.has('repeating')) { $(select).hide()}
+			// There's no obvious way to SHOW this element if you decide to change your mind.
+			// PERHAPS it should be disabled? Based on a TEST?
+			// Perhaps IT should have the "REMOVE XXX" after adding XXX?
+			// The DELETE button should have ON-click -> show this
+
 			var pkn = pekoeNode;
 			var od = pkn.ownerDocument;
 			var newNodeName = e.target.value;
@@ -819,12 +835,17 @@ This _could_ be an accessor:
 						}).appendTo(newFS);
 				}
 				jQuery(newFS).hide();
+				// another way to handle the post-rendering enhancements is to blindly apply them and let each one work out if it's relevent
+				//jQuery('input[type=date]',newFS).datepicker({dateFormat:'yy-mm-dd'});
+				// AUTOCOMPLETE LOOKUP ------------------------------------------- AUTOCOMPLETE ON FRAGMENT LOOKUP -------------
+				// Apply the pekoeLookup widget to any input with class .fragment-lookup or .autocompleter
+				if ($(newFS).hasClass('fragment-lookup')) {$(newFS).pekoeLookup();}
+
 
 				var parentN = formEl.parentNode;
 				var parentN = formEl.parentNode.insertBefore(newFS,formEl);
 				//parentN.appendChild(newFS);
 
-				//applyEnhancements(newFS);
 				jQuery(newFS).show('slow');
 
 			} else if (field !== "") {
@@ -834,14 +855,20 @@ This _could_ be an accessor:
 				// make a simple input
 				var newFS = document.createDocumentFragment();
 				//console.log('fieldChoiceInput calling InputMaker for',nn.nodeName);
-				gs.Pekoe.merger.InputMaker(newFS,nn);
+				var x = gs.Pekoe.merger.InputMaker(newFS,nn);
+				console.log('INPT MAKER RETURNED',x);
 				// created a fragment - the contents.
 				var el = newFS.firstChild;
 				jQuery(el).hide();
 				// if the element is a repeater, then insert before it. Otherwise replace it.
 				//sib = formEl.nextSibling;
 				var parentN = formEl.parentNode.insertBefore(newFS,formEl);
+				//jQuery('input[type=date]').datepicker({dateFormat:'yy-mm-dd'});
+				//// AUTOCOMPLETE LOOKUP ------------------------------------------- AUTOCOMPLETE ON FRAGMENT LOOKUP -------------
+				//// Apply the pekoeLookup widget to any input with class .fragment-lookup or .autocompleter
+				//jQuery(".fragment-lookup, .autocompleter", mform).pekoeLookup();
 				jQuery(el).show('slow');
+
 				// now need to check if there are any enhancements.
 				// problem with the
 				//if (jQuery(el).find('input').is('.autocompleter')) { jQuery(el).find('input').pekoeLookup(); } // any other enhancements that should be applied?

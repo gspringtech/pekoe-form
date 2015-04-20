@@ -153,9 +153,9 @@
 		
 		setFile : function (f) {
 			this.options.file = f;
-            console.log('setfile called with');
+            //console.log('setfile called with',f);
 			$.when(f.req, this.options.bag).then(function () {
-                console.log('when is now. f is',f);
+                //console.log('when is now. f is',f);
 				var doctype = f.getDoctype();
 				gs.bag.filter(doctype);
 				// I need to store the template title and then use it to select the span and activate ti
@@ -189,10 +189,20 @@
 							file: self.options.file
 					};
 					self.updateControls();
-                    self.options.formArea.addClass('waiting');
-					var mainWork = new gs.Pekoe.Form(formOptions); // In theory I could make a new one each time. Just need to check my generated IDs 
-					mainWork.display(self.options.markers);
-                    self.options.formArea.removeClass('waiting');
+                    //self.options.formArea.addClass('waiting');
+					self.options.formArea.append('<img style="position:relative; top:50%; left:50%" src="css/graphics/wait-antialiased.gif" >');
+					var mainWork = new gs.Pekoe.Form(formOptions); // In theory I could make a new one each time. Just need to check my generated IDs
+
+					//TODO here's an odd one. I want the Console to show the error, but this try block will prevent it from showing the line numbers
+					//try {
+						mainWork.display(self.options.markers);
+					//} catch (e) {
+					//	self.element.append("<h1>There was an error loading the form</h1>");
+					//	self.element.append("<div>Please report:</div>");
+					//	$("<div></div>").text(e.name).appendTo(self.element);
+					//	$("<div></div>").text(e.message).appendTo(self.element);
+					//}
+                    //self.options.formArea.removeClass('waiting');
 					self.options.formThing = mainWork;
 					// if setTemplate is called, it can call formThing.display().
 				})
@@ -314,10 +324,18 @@
 //				gs.templateCache[self.options.file.getDoctype()] = d; //  this is NAUGHTY as it may upset any other TAB
 				gs.templateCache[self.options.file.getDoctype()] = {markers: d, href:href};
 				var o = self.options; 
-				// need to check whether the file is dirty before 
-    			o.file.setData(o.formThing.getData()); // getting the data ensures it's pruned of empty branches before displaying in another template
-    			self.updateControls();
-				o.formThing.display(d);
+				// need to check whether the file is dirty before
+				if (o.formThing) {
+					o.file.setData(o.formThing.getData()); // getting the data ensures it's pruned of empty branches before displaying in another template
+					self.updateControls();
+					o.formThing.display(d);
+				} else {
+					console.warn("No Form Loaded",self);
+					//self.html("The Form is not loaded.")
+					self.element.append("<h1>No Form loaded - please Close and try again.</h1>");
+					self.element.append("<div>(Check the Console for an error message.)</div>");
+				}
+
 			});
 			var templateType = href.split(".");
 			var templateName = href.split("/").pop();

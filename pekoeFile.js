@@ -105,7 +105,7 @@
 					that.captured = true;
 
 				}).fail(function() {
-                    $.statusMessage('Unable to load the document. Has it been moved?');
+                    $.statusMessage('Unable to load the document. Is it locked by someone else? Your Admin user can unlock it.');
                 });
 		} // end of load
 		

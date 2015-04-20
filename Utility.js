@@ -104,16 +104,19 @@ gs.Pekoe.merger.Utility = function () {
         //  - sortable fieldsets
         //  - JAVASCRIPT enhancements from the schema (marked as .pekoe-enhancement)
         //  - Editable Rich Text
+		// lookups
 
-	    // I want a "calculation" that can be triggered on field-change.
+	    // I want a "calculation" that can be triggered on field-change. GOT IT - but it's a hack. See chasewater for an example
 	    // It should run every time a field is changed - check all the calculations 
 	    // If the input@derivedSrc is a calculation, the value should only be updated if not already set.
-	// there's a good example here: http://jsbin.com/ixabo/edit?html,js,output but it's complex
+		// there's a good example here: http://jsbin.com/ixabo/edit?html,js,output but it's complex
 
 	mergerUtils.applyEnhancements = applyEnhancements;
 
-	// consider the possibility of dynamically adding .sortable to the parent of the click-handle. Then,
-	// the selected elements can be made more specific
+	// TODO figure out how to apply these 'enhancements' to elements AFTER this phase.
+	// ONE simplistic approach would be to remove the class from each one.
+
+
 	function applyEnhancements(mform) {
 
 		/*
@@ -125,7 +128,8 @@ gs.Pekoe.merger.Utility = function () {
 
 		For some strange reason, an element can be dragged INSIDE another. (e.g. allowing a field to become a child of a field.)
 		 */
-
+		// consider the possibility of dynamically adding .sortable to the parent of the click-handle. Then,
+		// the selected elements can be made more specific
 		jQuery("fieldset").sortable({
 			axis:'y',
 			items:'.repeating',
@@ -165,85 +169,6 @@ gs.Pekoe.merger.Utility = function () {
 
 			}
 		});
-	//    // Automatic sorting for repeating items.
-	//	// first, it is the parent of the sortable items we want.
-	//    jQuery("fieldset:has( > .repeating)").each(function(){
-	//		var $fs = $(this);
-	//		$fs.sortable({
-	//		items: '> .repeating',
-	//		axis: 'y',
-	//		opacity: 0.5,
-	//		appendTo: $fs,
-	//		handle: 'legend .fa-sort',
-	//		beforeStop: function (event, ui) {
-    //
-	//		},
-	//	    stop : function (event, ui) {
-	//	    	console.log("ui.item ",ui.item);  //this is the FORM and ui.item is the [fieldset]
-	//	    	var pkn = ui.item.get(0).pekoeNode; // the moved item
-	//	    	var $prev = ui.item.prev();
-	//	    	var elderP = $prev.get(0).pekoeNode; // its new preceding-sib
-	//	    	if (elderP && pkn) {
-	//	    		jQuery(elderP).after(pkn);  // move it.
-	//	    	} else {
-	//	    		console.warn("Can't move because one or other of these is null. Prev FS (elderP):",elderP, "and pkn:",pkn);
-	//	    		jQuery.statusMessage("Can't move " + ui.item.attr("title") + " after " + $prev.attr("title"));
-	//	    	}
-	//	    }
-	//    });
-	//});
-		//jQuery('fieldset:has( > .item-repeating)').sortable({
-		//	items: '.item-repeating',
-		//	axis:'y',
-		//	appendTo: 'parent',
-		//	opacity: 0.5
-		//});
-
-		//jQuery("fieldset:has( > .item-repeating)").each(
-		//	function (){
-		//		var $fs = $(this);
-		//		$fs.sortable({
-		//			items: '.item-repeating',
-		//			axis:'y',
-		//			appendTo:$fs,
-		//			opacity: 0.5
-		//		});
-		//	});
-
-//		jQuery("fieldset", mform).sortable({
-//			items: "span.repeating",
-//			placeholder: 'sortable-placeholder',
-//			opacity: 0.5,
-//			appendTo: "parent",
-//			// this should be applied according to some rules in the schema.
-//			// reorder: none; among peers; among siblings; anywhere. Not sure how to make that work.
-//			stop : function (event, ui) {
-//				// ui.item is the .repeating element
-//				console.log("ui.item ",ui.item);  //this is the FORM and ui.item is the [fieldset]
-//				var $inp = ui.item.find('input')
-//				// Oh! So excellent. This works! Write less, do more!
-//				// Okay not quite right-- needs to trigger "dirty"
-//				var pkn = $inp.pekoeNode; // the moved item
-//				var $prev = ui.item.prev();
-//				// not quite so simple here. If the prev element isn't a fieldset, then I'll have to
-//				// dig to work out what it is and where the pekoeNode is to be found.
-//				// it could be a span, label
-//				// how can the "reorder" rules be applied?
-//				// I guess it's not so hard: "peers" means others of the same kind and within the same group (e.g. Links)
-//				// (might need better names than these)
-//				// "siblings" means anywhere within the item's parent (but not into any children)
-//				// and "anywhere" is interesting but achievable.
-//				var elderP = $prev.find('input').get(0).pekoeNode; // its new preceding-sib
-//				// should have a function here to investigate the whereabouts of the pekoeNode. Could use the schema.
-//				if (elderP && pkn) {
-////		    		console.log("going to move",pkn,"after",elderP);
-//					jQuery(elderP).after(pkn);  // move it.
-//				} else {
-//					console.warn("Can't move because one or other of these is null. Prev FS (elderP):",elderP, "and pkn:",pkn);
-//					jQuery.statusMessage("Can't move " + ui.item.attr("title") + " after " + $prev.attr("title"));
-//				}
-//			}
-//		});
 
 
 		//jQuery('span.repeating').sortable();
@@ -257,9 +182,14 @@ gs.Pekoe.merger.Utility = function () {
 			}
 		});
 
-		jQuery('input[type=date]').datepicker({dateFormat:'yy-mm-dd'});
-		//jQuery("fieldset.repeating:").append("<i class='fa fa-sort pull-right'></i>");
-	    
+		jQuery('input[type=date]',mform).datepicker({dateFormat:'yy-mm-dd'});
+		// AUTOCOMPLETE LOOKUP ------------------------------------------- AUTOCOMPLETE ON FRAGMENT LOOKUP -------------
+		// Apply the pekoeLookup widget to any input with class .fragment-lookup or .autocompleter
+		jQuery(".fragment-lookup, .autocompleter", mform).pekoeLookup();
+		// Editable Rich text ------------------------------------------- EDITABLE RICH TEXT -------------------------
+		// Beautiful.
+		jQuery(".rte").each(applyRTE);
+
 	    // Perhaps a better approach would be to apply widgets by searching for elements with a pekoe-enhancement class, then evaluating the widget data
 	    jQuery(".pekoe-enhancement", mform).each (function () {
 	    	var enhancement = jQuery.find("input enhancement",this.pekoeNode.ph)[0];
@@ -270,14 +200,6 @@ gs.Pekoe.merger.Utility = function () {
 		    	} catch (e) {console.warn("ENHANCEMENT ERROR:",e); }
 	    	}
 	    });
-
-        // Editable Rich text ------------------------------------------- EDITABLE RICH TEXT -------------------------
-        // Beautiful.
-        jQuery(".rte").each(applyRTE);
-
-        // AUTOCOMPLETE LOOKUP ------------------------------------------- AUTOCOMPLETE ON FRAGMENT LOOKUP -------------
-        // Apply the pekoeLookup widget to any input with class .fragment-lookup or .autocompleter
-	    jQuery(".fragment-lookup, .autocompleter", mform).pekoeLookup();
 
 		
 /*		jQuery(".context-menu",mform).on("click",function(){
@@ -897,7 +819,8 @@ mergerUtils.loadSchema = function (doctype) {
 			 // I don't want to add input/list to input. I just want a definition for it.
 			 // TODO - what if this was a "choice" element?
 			 	if ($p.find("options").text().indexOf("field-choice") >=0) {
-					console.warn("FIELD CHOICE FOR ",selectStmt);
+					//console.warn("FIELD CHOICE FOR ",selectStmt);
+					// TODO for some reason I'm not adding field-choice elements here - why not?
 					return;
 				}
 				var theNode = constructTreeFromPaths(thisSchema.fragmentsTree,selectStmt,child);

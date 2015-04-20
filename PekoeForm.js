@@ -208,7 +208,7 @@ getData : function () {
 	// 2) for each of the fields of interest, attach INPUT behaviour info
 	// 3) Render the form by recursively walking the tree and calling the toForm method. 
 	
-	jQuery(this.formLocation).html(""); // clear the current form	
+	jQuery(this.formLocation).html('<img style="position:relative; top:50%; left:50%" src="css/graphics/wait-antialiased.gif" >'); // clear the current form
 	var that = this; // because of the jQuery loop
 	var atLeastOneDefinedField = false;
     // IT'S NOT the list of PH-DEFINITIONS, its just the list of placeholders for THIS template
@@ -241,11 +241,16 @@ getData : function () {
 
         var $item = jQuery(item); // a <link>
         var isDefault = $item.parent().is("default-links"); // beautiful
-        var fieldpath = $item.attr("path"); // ...  to a field like /txo/property/address or /schema/field-or-fragmentRef
+        // TODO remove the "path" option when all templates are updated
+        var fieldpath = ($item.attr("field-path")!== undefined) ?  $item.attr("field-path") : $item.attr("path"); // ...  to a field like /txo/property/address or /schema/field-or-fragmentRef
+        if (fieldpath === undefined) { // this should never happen. The Link IS the path
+            console.warn("Can't process link without path",key,item);
+            return ;
+        }
         var field = fieldpath.split('?')[0]; // strip off params ?output=address-on-one-line
         field = (field.indexOf('[') !== 0) ? field = field.replace(/\[[^[]*\]/g, '') : field; // strip off any filter expressions like [last()]
         if (field === "") { // this should never happen. The Link IS the path
-            console.warn("Can't process link without path",key,item);
+            console.warn("Can't process link without path",item);
             return;
         }
         if (field.indexOf('//') === 0 || field.indexOf('/') !== 0) {
@@ -400,6 +405,10 @@ getData : function () {
             }
 
             // this causes the "new-field" class to be added by the InputMaker.
+            // But the basic tree is being constructed in the source query (with a generated ID).
+            // Why do I have a generated ID? Why not a lookup?
+            // anyway - perhaps the generated version could have another field? or Perhaps it DOESN'T have a field?
+            // if this.xTree.attr(mod-date) ???
 			if (!newTree) {child.nw = true;} // TODO  - fix this. It only made sense when the tree was constructed here.
             // DO I have access to the URL? is it "new"
             // this
@@ -444,31 +453,13 @@ getData : function () {
         var fm = gs.Pekoe.baseForm.call(that.xTree.documentElement); // Hehe, how easy is that!
         mform.append(fm);
     } catch (e) {console.error("Error rendering the form:",e); return;}
-    $div.append(mform);
+    $div.html(mform);
     // -------------------------------------------------------------------------------
     gs.Pekoe.merger.Utility.applyEnhancements(mform);
 
-    // TODO fix this - Mutation Events are obsolete. Use Mutation Observer instead
-    // https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
-
     /*
      https://developer.mozilla.org/en/docs/Web/API/MutationObserver
-
-     var observer = new MutationObserver(function (mrList){
-     mrList.forEach(function(mutation) {
-     console.log(mutation.type, mutation.target);
-     });
-     });
-
-     var config = { attributes: true, childList: true, characterData: true, subtree: true};
-
-
-     var sb = jQuery(gs.thedocument).find('school-booking').get(0);
-     observer.observe(sb,config);
-
-     Above, will return "childList <web-form>" when a change is made to the text of the /school-booking/web-form
-
-     FROM MutationObserver page:
+     FROM MutationObserver page: for config below
      childList	            Set to true if additions and removals of the target node's child elements (including text nodes) are to be observed.
      attributes	            Set to true if mutations to target's attributes are to be observed.
      characterData	        Set to true if mutations to target's data are to be observed.
@@ -617,6 +608,7 @@ gs.Pekoe.fragmentNodeForm = function () {
 					//var elisionType = "hidden-fieldset-children";
 					//if (thisPekoeNode.pekoeEmpty === undefined || thisPekoeNode.pekoeEmpty === false) { elisionType = "show-first-field-only"; }
 					// Crap. This doesn't work for .siblings. Would have to iterate and test.
+                    // TODO add this info to the current Job so that it stays closed.
 					if (evt.altKey) {
 							$parentFS.toggleClass("hidden-fieldset-children");
 							$parentFS.siblings("fieldset").toggleClass("hidden-fieldset-children");
@@ -656,26 +648,24 @@ gs.Pekoe.fragmentNodeForm = function () {
             .appendTo(legend);
     }
 
+    // merger-utils.applyenhancments is a one-shot search for all the things to be added after the initial form generation
+
 	// Does this fragment have a lookup script?
 	// Maybe it has more than one? Is that useful? NO
 	// if so, then merger-utils.apply enhancements will be used
     // TODO - improve this so that the fragment's lookup can be used OR overridden by the fragment-ref.
     // just because the element exists, doesn't mean it's really a lookup.
-    // should have a test. or else set it on the ph
+    // the lookup must either have a @path or a non-empty script
+
 
 	var $lookup = jQuery(fragmentNode.ph).find("lookup");
     // a valid lookup has either a @path or script (possibly both)
+    // A fragment-ref can possibly have an empty lookup. An input shouldn't, but might.
     var script = $lookup.find('script');
     var path = $lookup.attr('path');
     if (path || (script.length && script.text())) {
-        console.log('got lookup',$lookup);
         formEl.addClass("fragment-lookup");
     }
-
-	//if ($lookup !== null && ($lookup.attr('path')!=='' || $lookup.find('script').text() !== '')) {
-     //
-	//	formEl.addClass("fragment-lookup");
-	//}
 
     var help = jQuery(fragmentNode.ph).find("help")[0];
     if (help && $(help).text()) {
