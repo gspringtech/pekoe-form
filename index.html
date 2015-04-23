@@ -67,6 +67,8 @@
                 var s = {};
                 if (window.parent !== window) { // must be a child frame
                     s = window.parent.AuthService;
+                    gs.angular = window.parent.angular;
+                    gs.scope = gs.angular.element(window.frameElement).scope();
                 } else {
                     s.getTenant = function () {
                         return document.cookie;
@@ -74,6 +76,41 @@
                 }
                 return s;
             })();
+            gs.openItem = function() {
+                if (gs.scope) {
+                    console.log('using angular scope version')
+                    return function (tab, inNewTab) {
+                        if (tab.type === 'folder' || inNewTab) {
+                            gs.scope.addTab(tab); //
+                        } 
+                    };
+                } else {
+
+                    return function (tab) { // open in this window
+                        location.href = tab.href;
+                    };
+                };
+            }();
+
+            gs.tabInfo = function ($tr) {
+                var tab = {};
+                tab.href = $tr.data('href'); // /exist/pekoe-app/files.xql?collection=/files/test-jobs
+                tab.title = $tr.data('title'); // test-jobs
+                tab.type = $tr.data('type'); // folder
+                tab.path = $tr.data('path'); // /files/test-jobs
+                var param = $tr.data('param');
+                if (param) {tab.param = param};
+                return tab;
+            };
+
+            // apply pekoe-tab to links which will open a new pekoe-workspace tab
+            $('.pekoe-tab').on("click",function () {
+                $a = $(this);
+                var t = gs.tabInfo($a);
+                console.log('tab is',t);
+                gs.openItem(t,true);
+
+            });
 
             var bagLoaded = new $.Deferred();
             var templateSelector = new gs.Pekoe.BureauAG("#bagNav");

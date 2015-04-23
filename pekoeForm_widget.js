@@ -78,6 +78,22 @@
 				});
 			self.options.closeButton = closeBtn;
 
+			var job_folderBtn = $("<button>Open folder</button>")
+				.button({text: true, disabled:false})
+				.click(function () {
+					$( document.activeElement ).blur();
+					$a = $(this);
+					var filepath = self.options.file.getPath().split('/');
+					filepath.pop();
+					filepath.splice(0,3);
+					filepath.unshift('');
+					var folderName = filepath[filepath.length-1];
+					var t = {path: filepath.join('/'), href: "/exist/pekoe-app/files.xql?collection=" + filepath.join('/'), type:"folder", title:folderName + "-folder"}
+					console.log(t);
+					gs.openItem(t,true);
+				});
+			self.options.folderButton = job_folderBtn;
+
 	    	
 	    	var savePrintBtn = $("<button>Get final document</button>")
 	    		.button({text: true, disabled: true}) // Consider changing the name according to the document type. (eg. Download/Open Word, View HTML.
@@ -102,7 +118,7 @@
 	    	self.options.savePrintButton = savePrintBtn; 
 	    	
 	    	
-	    	var controls = $("<span class='ui-widget-header ui-corner-all' style='padding: 10px 4px;'></span>").append(saveBtn).append(closeBtn); //.append(savePrintBtn);
+	    	var controls = $("<span class='ui-widget-header ui-corner-all' style='padding: 10px 4px;'></span>").append(saveBtn).append(closeBtn).append(job_folderBtn); //.append(savePrintBtn);
 	    	self.options.savePrintButton.button("option","disabled",true);
 			self.options.controls = controls;
 			var $div = $("<div class='form-controls'></div>");
