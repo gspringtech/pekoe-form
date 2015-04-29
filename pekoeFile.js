@@ -89,7 +89,7 @@
 				},
 				function (d,status, jqxhr) {
 					if (jqxhr.status === 201){
-						settings.path = jqxhr.getResponseHeader("Location");
+						settings.path = jqxhr.getResponseHeader("Location"); // this is to get the ID of a NEW Job
 					}
 					that.doc = d;
 					var thisDocType = d.documentElement.nodeName;
@@ -110,13 +110,14 @@
 		} // end of load
 		
 		function save() {
+			console.log('going to save');
 			 	$.ajax({
 			 		url: settings.path,
 			 		data:that.doc,
 			 		type: 'POST',
 				 	processData: false,
 				  	contentType: "text/xml",
-			 		success: function (d,s) {
+			 		success: function (d,s,jqxhr) {
 			 			// Here's a complication. When this is a New Job, we might have a path to a Query with an id:
 			 			// bookings.xql?id=123
 			 			// instead of a path to a Job.
@@ -126,9 +127,12 @@
 			 			// <result status="okay" path="/db/pekoe/files/education/bookings/2012/08/booking-00349/data.xml">Saved item 349</result>
 			 			// THE REAL PROBLEM IS THAT THESE "SAVE" RESULTS ARE FROM CUSTOM QUERIES.
 						window.dirty = false; // TODO tabs.ctrl is checking this
-			 			var returnedPath = $(d).attr("path");
-			 			//console.log("path: ", settings.path, "returnedPath",returnedPath);
-			 			if (returnedPath) {settings.path = returnedPath;} // Still not captured. And still not STANDARD.
+						if (jqxhr.status === 201){
+							settings.path = jqxhr.getResponseHeader("Location"); // After save there might be a new path.
+						}
+			 			//var returnedPath = $("result",d).attr("path");
+			 			console.log("AFTER SAVE path: ", settings.path);
+			 			//if (returnedPath) {settings.path = returnedPath;} // Still not captured. And still not STANDARD.
 			 			// SO do this by CONVENTION or in browse.xql? Make it part of the SYSTEM or leave it to beaver?
 			 				
 			 			
