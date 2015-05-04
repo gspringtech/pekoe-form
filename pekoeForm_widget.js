@@ -223,7 +223,7 @@
 					// if setTemplate is called, it can call formThing.display().
 				})
 				.fail(function () {
-                    $.statusMessage("Unable to load the form. Has the file been moved?");
+                    $.statusMessage("Unable to load the form. The file may be locked. Please use the Files list to confirm.?");
 				});
 		},
 		
