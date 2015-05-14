@@ -40,6 +40,7 @@
 
 	$.statusMessage = function (msg){
         // TODO needs to be queued.
+		console.log('STATUSMESSAGE:',msg);
 		$("#status")
 			.hide()
 			.html("<span class='status_message'>" + msg + "</span>")
@@ -130,6 +131,7 @@
     		});
     		
 			this.options.formArea = $wrapper;
+			this.options.templateData = null;
 			this.options.template = null;
 			this.options.markers = null;
 			$div.append($wrapper);
@@ -223,7 +225,7 @@
 					// if setTemplate is called, it can call formThing.display().
 				})
 				.fail(function () {
-                    $.statusMessage("Unable to load the form. The file may be locked. Please use the Files list to confirm.?");
+                    $.statusMessage("Unable to load the form. The file may be locked. Please use the Files list to confirm.");
 				});
 		},
 		
@@ -301,9 +303,11 @@
 			return req; // we can resolve this using this.options.templatePromise
 		},
 		
-		setTemplate	: function (href) {  // first called when a template is clicked
+		setTemplate	: function (templateData) {  // first called when a template is clicked
 			var self = this;
-			this.options.template = href;
+			this.options.templateData = templateData;
+			var href = templateData.path;
+			this.options.template = templateData.path;
 		    
 			// AJAX request sent to templates.xql.
 			$.get("/exist/pekoe-app/templates.xql", {"get":"links","template":href}, function (d) {
@@ -323,10 +327,12 @@
 			this.setTemplate = this.changeTemplate; // change to ...
 		},
 		
-		changeTemplate : function (href) {  // subsequent calls to setTemplate...
+		changeTemplate : function (templateData) {  // subsequent calls to setTemplate...
 			var self = this;
 			//console.log('change template');
-			this.options.template = href; 
+			this.options.templateData = templateData;
+			var href = templateData.path;
+			this.options.template = templateData.path;
 
 			$.get("/exist/pekoe-app/templates.xql", {"get":"links","template":href}, function (d) {
 				var doctype = self.options.file.getDoctype();

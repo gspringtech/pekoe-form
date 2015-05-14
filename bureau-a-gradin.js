@@ -75,7 +75,7 @@ gs.Pekoe.BureauAG.prototype = { // christ its a fucking prototype based thing. B
 			jQuery("#templateItems div").hide();
 			jQuery('#bag [title=templateRoot]').show().parent().show();
 			
-			jQuery("#bagNav").click(function (e) {  
+			jQuery("#bagNav").click(function (e) {
 			    var t = jQuery(e.target);
 			    if (!t.hasClass("folder")) {return;} // don't process spacers
 			    t.addClass("active");
@@ -184,8 +184,9 @@ gs.Pekoe.BureauAG.prototype = { // christ its a fucking prototype based thing. B
 	     
 	    jQuery.each(itemsNodeList, function (k,v) {
 	    	var $li = jQuery(v);
-			var cell = jQuery("<span/>").text($li.text()).attr("title",$li.attr("title")).addClass($li.attr("fileType"));
-			if ($li.attr('default-for')) {cell.attr('default-for',$li.attr('default-for'));}
+			var cell = jQuery("<span/>").text($li.text()).attr("title",$li.attr("title")).addClass($li.data("file-type")); // file-type will be used to set the icon
+			//if ($li.data('default-for')) {cell.attr('default-for',$li.data('default-for'));}
+			cell.data($li.data()); // Any data- attributes will be passed to the pekoeForm here - and will be accessible from the Custom Commands.
 			cell.appendTo(items);
 	    });
 
@@ -199,6 +200,7 @@ gs.Pekoe.BureauAG.prototype = { // christ its a fucking prototype based thing. B
 	
 	reveal : function(template) {
 		// get the templateItems div
+		console.log('reveal template',template);
 		if (template && template.indexOf('/templates') > -1) {
 			jQuery("#templateItems .active").removeClass("active");
 			jQuery("#templateItems div").hide();
@@ -206,6 +208,8 @@ gs.Pekoe.BureauAG.prototype = { // christ its a fucking prototype based thing. B
 			jQuery('#bagNav [title=templateRoot]').show().parent().show(); // because otherwise they will remain hidden
 
 			// to show the appropriate bagNav, use the template path - work up through the path, chopping off the ends
+			// TODO reveal template doesn't show the parent folder correctly.
+			// Probably needs to go top-down.
 			var pathParts = template.split("/");
 			while (pathParts.pop() !== "templates") {
 				if (!pathParts) break;
@@ -231,6 +235,7 @@ gs.Pekoe.BureauAG.prototype = { // christ its a fucking prototype based thing. B
 		if (f.length > 0) {
 			this.reveal(f.attr('title'));
 		} else {
+			console.log('Find first template for', doctype);
 			var f = jQuery("#templateItems").find('span.' + doctype).first();
 			this.reveal((f.attr('title')));
 		}

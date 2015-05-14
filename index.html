@@ -82,7 +82,7 @@
                     return function (tab, inNewTab) {
                         if (tab.type === 'folder' || inNewTab) {
                             gs.scope.addTab(tab); //
-                        } 
+                        }
                     };
                 } else {
 
@@ -120,13 +120,26 @@
             $("#templateItems").on("click", "span", function (e) {
                 // this really should be inside the BAG. The pekoeForm call should be a callback or listener.
                 // the reason is that I would like one function to display the current template name.
+//                console.log(e.metaKey);
                 var $span = $(this);
-                if ($span.hasClass("irrelevant")) {jQuery.statusMessage("that template doesn't apply to this file"); return; }
                 var tPath = $span.attr('title');
-                panel.pekoeForm("setTemplate",tPath);
+                if (e.metaKey) {
+                    var filepath = tPath.split('/'); // '/db/pekoe/tenants/cm/templates/AD-Bookings/Thank-you.odt'
+                    filepath.pop(); // /db/pekoe/tenants/cm/templates/AD-Bookings
+                    filepath.splice(0,5); // templates/AD-Bookings
+                    filepath.unshift(''); // /templates/AD-Bookings
+                    var folderName = filepath[filepath.length-1]; // 'AD-Bookings'
+                    // I should be able to write /exist/pekoe-app/templates.xql?collection=
+                    var t = {path: filepath.join('/'), href: "/exist/pekoe-app/files.xql?collection=" + filepath.join('/'), type:"folder", title:folderName + "-folder"}
+                    gs.openItem(t,true);
+                    return;
+                }
+
+                if ($span.hasClass("irrelevant")) {jQuery.statusMessage("that template doesn't apply to this file"); return; }
+                panel.pekoeForm("setTemplate",$span.data());
                 $span.siblings().removeClass("active");
                 $span.addClass("active");
-                $('#bagstart').html('Templates (current: <strong>' + tPath.substring(tPath.indexOf('/templates/') + '/templates/'.length) + '</stronghtt>)');
+                $('#bagstart').html('Templates (current: <strong>' + tPath.substring(tPath.indexOf('/templates/') + '/templates/'.length) + '</strong>)');
             });
 
             var panel = $("<div></div>").attr("id","formDiv").appendTo('#workarea');
