@@ -58,84 +58,33 @@
 		
 		_init: function () {
 			var self = this;
-			//console.log('this is ',this);
-			var saveBtn = $("<button>Save</button>")
-	    		.button({text: true, disabled:true}) // button will be enabled when $wrapper receives "dirty" event from PekoeForm
-	    		.click(function () { 
-	    			$( document.activeElement ).blur();
-	    			self.save();
-	    			
-	    			
-				});
-	    	self.options.saveButton = saveBtn;
 
 			var closeBtn = $("<button>Close</button>")
 				.button({text: true, disabled:false})
 				.click(function () {
 					$( document.activeElement ).blur();
 					pekoeClose();
-
-
 				});
 			self.options.closeButton = closeBtn;
-
-			var job_folderBtn = $("<button>Open folder</button>")
-				.button({text: true, disabled:false})
-				.click(function () {
-					$( document.activeElement ).blur();
-					$a = $(this);
-					var filepath = self.options.file.getPath().split('/');
-					filepath.pop();
-					filepath.splice(0,3);
-					filepath.unshift('');
-					var folderName = filepath[filepath.length-1];
-					var t = {path: filepath.join('/'), href: "/exist/pekoe-app/files.xql?collection=" + filepath.join('/'), type:"folder", title:folderName + "-folder"}
-					console.log(t);
-					gs.openItem(t,true);
-				});
-			self.options.folderButton = job_folderBtn;
-
 	    	
-	    	var savePrintBtn = $("<button>Get final document</button>")
-	    		.button({text: true, disabled: true}) // Consider changing the name according to the document type. (eg. Download/Open Word, View HTML.
-	    		.click(function () { 
-	    			$( document.activeElement ).blur();
-	    			// IS the document dirty? Do we need to SAVE first?
-					var o = self.options;
-					// BIGGEST problem with form based merge (or even location.href=...) 
-					// is that there's no way to handle an error without losing the context of this page 
-
-					// TODO make this open a new window
-					if (o.template) {
-						// perhaps there's a way to ask for this and then get it when it works.
-						// send the original merge request via Ajax and then do the download when a positive response is received.
-						// but that brings me back to storing artifacts in the DB.
-						var path = o.template + "?job=" + o.file.getPath();
-						$.statusMessage("merge " +path);
-						window.location.href= "merge" + path; // THIS IS IT. It doesn't handle server-side errors.
-					}
-
-				});
-	    	self.options.savePrintButton = savePrintBtn; 
-	    	
-	    	
-	    	var controls = $("<span class='ui-widget-header ui-corner-all' style='padding: 10px 4px;'></span>").append(saveBtn).append(closeBtn).append(job_folderBtn); //.append(savePrintBtn);
-	    	self.options.savePrintButton.button("option","disabled",true);
+	    	var controls = $("<span class='ui-widget-header ui-corner-all' style='padding: 10px 4px;'></span>").append(closeBtn);
 			self.options.controls = controls;
 			var $div = $("<div class='form-controls'></div>");
 	    	$div.append(controls);
 	    	var $wrapper = $("<div></div>");
 	    	
 	    	$wrapper.on("dirty", function(e) {
-    			self.options.saveButton.button("option","disabled",false);
+				self.options.dirty = true;
+				$('.enable-when-dirty').button("option","disabled",false);
+				$('.enable-when-clean').button("option","disabled",true);
     		});
     		
 			this.options.formArea = $wrapper;
 			this.options.templateData = null;
 			this.options.template = null;
 			this.options.markers = null;
+			this.options.dirty = false;
 			$div.append($wrapper);
-			this.element.append($("#bag")); // move it from wherever it is
 			this.element.append($div);			
 		}, // end _init
 		
@@ -145,22 +94,19 @@
 			self.options.controls.find(".site-control").remove();
 			// add custom commands associated with this doctype and template.
 			$(this.options.markers).find("command").each(function () {
-
+				// these site commands are already filtered for this template and doctype
 				var $c = $(this);
-				// does $c have an attribute "applies-to"?
-				if ($c.attr("template-type")) {
-					//console.log('applies-to?');
-					var templateType = self.options.template.replace(/^[^.]+\./,'');
-					if ($c.attr("template-type").split(',').indexOf(templateType) === -1) {
-						//console.log('... no');
-						return;
-					}
-				}
-				// if so, does it match this template
+				// when should this button be enabled?
+				var enableClass = "enable-when-" + $c.attr('enable-when');
+				var enabled =  (enableClass === 'enable-when-always')
+					|| ((enableClass === 'enable-when-dirty') && self.options.dirty)
+					|| ((enableClass === 'enable-when-clean') && !self.options.dirty);
+
 				var button = $("<button class='site-control'></button>")
 					.text($c.attr("name"))
 					.attr("title",$c.attr("description"))
-		    		.button({text: true, disabled: false}) // Consider changing the name according to the document type. (eg. Download/Open Word, View HTML.
+					.addClass(enableClass)
+		    		.button({text: true, disabled: !enabled}) // Consider changing the name according to the document type. (eg. Download/Open Word, View HTML.
 		    		.click(function () { 
 		    				eval($c.text()); // will have access to the whole context - including self.options etc.
 		    		});
@@ -188,13 +134,12 @@
 		},
 		
 		save : function () {
-//			console.log("You saved me");
 			var o = this.options; 
 			o.file.setData(o.formThing.getData());
 			o.file.save();
-			o.saveButton.button("option","disabled",true);
-			console.log('save button?', o.saveButton);
-//			o.savePrintButton.button("option","disabled",true);
+			$('.enable-when-clean').button("option","disabled",false);
+			$('.enable-when-dirty').button("option","disabled",true);
+			o.dirty = false;
 		},
 
 		
@@ -207,22 +152,13 @@
 							file: self.options.file
 					};
 					self.updateControls();
-                    //self.options.formArea.addClass('waiting');
 					self.options.formArea.append('<img style="position:relative; top:50%; left:50%" src="css/graphics/wait-antialiased.gif" >');
 					var mainWork = new gs.Pekoe.Form(formOptions); // In theory I could make a new one each time. Just need to check my generated IDs
 
 					//TODO here's an odd one. I want the Console to show the error, but this try block will prevent it from showing the line numbers
 					//try {
 						mainWork.display(self.options.markers);
-					//} catch (e) {
-					//	self.element.append("<h1>There was an error loading the form</h1>");
-					//	self.element.append("<div>Please report:</div>");
-					//	$("<div></div>").text(e.name).appendTo(self.element);
-					//	$("<div></div>").text(e.message).appendTo(self.element);
-					//}
-                    //self.options.formArea.removeClass('waiting');
 					self.options.formThing = mainWork;
-					// if setTemplate is called, it can call formThing.display().
 				})
 				.fail(function () {
                     $.statusMessage("Unable to load the form. The file may be locked. Please use the Files list to confirm.");
@@ -246,7 +182,6 @@
 			var req = dfd.promise(); // we'll manually resolve this promise.
 			var self = this;
 			if (this.options.schemaLoaded) {
-//				console.log("Schema is loaded");
 				dfd.resolve(); // it's resolved already		
 			} else {
 				$.when(gs.Pekoe.merger.Utility.loadSchema(this.options.file.getDoctype()))
@@ -262,7 +197,6 @@
 		
 		refresh : function () {
 			var doctype = this.options.file.getDoctype();
-			//console.log('GOING TO REFRESH',doctype);
 			gs.bag.filter(doctype); 
 		},
 		
@@ -323,13 +257,12 @@
 			});
 			var templateType = href.split(".");
 			var templateName = href.split("/").pop();
-			self.options.savePrintButton.button("option","label","Get " + templateName).button("option","disabled",false);
+			//self.options.savePrintButton.button("option","label","Get " + templateName).button("option","disabled",false);
 			this.setTemplate = this.changeTemplate; // change to ...
 		},
 		
 		changeTemplate : function (templateData) {  // subsequent calls to setTemplate...
 			var self = this;
-			//console.log('change template');
 			this.options.templateData = templateData;
 			var href = templateData.path;
 			this.options.template = templateData.path;
@@ -343,7 +276,6 @@
 				}
 				self.options.markers = d; 
 				// this is hardly a cache if we're going to load it every time.
-//				gs.templateCache[self.options.file.getDoctype()] = d; //  this is NAUGHTY as it may upset any other TAB
 				gs.templateCache[self.options.file.getDoctype()] = {markers: d, href:href};
 				var o = self.options; 
 				// need to check whether the file is dirty before
@@ -353,31 +285,25 @@
 					o.formThing.display(d);
 				} else {
 					console.warn("No Form Loaded",self);
-					//self.html("The Form is not loaded.")
 					self.element.append("<h1>No Form loaded - please Close and try again.</h1>");
 					self.element.append("<div>(Check the Console for an error message.)</div>");
 				}
-
 			});
 			var templateType = href.split(".");
 			var templateName = href.split("/").pop();
-			self.options.savePrintButton.button("option","label","Get " + templateName).button("option","disabled",false);
-
 		},
 		
 		isDirty : function () {
-			return (this.options.saveButton.button("option","disabled") === false);
+			return (this.options.dirty );
 		},
 		
 		destroy : function () {
-//			console.log("Destroy method");
 			if (this.options.file && this.options.file.isCaptured()) {
 				this.options.file.release();
 			} else {
 				console.log("file wasn't captured - so can't release."); // So WHY ...?
 				this.options.file.release();
 			}
-
 			$.Widget.prototype.destroy.apply(this, arguments);
 		}
 	});

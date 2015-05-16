@@ -166,7 +166,7 @@ color:inherit;
     outline-color: #00AAFF;
     font-weight: bold;
     color: blue;
-    background-color:#CEDDA2;
+    /*background-color:inherit;*/
 }
 #templateItems div { 
     /* display:none; */
@@ -206,10 +206,14 @@ color:inherit;
     color:inherit;
 }
 
-
-
-.txt{
+.mail{
     background-color: wheat;
+    background-image: url(graphics/icons/email.png);
+    color: black;
+}
+
+.txt, .text{
+    background-color: white;
     background-image: url(graphics/icons/page_white_text.png);
     color: black;
 }

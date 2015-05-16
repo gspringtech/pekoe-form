@@ -206,10 +206,7 @@ gs.Pekoe.BureauAG.prototype = { // christ its a fucking prototype based thing. B
 			jQuery("#templateItems div").hide();
 			jQuery("#bagNav div").hide();
 			jQuery('#bagNav [title=templateRoot]').show().parent().show(); // because otherwise they will remain hidden
-
 			// to show the appropriate bagNav, use the template path - work up through the path, chopping off the ends
-			// TODO reveal template doesn't show the parent folder correctly.
-			// Probably needs to go top-down.
 			var pathParts = template.split("/");
 			while (pathParts.pop() !== "templates") {
 				if (!pathParts) break;
@@ -219,9 +216,9 @@ gs.Pekoe.BureauAG.prototype = { // christ its a fucking prototype based thing. B
 			jQuery("#templateItems").find('span[title="' + template + '"]').click().parent().show();
 		} else {console.warn('bad template path',template);}
 	},
-	
+
+	// the doctype isn't going to change - only the active element.
 	filter : function (doctype) {
-		//console.log('filtering',doctype);
 		jQuery("#templateItems").find("span")
 			.addClass("irrelevant").removeClass("active").end()
 			.find("." + doctype)
@@ -235,7 +232,7 @@ gs.Pekoe.BureauAG.prototype = { // christ its a fucking prototype based thing. B
 		if (f.length > 0) {
 			this.reveal(f.attr('title'));
 		} else {
-			console.log('Find first template for', doctype);
+			console.log('Find first available template for', doctype);
 			var f = jQuery("#templateItems").find('span.' + doctype).first();
 			this.reveal((f.attr('title')));
 		}

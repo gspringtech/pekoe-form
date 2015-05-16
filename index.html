@@ -111,6 +111,9 @@
                 gs.openItem(t,true);
 
             });
+            var args = gs.Utility.getArgs();
+            var href = args.job;
+            var doctype = href.split(':').shift();
 
             var bagLoaded = new $.Deferred();
             var templateSelector = new gs.Pekoe.BureauAG("#bagNav");
@@ -120,16 +123,15 @@
             $("#templateItems").on("click", "span", function (e) {
                 // this really should be inside the BAG. The pekoeForm call should be a callback or listener.
                 // the reason is that I would like one function to display the current template name.
-//                console.log(e.metaKey);
                 var $span = $(this);
-                var tPath = $span.attr('title');
+                var tPath = $span.attr('title'); // DISPLAY Title (safe)
                 if (e.metaKey) {
-                    var filepath = tPath.split('/'); // '/db/pekoe/tenants/cm/templates/AD-Bookings/Thank-you.odt'
+                    var filepath = $span.data('path').split('/'); // '/db/pekoe/tenants/cm/templates/AD-Bookings/Thank-you.odt'
                     filepath.pop(); // /db/pekoe/tenants/cm/templates/AD-Bookings
                     filepath.splice(0,5); // templates/AD-Bookings
                     filepath.unshift(''); // /templates/AD-Bookings
                     var folderName = filepath[filepath.length-1]; // 'AD-Bookings'
-                    // I should be able to write /exist/pekoe-app/templates.xql?collection=
+                    // TODO create a unified view of Templates and change this ...
                     var t = {path: filepath.join('/'), href: "/exist/pekoe-app/files.xql?collection=" + filepath.join('/'), type:"folder", title:folderName + "-folder"}
                     gs.openItem(t,true);
                     return;
@@ -137,18 +139,16 @@
 
                 if ($span.hasClass("irrelevant")) {jQuery.statusMessage("that template doesn't apply to this file"); return; }
                 panel.pekoeForm("setTemplate",$span.data());
-                $span.siblings().removeClass("active");
                 $span.addClass("active");
-                $('#bagstart').html('Templates (current: <strong>' + tPath.substring(tPath.indexOf('/templates/') + '/templates/'.length) + '</strong>)');
+                $('#bagstart').html('Templates (selected: <strong>' + tPath.substring(tPath.indexOf('/templates/') + '/templates/'.length) + '</strong>)');
             });
 
             var panel = $("<div></div>").attr("id","formDiv").appendTo('#workarea');
-            var args = gs.Utility.getArgs();
+
             panel.pekoeForm({bag:bagLoaded}).pekoeForm("setFile",gs.Pekoe.pekoeFile({"href":args.job}));
 
             window.pekoeClose = function () { // See TabsService.
                 if (!dirty || confirm('Close form without Saving?')) {
-
                     // TODO improve this so that errors don't prevent the tab from closing.
                     panel.remove(); // this results in a call to pekoeFile.release which then calls readyToClose in tabs.service
                     return true;
