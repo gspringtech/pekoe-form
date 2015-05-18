@@ -139,6 +139,7 @@
 
                 if ($span.hasClass("irrelevant")) {jQuery.statusMessage("that template doesn't apply to this file"); return; }
                 panel.pekoeForm("setTemplate",$span.data());
+                $('#templateItems .active').removeClass('active');
                 $span.addClass("active");
                 $('#bagstart').html('Templates (selected: <strong>' + tPath.substring(tPath.indexOf('/templates/') + '/templates/'.length) + '</strong>)');
             });
