@@ -291,11 +291,12 @@ mergerUtils.replicateElement = function (pkn, formEl) {
 		} else {
 			parentN.appendChild(newFS);
 		}	
-		jQuery(el).show('slow').find('input').focus();
+
         // now need to check if there are any enhancements.
         // problem with the
 		if (jQuery(el).find('input').is('.autocompleter')) { jQuery(el).find('input').pekoeLookup(); } // any other enhancements that should be applied?
         jQuery(el).find('.rte').each(applyRTE);
+		jQuery(el).show('slow').find('input').focus();
 	};
 	
 mergerUtils.deleteMe = function (fieldset) {
