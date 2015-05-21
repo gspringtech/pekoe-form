@@ -725,7 +725,7 @@ mergerUtils.loadSchema = function (doctype) {
                     var script = $lookup.find('script');
                     var path = $lookup.attr('path');
                     if (path || (script.length && script.text())) {
-                        console.log('FIELD lookup has content');
+                        console.log('FIELD',$field.attr("path"),'has lookup');
 
                     } else {
                         var fragName = $field.attr('path').split('/').pop();

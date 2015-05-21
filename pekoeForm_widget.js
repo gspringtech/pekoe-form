@@ -95,6 +95,7 @@
 			// add custom commands associated with this doctype and template.
 			$(this.options.markers).find("command").each(function () {
 				// these site commands are already filtered for this template and doctype
+
 				var $c = $(this);
 				// when should this button be enabled?
 				var enableClass = "enable-when-" + $c.attr('enable-when');
@@ -122,10 +123,15 @@
                 //console.log('when is now. f is',f);
 				var doctype = f.getDoctype();
 				gs.bag.filter(doctype);
-				// I need to store the template title and then use it to select the span and activate ti
-				var previousTemplate; 	// TODO save the previousTemplate as a cookie
+				// I need to store the template title and then use it to select the span and activate
+				// if there's a template in the args, then load it .
+				var previousTemplate = gs.template ? gs.template : null; 	// TODO save the previousTemplate as a cookie
 				if (previousTemplate) {
-
+					console.log('find and load',previousTemplate);
+					if (!gs.bag.reveal(previousTemplate)) {
+						console
+						gs.bag.findDefault(doctype);
+					}
 				} else {
 					gs.bag.findDefault(doctype);
 				}
@@ -260,7 +266,9 @@
 			//self.options.savePrintButton.button("option","label","Get " + templateName).button("option","disabled",false);
 			this.setTemplate = this.changeTemplate; // change to ...
 		},
-		
+
+		// TODO - use this to CHANGE THE ARGS TO REFLECT THIS TEMPLATE
+
 		changeTemplate : function (templateData) {  // subsequent calls to setTemplate...
 			var self = this;
 			this.options.templateData = templateData;

@@ -213,8 +213,19 @@ gs.Pekoe.BureauAG.prototype = { // christ its a fucking prototype based thing. B
 			    var p = pathParts.join("/");
 			    jQuery("#bag span[title='" + p + "']").addClass('active').parent().show().parent().show();
 			}
-			jQuery("#templateItems").find('span[title="' + template + '"]').click().parent().show();
-		} else {console.warn('bad template path',template);}
+			var tSpan = jQuery("#templateItems").find('span[title="' + template + '"]');
+			if (tSpan.length === 1) {
+				tSpan.click().parent().show();
+				return true;
+			} else {
+				console.warn('Template not found');
+				return false;
+			}
+
+		} else {
+			console.warn('bad template path',template);
+			return false;
+		}
 	},
 
 	// the doctype isn't going to change - only the active element.

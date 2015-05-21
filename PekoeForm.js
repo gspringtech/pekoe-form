@@ -471,17 +471,18 @@ getData : function () {
      */
 
     var observer = new MutationObserver(function (mutations){
+        // a jQuery Selector on this document will cause two mutations - an add and remove.
+        // this is really irritating. It means I can't use jQuery selectors in my Site-Commands (e.g to check a field before sending an email)
         that.dirty(); // activate the Save button etc.
         mutations.forEach(function (mutation){
             // regardless of the type, we want the element.
             var modElement = mutation.target;
             modElement.pekoeEmpty = false;
-            jQuery(modElement).parents().each(function (e) {e.pekoeEmpty = false;})
+            jQuery(modElement).parents().each(function (e) {e.pekoeEmpty = false;}); // strange that this doesn't also trigger a mutation.
         });
     });
     var config = {attributes: true, childList: true, subtree: true};
     observer.observe(that.xTree,config);
-
     // INITIAL STATE is clean
     this.setClean(true);
 

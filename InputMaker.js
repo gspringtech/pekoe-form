@@ -185,7 +185,7 @@ This _could_ be an accessor:
 
 	var updateTree = function() { // INSTANCE - METHOD
 //		// this is a fairly hefty closure...
-		console.log('Update Tree',this.value,currentValue());
+//		console.log('Update Tree',this.value,currentValue());
 		if (currentValue() == this.value) {
 			return;
 		}
@@ -199,7 +199,7 @@ This _could_ be an accessor:
                 pekoeNode.setAttribute("time-stamp", d.toString().split(' ')[4]);
             }
             if (options.has('dateTimeStamp') === true) {
-                pekoeNode.setAttribute("time-stamp", d.toISODateTime());
+                pekoeNode.setAttribute("dateTime-stamp", d.toISODateTime());
             }
         }
 
@@ -321,6 +321,10 @@ This _could_ be an accessor:
 		var ts = pekoeNode.getAttribute("time-stamp");		
 		if (ts !== null) {
 			jQuery("<span class='date-stamp'></span>").text(ts).appendTo(formEl);	
+		}
+		var dts = pekoeNode.getAttribute("dateTime-stamp");
+		if (dts !== null) {
+			jQuery("<span class='date-stamp'></span>").text(dts).appendTo(formEl);
 		}
 	}
 	
@@ -723,6 +727,7 @@ This _could_ be an accessor:
          formEl = $formEl.get(0);
 	 }
 
+	// TODO - make input LOOKUP work here.
 	function selectInput(  ) { 
 		formEl = document.createElement("label");
 		formEl.textContent = makeLabelText(pekoeNode);
