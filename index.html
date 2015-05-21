@@ -126,6 +126,8 @@
                 // the reason is that I would like one function to display the current template name.
                 var $span = $(this);
                 var tPath = $span.attr('title'); // DISPLAY Title (safe)
+                args.template = tPath;
+                history.replaceState(null,null,location.origin + location.pathname + '?' + $.param(args)); // update the location to include the current template
                 if (e.metaKey) {
                     var filepath = $span.data('path').split('/'); // '/db/pekoe/tenants/cm/templates/AD-Bookings/Thank-you.odt'
                     filepath.pop(); // /db/pekoe/tenants/cm/templates/AD-Bookings
