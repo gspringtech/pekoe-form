@@ -697,12 +697,12 @@ mergerUtils.loadSchema = function (doctype) {
                      // possible that it has a lookup but no script or path
                      // TODO - determine the best test for a non-empty lookup
                      var $lookup = $fragment.children('lookup');
-                     var script = $lookup.find('script');
+                     var script = $lookup.find('script').get(0);
                      var path = $lookup.attr('path');
                      //var thescript = script.length ? script.text() : '';
                      //console.log('fragment lookup?',$lookup,thescript,path);
-                     if (path || (script.length && script.text())) {
-                         console.log('adding fragmentLookup for',$fragment.attr('name'));
+                     if (path !== '' || $(script).text()) {
+                         console.log('adding fragment lookup for',$fragment.attr('name'));
                          thisSchema.fragmentLookups[$fragment.attr('name')] = $lookup.get(0);
                      }
 
@@ -723,17 +723,15 @@ mergerUtils.loadSchema = function (doctype) {
 
 
                     var $lookup = $field.find('lookup');
-                    var script = $lookup.find('script');
+                    var script = $lookup.find('script').get(0);
                     var path = $lookup.attr('path');
-                    if (path || (script.length && script.text())) {
-                        console.log('FIELD',$field.attr("path"),'has lookup');
-
+                    if (path !== '' || $(script).text()) {
+                        console.log('FIELD',$field.attr("path"),'has own lookup');
                     } else {
                         var fragName = $field.attr('path').split('/').pop();
                         if (thisSchema.fragmentLookups[fragName]) {
-                            console.log('FOUND A FRAGMENT LOOKUP for',fragName);
+                            console.log('USING A FRAGMENT LOOKUP for', $field.attr('path'));
                             $field.get(0).appendChild(thisSchema.fragmentLookups[fragName].cloneNode(true));
-
                         }
                     }
 

@@ -662,9 +662,9 @@ gs.Pekoe.fragmentNodeForm = function () {
 	var $lookup = jQuery(fragmentNode.ph).find("lookup");
     // a valid lookup has either a @path or script (possibly both)
     // A fragment-ref can possibly have an empty lookup. An input shouldn't, but might.
-    var script = $lookup.find('script');
+    var script = $lookup.find('script').get(0);
     var path = $lookup.attr('path');
-    if (path || (script.length && script.text())) {
+    if (path !== '' || $(script).text()) {
         formEl.addClass("fragment-lookup");
     }
 
