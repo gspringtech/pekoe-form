@@ -423,7 +423,6 @@ function duplicate(source, dest) {
 	var type = "unknown";
 	if (xpr == null) return "";
 	switch (xpr.resultType) {
-		
 		case XPathResult.STRING_TYPE:
 			type = "STRING";
 			resultString = xpr.stringValue;
@@ -700,9 +699,12 @@ mergerUtils.loadSchema = function (doctype) {
                      var script = $lookup.find('script').get(0);
                      var path = $lookup.attr('path');
 					 if ((path && path !== '') || $(script).text().length !== 0) {
-						 console.log('adding fragment lookup for',$fragment.attr('name'), 'with path',path,'script-length',$(script).text().length);
+						 //console.log('adding fragment lookup for',$fragment.attr('name'), 'with path',path,'script-length',$(script).text().length);
                          thisSchema.fragmentLookups[$fragment.attr('name')] = $lookup.get(0);
-                     }
+                     } else {
+						 // remove the lookup so it doesn't confuse things
+						 $lookup.remove();
+					 }
                  }
              }
          );
@@ -717,11 +719,13 @@ mergerUtils.loadSchema = function (doctype) {
                     var script = $lookup.find('script').get(0);
                     var path = $lookup.attr('path');
 					if ((path && path !== '') || $(script).text().length !== 0) {
-                        console.log('FIELD',$field.attr("path"),'has own lookup', 'with path',path,'script-length',$(script).text().length);
+                        //console.log('FIELD',$field.attr("path"),'has own lookup', 'with path',path,'script-length',$(script).text().length);
                     } else { // ... otherwise check for a fragment lookup
                         var fragName = $field.attr('path').split('/').pop();
                         if (thisSchema.fragmentLookups[fragName]) {
-                            console.log('USING A FRAGMENT LOOKUP for', $field.attr('path'));
+							// remove the original. It confuses the test in PekoeForm
+							$lookup.remove();
+                            //console.log('USING A FRAGMENT LOOKUP for', $field.attr('path'));
                             $field.get(0).appendChild(thisSchema.fragmentLookups[fragName].cloneNode(true));
                         }
                     }
