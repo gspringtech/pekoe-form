@@ -699,13 +699,10 @@ mergerUtils.loadSchema = function (doctype) {
                      var $lookup = $fragment.children('lookup');
                      var script = $lookup.find('script').get(0);
                      var path = $lookup.attr('path');
-                     //var thescript = script.length ? script.text() : '';
-                     //console.log('fragment lookup?',$lookup,thescript,path);
-                     if (path !== '' || $(script).text()) {
-                         console.log('adding fragment lookup for',$fragment.attr('name'));
+					 if ((path && path !== '') || $(script).text().length !== 0) {
+						 console.log('adding fragment lookup for',$fragment.attr('name'), 'with path',path,'script-length',$(script).text().length);
                          thisSchema.fragmentLookups[$fragment.attr('name')] = $lookup.get(0);
                      }
-
                  }
              }
          );
@@ -714,32 +711,21 @@ mergerUtils.loadSchema = function (doctype) {
 			function () {
 				var $field = jQuery(this);
 				thisSchema.fieldDefsByPath[  $field.attr("path") ] = this;
-                // now, somehow want to use the path to determine whether the fragment has a lookup
-                //first check for frag-ref...
+                // if this is a frag-ref and it has a real lookup then...
                 if ($field.is('fragment-ref')) {
-                    //console.log('got fragment-ref with path',$field.attr('path'));
-                    // next, test to see if this frag-ref already has a lookup. THEY ALL DO.
-                    // need to test whether the lookup has useful content. How? (see above) ***************
-
-
                     var $lookup = $field.find('lookup');
                     var script = $lookup.find('script').get(0);
                     var path = $lookup.attr('path');
-                    if (path !== '' || $(script).text()) {
-                        console.log('FIELD',$field.attr("path"),'has own lookup');
-                    } else {
+					if ((path && path !== '') || $(script).text().length !== 0) {
+                        console.log('FIELD',$field.attr("path"),'has own lookup', 'with path',path,'script-length',$(script).text().length);
+                    } else { // ... otherwise check for a fragment lookup
                         var fragName = $field.attr('path').split('/').pop();
                         if (thisSchema.fragmentLookups[fragName]) {
                             console.log('USING A FRAGMENT LOOKUP for', $field.attr('path'));
                             $field.get(0).appendChild(thisSchema.fragmentLookups[fragName].cloneNode(true));
                         }
                     }
-
-
-                    // one option is to copy the lookup element from the fragment. I'll try that. It might be a little expensive
-                    // but it saves some hacking elsewhere.
                 }
-                //console.log('thisElement',thisElement);
 			});
 
 
