@@ -374,6 +374,7 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 	var wrappedFormInput = inputWrapper(pekoeNode.formElement); // this object will be available to the command-button code.
 	$fieldDef.find('command-button').each(function () {
 		var $command = $(this);
+		if (!$command.attr('name')) { return; }
 		// this gets me a clean function with global scope. Somehow that seems better than getting the current scope.
 		// Crockford calls this a 'bad part of Javascript'
 		var commandFnMaker = new Function("wrappedFormInput", "return function () {" + $command.text() + "}");
