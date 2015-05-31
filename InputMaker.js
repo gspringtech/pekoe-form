@@ -169,20 +169,11 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
         }
     })(isAttribute);
 	
-/*
-This _could_ be an accessor:
 
- It would probably need to be wrapped in a simple constructor:
- inp.pekoeNode = makeAccessor(pekoeNode) {
-    var o = {
-            get pekoeNode() {return this.datav},
-            set pekoeNode(v) { this.datav = v; return v; }
- }
- };
- */
 	// KEY FEATURE: direct link from form element to xTree node content
     // but only one-way. Consider the other direction.
 
+	// Could this be converted to an Accessor Wrapper without breaking things? Probably not.
 	var updateTree = function() { // INSTANCE - METHOD
 //		// this is a fairly hefty closure...
 //		console.log('Update Tree',this.value,currentValue());
@@ -205,110 +196,6 @@ This _could_ be an accessor:
 
 	};
 
-	// It appears that all lookups are handled by PekoeLookup_widget.
-	var generateLookupQuery = function () { // TODO - Is this cruft? Probably.
-		var emptyLine = /^[\s]*$/; 
-		/* First line is the path, following lines are variables. pekoeNode is the context
-		  collection("pekoe/postcodes")/post-codes/pc[locality &= $1 and state=$2] 
-		  ./suburb 
-		  ./state
-		 */
-		var lines = $fieldDef.find("input lookup").text().split(/\s*\n\s*/);//  split the lines
-		var xp = lines[0];  
-		var ll = lines.length;
-		
-		if (ll > 1) {
-			var pEl = pekoeNode;
-			// ARGHH!! PEKOE-TODO remove or rework attr.ownerElement
-			if (pEl.nodeType == Node.ATTRIBUTE_NODE) { pEl = pekoeNode.ownerElement; console.log("moved to parent element for pEl",pEl); } 
-		// there's an opportunity here for malicious code injection. ------------------------------------------------------------------------------------ WARNING
-			for (var i = 1; i < ll; i++) {
-				// the $i is the reason for a "for" loop rather than getting all the values with an xpath expr
-				var varName = "$"+i;
-				var pathToAValue = lines[i];
-				if (emptyLine.test(pathToAValue)) { console.warn("Empty line in lookup script"); continue; }
-				
-				var oResult = null;				
-				try{  
-					oResult = gs.Pekoe.oEvaluator.evaluate(pathToAValue, pEl ,null, XPathResult.ANY_TYPE, null);
-				} catch (e) { 
-					console.warn("XPath failed on", pathToAValue.toString());
-					console.warn('at', pEl.nodeName);
-					console.warn('err:',e); 
-				}
-				if (oResult != null) {
-					var collector = mergerUtilities.xpathResultToString(oResult);
-//					console.log("Generate Lookup Query using",pathToAValue,"to put",collector,"into",varName);
-					xp = xp.replace(varName,collector); // --------------------------------------------------------- Single $1 REPLACE - might need multiple
-				} 
-			}
-		} else {
-			// it's possible that there's nothing to lookup. Check the xp for a $1
-			if (xp.indexOf("$1")> -1) {
-				
-				var thisValue = $F(pekoeNode.formElement);
-				if (thisValue == "") thisValue = prompt("Lookup:", "");
-				if (thisValue == null) return;
-				xp = xp.replace("$1",thisValue);
-			}
-		}
-//		console.log("generateLookupQuery xp:",xp);
-		return xp;
-	};
-	
-	// This appears to be only for "input calculation"
-	var parameterisedXPath = function (showLookup) {
-		console.log("You called parameterisedXPath");
-		var xp = generateLookupQuery();
-		var that = pekoeNode;
-		// if this is a javascript, then we eval line 1 and insert it. Otherwise, send to the server
-		
-		var data = {"_query":xp, "_howmany": 100, "_wrap":"yes" };
-		var dbpath = $inp.find("lookup").attr("dbpath") || "";
-		
-		function showChoices(t) {
-			gs.Pekoe.merger.Utility.showAutocomplete(that.formElement,t);
-		}
-		
-		function insertValue(t) {
-			var v = (typeof t == "object") ? jQuery.trim(jQuery(t).text()) : jQuery.trim(t);
-			if (pekoeNode.formElement.nodeName == "textarea") {
-				pekoeNode.formElement.textContent = v;
-			} else {
-				pekoeNode.formElement.value = v;
-			}
-			currentValue(v);
-		}
-		var resultAction = (showLookup) ? showChoices : insertValue;
-		if ($fieldDef.find("input lookup").attr("type") === "javascript") { 
-			resultAction(eval(xp)); // evaluate the first line as a javascript and put the result directly into the field.
-		} else { // no input type so assume its a standard server-lookup ("xquery")
-			jQuery.get(
-				"/exist/rest/db/pekoe/" + dbpath, 
-				data, 
-				resultAction,
-				"xml"
-			);
-		}
-	};
-	
-	/*
-	 * I think the approach here is that the "calculation" @type will determine the evaluation pattern (e.g. javascript, hybrid1)
-	 * In fact, as the "input/@source" is the determinant, the above "lookup" will be incorporated into this mechanism. 
-	 * One "derivedInput" mechanism to handle an xpath, xquery, javascript, or other type of "lookup".
-	 * 
-	 * 
-	 * A NUMBER of PROBLEMS here. 
-	 * First is the attempted overload of Calculation and Lookup.
-	 * Second is the use of Autocomplete.
-	 * 
-	 * Autocomplete isn't able to work correctly because I'm not usefully handling the query.
-	 * I need to write a real CALLBACK for Autocomplete so that I can apply the widget directly (rather than Indirectly as is current).
-	 * 
-	 */
-	
-//	var showLookupValues = function (evt) {parameterisedXPath(true)};
-	var updateCalculation = function () {parameterisedXPath(false)}; // evt.preventDefault();
 	
 	// Date Stamp
 	function showDS(formEl,pekoeNode){
@@ -340,10 +227,13 @@ This _could_ be an accessor:
 	}
 //	console.log("building input",inptype,"for value",currentValue, "in element",pekoeNodeName)
 	// Yetch. This is a function function call. constructElement() returns the appropriate builder method, which we then call.
+	// BUT strangely, the functions all depend on access to variables at this level. In particular, the formEl
 	try {
-	    constructElement(inptype)();	// the work is done here *************************************************** !!!!!!!!!!!
+	    constructElement(inptype)();	// ***************************************************  the work is done here !!!!!!!!!!!
 	} catch (abc) {console.warn("ElementMaker construct element error on",inptype,">",abc);}
 
+	// having constructed the basic form element (input, select, textarea etc) , now finish setting up the field
+	// construct a title attribute
 	formEl.title = (isAttribute) ? gs.Utility.getElementTreeXPath(parentElement) + "/@" + pekoeNodeName : gs.Utility.getElementTreeXPath(pekoeNode);
 	// this is unfortunate - neither the fieldDef@path
 	//  nor this function will handle both elements and attributes.  ( what does this mean???)
@@ -362,13 +252,14 @@ This _could_ be an accessor:
 	}
 	// -------------- Add the replicator to the form-element's label if fieldDef.replicate is true
 
-
-	if ($inp.find("calculation").length > 0) {
-		// this should be called in response to a trigger - rather than a click
-        // perhaps a "listen to" field - like Applies To
-		var $updateButton = jQuery("<img src='css/graphics/icons/cog.png' />").click(updateCalculation);
-		formEl.appendChild($updateButton.get(0));
-	}
+	// What if there were two Calculations? e.g. 'Get Receipt number' 'Recycle'
+	//if ($inp.find("calculation").length > 0) {
+	//	// an automatic action can be created using an Enhancement - rather than a calculation.
+	//	// perhaps the name should be Command or Action.
+	//
+	//	var $updateButton = jQuery("<img src='css/graphics/icons/cog.png' />").click(updateCalculation);
+	//	formEl.appendChild($updateButton.get(0));
+	//}
 
 	if (pekoeNode.attributes) {
 		// create a fieldset 
@@ -402,11 +293,13 @@ This _could_ be an accessor:
 	// Technically, my Label is incorrect, because it contains the button. Oh well. Fix it another day.
 
     // ------------------------  ADD REPLICATE AND DELETE BUTTONS IF REQUIRED ------------------------------------------
+	var $finalE = $(formEl); // such a mess.
+
 	// working on the assumption that the only deletable fields are repeating. (but the input checkbox doesn't indicate this) 
 	// the key issue with "deletable" is that there must be one item left 
 	// TODO if "singleUse" then it shouldn't be deletable after being saved.
  	 if (options.has('repeating') && !isAttribute) { // Can't replicate an Attribute.
-	  	jQuery(formEl).addClass("repeating");
+	  	$finalE.addClass("repeating");
 	  	// Sortable??? - Would require these elements to be within a container.
 	  	// At the same time, change the appearance so they're in a vertical list, and hide the LABEL on all but the first.
 	  	// I tried this with CSS - but couldn't get it right. Worth another play sometime - but even nth-of-type isn't helpful because the class is not counted in the type.
@@ -417,8 +310,8 @@ This _could_ be an accessor:
 					var hasSib =  gs.Pekoe.oEvaluator.evaluate("count(parent::node()/*[name(.) = '" + nn + "']) > 1", pekoeNode ,null, XPathResult.BOOLEAN_TYPE, null);
 					if (!hasSib.booleanValue) {alert("Can't delete the last of these elements"); return; }
 					if (confirm("Do you want to delete this element?")) {   
-						jQuery(formEl).hide('slow',function () {						
-							jQuery(formEl).trigger("dirty").remove();					
+						$finalE.hide('slow',function () {
+							$finalE.trigger("dirty").remove();
 							jQuery(pekoeNode).remove();
 						});
 					}
@@ -433,8 +326,8 @@ This _could_ be an accessor:
 		 jQuery("<img src='css/graphics/icons/delete.png' class='tool-icon' />")
 			 .click(function () {
 				 if (confirm("Do you want to delete this element?")) {
-					 jQuery(formEl).hide('slow',function () {
-						 jQuery(formEl).trigger("dirty").remove();
+					 $finalE.hide('slow',function () {
+						 $finalE.trigger("dirty").remove();
 						 //TODO  this shouldn't be a straight remove - it should be a "field-choice" added back here.
 						 // only problem is - I don't know which 'field-choice' it is.
 						 // now it's getting complicated.
@@ -442,12 +335,67 @@ This _could_ be an accessor:
 					 });
 				 }
 			 }).appendTo(formEl);
-
-
 	}
-	
-	if (pekoeNode.nw) {jQuery(formEl).addClass('new-field');} // .nw added by displayTemplateContent if the field or fs is not in the tree. 
-	if (pekoeNode.defaultField) {jQuery(formEl).addClass('default-field');}
+
+	// --------------------------------------------------------------------------------------  ADD COMMANDS IF AVAILABLE
+	/*
+	 See docs for command-button
+	 NOTE: the headers contain a useful amount of info such as the job- and template paths, the tenant (cookie) the session
+	 So consider adding access to the document via the form element.
+	 */
+	// TODO Add the PekoeNode and the file info.
+	var inputWrapper = function(_fe) { // state management for the form element and the command-buttons
+		var $fe = $(_fe);
+		var _state = $fe.val() === '' ? 'initially-empty' : 'initially-set';
+		var commandState = function () {
+			$fe.siblings('.command-button').hide(); // first, hide all buttons
+			var activeStateClass = ".always, ." + _state;
+			$fe.siblings(activeStateClass).show(); // show those buttons that match the current state or 'always'
+		};
+		$fe.on('change', function (){  // if the form element is changed by the user, update the state.
+			if ($fe.val() === ''){
+				_state = 'currently-empty';
+			} else {
+				_state = 'currently-set'
+			}
+			commandState(); // update visibility
+		});
+		return {
+			init : commandState,
+			pkn: pekoeNode,
+			get value() {return $fe.val(); },
+			set value(newV) {$fe.val(newV); $fe.trigger('change'); },
+			get state () {return _state;},
+			set state (newS) {_state = newS; commandState();},
+			get lock () { $fe.attr('disabled') && fe.attr('disabled') === 'disabled';},
+			set lock (newTruthy) {if (newTruthy) {$fe.attr('disabled','disabled');}}
+		};
+	};
+	var wrappedFormInput = inputWrapper(pekoeNode.formElement); // this object will be available to the command-button code.
+	$fieldDef.find('command-button').each(function () {
+		var $command = $(this);
+		// this gets me a clean function with global scope. Somehow that seems better than getting the current scope.
+		// Crockford calls this a 'bad part of Javascript'
+		var commandFnMaker = new Function("wrappedFormInput", "return function () {" + $command.text() + "}");
+		var commandFn = commandFnMaker(wrappedFormInput);
+		var b = $('<button class="command-button"></button>')
+			.text($command.attr('name') || '?')
+			.on('click',
+				function(e){
+					e.preventDefault();
+					commandFn();
+				})
+			.addClass($command.attr('enabled-state'))
+			.appendTo($finalE);
+	});
+	wrappedFormInput.init(); // set the initial visibility of the buttons.
+	// ------------------------------------------------------------------------------------------ end of command-button
+
+	if (pekoeNode.nw) {$finalE.addClass('new-field');} // .nw added by displayTemplateContent if the field or fs is not in the tree.
+	if (pekoeNode.defaultField) {$finalE.addClass('default-field');}
+
+
+	// --------------------------- THE WORK IS DONE. FROM HERE ON ARE THE INDIVIDUAL COMPONENTS ...
 	
 	function makeLabelText (n) { // if the node is an attribute, get the parent-Element's name
         if ($fieldDef.find('help')) {}
@@ -603,15 +551,14 @@ This _could_ be an accessor:
 			inp.pekoeNode = pekoeNode; 
 			pekoeNode.formElement = inp;
 			formEl.appendChild(inp);
-//		}
 	 }
+
 	function multiCheckBox() {
 		var $formEl = jQuery("<span class='label' />").text(makeLabelText(pekoeNode));
 		formEl = $formEl.get(0);
 
 		
 		showDS(formEl,pekoeNode);
-//		formEl.appendChild(document.createElement("br"));
 		jQuery("<br />").appendTo($formEl);
 		var vals = jQuery($inp.find("list")[0]).text().split(/\s*\n\s*/); // separated by line-breaks. possibly CRLF
 		var inpName = $fieldDef.attr("path") + "-" + gs.Pekoe.nodeId++;
@@ -645,8 +592,9 @@ This _could_ be an accessor:
 		});
 		pekoeNode.formElement = null; // probably need to create a getter/setter for radios and selects
 	}
+
 	function textareaInput(  ) { 
-		if (options.has("htmledit")) {
+		if (options.has("htmledit")) { //TODO  HUH? What does this do?
 			
 			formEl = jQuery("<div class='read-only'></div>").get();
 			
@@ -706,9 +654,7 @@ This _could_ be an accessor:
 	 }
 
 	 function richTextInput(  ) {
-
          // CKEDITOR is applied inline. See Utility.js - line 148 or thereabouts
-
          var $formEl = jQuery("<div class='rt-box' ></div>"); // Field wrapper
          var $display = jQuery("<div class='rte'></div>") // display the Rich Text Content
              .attr("id","rte-"+ gs.Pekoe.nodeId)
@@ -717,11 +663,9 @@ This _could_ be an accessor:
          if (!options.has('singleUse') || ($display.text() === "")) {
              $display.attr("contenteditable","true");
          }
-
          jQuery("<label class='rte-button'></label>") // make the field LABEL be the active element
              .text(pekoeNodeName)
              .appendTo($formEl);
-
          $formEl.append($display);
          $display.data("pekoeNode",pekoeNode);
          formEl = $formEl.get(0);
@@ -742,7 +686,6 @@ This _could_ be an accessor:
 		var selectList = jQuery($inp.find("list")[0]).text();
 		if ((currentValue() !== "") && (selectList.indexOf(currentValue()) == -1)){selectList += "\n"+currentValue();} // make sure list contains the value
 		var vals = selectList.split(/\s*\n\s*/); // separated by line-breaks. possibly CRLF
-		
 		
 		jQuery.map(vals, function(n) {
 			var inp = document.createElement("option");

@@ -38,16 +38,32 @@
 		}
 	});
 
-	$.statusMessage = function (msg){
+
+	// TODO - put this somewhere more useful and Queue it. Consider using a modal for the error.
+	$.statusMessage = function (msg,err){
         // TODO needs to be queued.
-		console.log('STATUSMESSAGE:',msg);
-		$("#status")
-			.hide()
-			.html("<span class='status_message'>" + msg + "</span>")
-			.fadeIn(100)
-			.delay(5000)
-			.fadeOut(5000);
+		if (err) {
+			console.error('STATUS ERROR',msg, err);
+			$("#status")
+				.hide()
+				.html("<span class='error_message'>" + msg + "</span>")
+				.fadeIn(100)
+				.delay(8000)
+				.fadeOut(3000);
+		} else {
+			console.log('STATUSMESSAGE:',msg);
+			$("#status")
+				.hide()
+				.html("<span class='status_message'>" + msg + "</span>")
+				.fadeIn(100)
+				.delay(5000)
+				.fadeOut(3000);
+		}
 	};
+
+	$( document ).ajaxError(function( event, jqxhr, settings, thrownError ) {
+		$.statusMessage( "Please report an error for " + settings.url,true );
+	});
 
 	gs.templateCache = {};
 

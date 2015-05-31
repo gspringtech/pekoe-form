@@ -226,24 +226,6 @@ gs.Pekoe.merger.Utility = function () {
         });
     }
 	
-	mergerUtils.showAutocomplete = function (formElement,xmlResponse) {
-		var data = [];
-		jQuery( "exist\\:result,result", xmlResponse ).children().each(function(k) {
-			var $this = jQuery(this);
-			data[k] = jQuery.trim($this.text());
-		});
-
-		jQuery( formElement).autocomplete({
-			autoFocus: false,
-			minLength: 0, // no need to enter anything
-			source: data,
-			select: function( event, ui ) {
-				jQuery(this).val(jQuery.trim(ui.item.value));
-				jQuery(this).trigger("change"); // alternatively might want to set the pekoenode explicitly 
-			}
-		}).autocomplete("search",""); 
-	}; 
-	
 //	If a field is marked as "repeating" then this method is attached to a button next to the field. WILL NOT BE APPLIED TO Attributes.
 mergerUtils.replicateElement = function (pkn, formEl) {
 		// this procedure creates a new  pekoeNode in the the document
