@@ -185,7 +185,7 @@ gs.Pekoe.BureauAG.prototype = { // christ its a fucking prototype based thing. B
 	    jQuery.each(itemsNodeList, function (k,v) {
 	    	var $li = jQuery(v);
 			var cell = jQuery("<span/>").text($li.text()).attr("title",$li.attr("title")).addClass($li.data("file-type")); // file-type will be used to set the icon
-			//if ($li.data('default-for')) {cell.attr('default-for',$li.data('default-for'));}
+			if ($li.data('defaultFor')) {cell.attr('default-for',$li.data('defaultFor'));} // need this as a plain attribute for easy selection below.
 			cell.data($li.data()); // Any data- attributes will be passed to the pekoeForm here - and will be accessible from the Custom Commands.
 			cell.appendTo(items);
 	    });
