@@ -272,7 +272,8 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 		
 		jQuery.map(pekoeNode.attributes, function (a) { 
 			if ((a.ph) && (a.ph != null)) {
-				console.warn("Calling InputMaker on attribute:",a.nodeName);
+				// maybe this should do a lookup first? test to see if the attribute is of any interest?
+				//console.warn("Calling InputMaker on attribute:",a.nodeName);
 				gs.Pekoe.merger.InputMaker(fs,a,pekoeNode);
 			}
 		});
@@ -362,7 +363,7 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 		});
 		return {
 			init : commandState,
-			pkn: pekoeNode,
+			pkn: pekoeNode, // closure
 			get value() {return $fe.val(); },
 			set value(newV) {$fe.val(newV); $fe.trigger('change'); },
 			get state () {return _state;},
@@ -374,13 +375,13 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 	var wrappedFormInput = inputWrapper(pekoeNode.formElement); // this object will be available to the command-button code.
 	$fieldDef.find('command-button').each(function () {
 		var $command = $(this);
-		if (!$command.attr('name')) { return; }
+		if (!$command.attr('name')) { return; } // empty command-buttons will exist.
 		// this gets me a clean function with global scope. Somehow that seems better than getting the current scope.
 		// Crockford calls this a 'bad part of Javascript'
 		var commandFnMaker = new Function("wrappedFormInput", "return function () {" + $command.text() + "}");
 		var commandFn = commandFnMaker(wrappedFormInput);
 		var b = $('<button class="command-button"></button>')
-			.text($command.attr('name') || '?')
+			.text($command.attr('name'))
 			.on('click',
 				function(e){
 					e.preventDefault();
@@ -438,7 +439,7 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 			var size = $inp.attr("size");
 			var discrepancy = size - currentValue().length;
 			if ((size> 0) && (size < currentValue().length)) {
-				console.log(pekoeNodeName," field too small",discrepancy);
+				console.log(pekoeNodeName," field too small",discrepancy,size,currentValue())
 			}
 		} else {
 			//var defaultVal = $inp.attr("defaultValue");
@@ -788,13 +789,13 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 				//jQuery('input[type=date]',newFS).datepicker({dateFormat:'yy-mm-dd'});
 				// AUTOCOMPLETE LOOKUP ------------------------------------------- AUTOCOMPLETE ON FRAGMENT LOOKUP -------------
 				// Apply the pekoeLookup widget to any input with class .fragment-lookup or .autocompleter
-				if ($(newFS).hasClass('fragment-lookup')) {$(newFS).pekoeLookup();}
+				//if ($(newFS).hasClass('fragment-lookup')) {$(newFS).pekoeLookup();}
 
 
 				var parentN = formEl.parentNode;
 				var parentN = formEl.parentNode.insertBefore(newFS,formEl);
 				//parentN.appendChild(newFS);
-
+				gs.Pekoe.merger.Utility.applyEnhancements(newFS);
 				jQuery(newFS).show('slow');
 
 			} else if (field !== "") {
