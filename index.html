@@ -173,7 +173,30 @@
 ////                args.job.replace(bundleRE,'') : null;
 //            }
 
+            jQuery(document).keypress(function (evt){
+                // TODO - move or copy this into Pekoe Workspace
+                if (evt.metaKey || evt.ctrlKey) { // or Control
+                    console.log('metakey-event',evt.which);
 
+                    switch (evt.which) {
+                        case (115): //command-s Save
+                            evt.preventDefault();
+                            $( document.activeElement ).blur();
+                            $('button:contains(Save)').click();
+                            break;
+                        case (78): // command-n New
+//	        				evt.preventDefault();
+                            break;
+                        case (79): // command-o Open something
+//        					evt.preventDefault();
+                            break;
+                        case (119): // command-w Close returns to the list mode
+                            evt.preventDefault();
+                            $('button:contains(Close)').click()
+                            break;
+                    }	// switch
+                }
+            });
 
         });
 
