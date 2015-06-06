@@ -269,7 +269,7 @@ getData : function () {
         fields[field] = fieldDefinition; // will be defined once for unique field
         fields[field].isDefault = isDefault;
         var $el = $(fieldDefinition);
-        //console.log('fieldDevi',fieldDefinition);
+
         var fieldChoice = $el.find('input').attr('type') === 'field-choice';
         if (fieldChoice) {
             var optionalFields = $el.find('list').text().trim().split('\n');
@@ -283,7 +283,7 @@ getData : function () {
                 //console.log('got fd',fd);
                 if (fd) {
                     fields[fieldOption] = fd;
-                    fields[fieldOption].optional = true;
+                    fields[fieldOption].optional = true; // only used once -- see 383 below
                 }
 
             }
@@ -576,10 +576,12 @@ gs.Pekoe.fragmentNodeForm = function () {
      */
 
     var options = jQuery(fragmentNode.ph).find("options").text();
-	var isRepeating = options.indexOf("repeating") !== -1; //jQuery(fragmentNode.ph).find("options:contains('repeating')").length > 0;
+	var isRepeating = options.indexOf("repeating") !== -1;
+    var isDeletable = options.indexOf('deletable') !== -1;
     if (isRepeating) formEl.addClass('repeating');
 	var hideEmpty = options.indexOf("initially-closed") !== -1; //jQuery(fragmentNode.ph).find("options:contains('initially-closed')").length > 0;
     var fieldChoice = options.indexOf("field-choice") !== -1;
+    var isSingleUse = options.indexOf("singleUse") !== -1;
     var pathToHere = gs.Utility.getElementTreeXPath(fragmentNode);
 	var re = /\[[\d]+\]$/; // match the position filter (e.g. "[2]") at the end of the path.  
 	var t = (isRepeating) ? pathToHere : pathToHere.replace(re,""); // remove it if this is a non-repeating field (for the title attribute)
@@ -596,13 +598,16 @@ gs.Pekoe.fragmentNodeForm = function () {
 		// Hide elements if they are empty and marked as "initially-closed"
 		formEl.addClass("hidden-fieldset-children"); // Also need "show-first-field-only" for fragment elision
 	}
-	// finally, want this to be used to change the background-color 
+	// finally, want this to be used to change the background-color
+
+    // There are many good ideas here - but not fully considered or poorly implemented.
 	
 	var legend = jQuery("<legend />");
 	var fsName = jQuery("<span class='fragmentName'/>")
 		.text(this.nodeName + fieldIndex)
 		.click( 	// Hide the contents of this Fragment. As above, hide all if empty, otherwise show only first field.
-			function (evt) {  
+			function (evt) {
+                // TODO assess this globalCopy WRT SingleUse
 				if (! gs.Pekoe.GlobalCopy.copyToHere(legend[0])) {	
 					var $this = jQuery(this);
 					var $parentFS =  $this.parents("fieldset").first();
@@ -620,33 +625,157 @@ gs.Pekoe.fragmentNodeForm = function () {
 		})
 		.appendTo(legend);
     // TODO move this to some kind of Angular Directive.
-	if (isRepeating) {
-		// addMe
-		jQuery("<span class='btn'><img src='css/graphics/icons/add.png' class='tool-icon' /></span>")
-			.attr("title", "Add another '" + fragmentNode.nodeName +"'")
-			.click(function () {gs.Pekoe.merger.Utility.addMe(formEl[0],false);})
-			.appendTo(legend);
-		// deleteMe
-		jQuery("<span class='btn'><img src='css/graphics/icons/delete.png' class='tool-icon' /></span>")
-			.attr("title", "Delete this '" + fragmentNode.nodeName +"'")
-			.click(function () {gs.Pekoe.merger.Utility.deleteMe(formEl[0]);})
-			.appendTo(legend);
-		// copy Me
-		jQuery("<span class='btn'><img src='css/graphics/icons/page_copy.png' class='tool-icon' /></span>")
-			.attr("title", "Add a Copy of '" + fragmentNode.nodeName +"'")
-			.click(function () {gs.Pekoe.merger.Utility.addMe(formEl[0],true);})
-			.appendTo(legend);
-		// copy my Values
-		jQuery("<span class='btn'><img src='css/graphics/icons/pencil_add.png' class='tool-icon' /></span>")
-			.attr("title", "Copy values from this '" + fragmentNode.nodeName +"'")
-			.click(function () {gs.Pekoe.GlobalCopy.copyMe(legend[0]);})
-			.appendTo(legend);
-        jQuery("<i class='fa fa-sort pull-right' title='this item can be re-ordered among its peers.'></i>").appendTo(legend);
-    } else if (fieldChoice) {
+    // for some bizarre reason, this doesn't consider the options.
+    // In the field-choice case, I may want fields that can be added but not removed.
+    /*
+    Time to fix this.
+    Options available are for a FIELD:
+    Single-use
+    Repeating
+    Deletable
+    Initially-closed
+    No-direct-entry
+
+    Options for a Fragment-ref:
+    Field-choice
+    Initially-closed
+    Repeating
+    Deletable
+
+    Now - what do I want here?
+
+    ALSO note that if the ELEMENT is a 'field-choice' then setting it to nothing (not repeating) gives the most appropriate behaviour
+    HOWEVER this should really be 'only-one-of', 'one-or-more-of'
+    In the first case, the element is disabled after creating the field (or when the field exists)
+    In the second case, the element remains active.
+
+    Currently, setting 'field-choice' on a fragment is used to prevent the fragment being added unnecessarily.
+    It could also be called "optional" meaning that it should not be added.
+
+    Any fragment-ref can have this
+
+    The current problem:
+    I want a field-choice for /stock-item/(in | out)
+    The user should be able to add and then delete (or 'undo' - wouldn't that be nice)
+    But once it's SAVED, the fragment should not be editable. The whole fragment should be single-use.
+
+    Part of the problem here is that there's no distiction between New and existing data.
+     */
+    /*
+        Will always want Copy Values
+        If Repeating, will want Add and Duplicate
+        Maybe it's better to be explicit.
+        Add
+        Duplicate
+        Copy Values
+        Delete
+        Single-use
+        field-choice
+        Sortable
+
+        I don't think that field-choice is relevant here.
+        what IS relevant is whether this is NEW or old.
+        AND the problem with that is I DON'T KNOW because my 'pekoeEmpty' is stupid.
+
+     */
+    if (this.pekoeEmpty === undefined) {
+        console.error('missing pekoeEmpty on',this);
+        //return;
+        // pekoeEmpty === undefined != pekoeEmpty === false
+    }
+    //if (this.pekoeEmpty)
+	//if (this.pekoeEmpty) { // must be a new fragment
+
+    //if (isRepeating) {
+    //    // addMe
+		//jQuery("<span class='btn'><img src='css/graphics/icons/add.png' class='tool-icon' /></span>")
+		//	.attr("title", "Add another '" + fragmentNode.nodeName +"'")
+		//	.click(function () {gs.Pekoe.merger.Utility.addMe(formEl[0],false);})
+		//	.appendTo(legend);
+		//// deleteMe
+		//jQuery("<span class='btn'><img src='css/graphics/icons/delete.png' class='tool-icon' /></span>")
+		//	.attr("title", "Delete this '" + fragmentNode.nodeName +"'")
+		//	.click(function () {gs.Pekoe.merger.Utility.deleteMe(formEl[0]);})
+		//	.appendTo(legend);
+		//// copy Me
+		//jQuery("<span class='btn'><img src='css/graphics/icons/page_copy.png' class='tool-icon' /></span>")
+		//	.attr("title", "Add a Copy of '" + fragmentNode.nodeName +"'")
+		//	.click(function () {gs.Pekoe.merger.Utility.addMe(formEl[0],true);})
+		//	.appendTo(legend);
+		//// copy my Values
+		//jQuery("<span class='btn'><img src='css/graphics/icons/pencil_add.png' class='tool-icon' /></span>")
+		//	.attr("title", "Copy values from this '" + fragmentNode.nodeName +"'")
+		//	.click(function () {gs.Pekoe.GlobalCopy.copyMe(legend[0]);})
+		//	.appendTo(legend);
+    //    jQuery("<i class='fa fa-sort pull-right' title='this item can be re-ordered among its peers.'></i>").appendTo(legend);
+    //} else if (fieldChoice) {
+    //    console.log('this field-choice is',this, 'and the options are',options,this.pekoeEmpty);
+    //    //this.pekoeEmpty is false if the element was previously defined
+    //    //this.pekoeEmpty is undefined if this element is NEW.
+	//
+    //    jQuery("<span class='btn'><img src='css/graphics/icons/delete.png' class='tool-icon' /></span>")
+    //        .attr("title", "Delete this '" + fragmentNode.nodeName +"'")
+    //        .click(function () {gs.Pekoe.merger.Utility.deleteMe(formEl[0]);})
+    //        .appendTo(legend);
+    //}
+
+
+    // NEW approach
+
+    // copy my Values always available
+    jQuery("<span class='btn'><img src='css/graphics/icons/pencil_add.png' class='tool-icon' /></span>")
+        .attr("title", "Copy values from this '" + fragmentNode.nodeName +"'")
+        .click(function () {gs.Pekoe.GlobalCopy.copyMe(legend[0]);})
+        .appendTo(legend);
+
+    if (this.pekoeEmpty) { // must be a new fragment because otherwise it would be deleted.
+        // don't care about single-use
+        if (isRepeating) {
+            // addMe
+            jQuery("<span class='btn'><img src='css/graphics/icons/add.png' class='tool-icon' /></span>")
+                .attr("title", "Add another '" + fragmentNode.nodeName +"'")
+                .click(function () {gs.Pekoe.merger.Utility.addMe(formEl[0],false);})
+                .appendTo(legend);
+            // copy Me
+            jQuery("<span class='btn'><img src='css/graphics/icons/page_copy.png' class='tool-icon' /></span>")
+                .attr("title", "Add a Copy of '" + fragmentNode.nodeName +"'")
+                .click(function () {gs.Pekoe.merger.Utility.addMe(formEl[0],true);})
+                .appendTo(legend);
+        }
+        // deleteMe - if you just added it, you can also delete it
         jQuery("<span class='btn'><img src='css/graphics/icons/delete.png' class='tool-icon' /></span>")
             .attr("title", "Delete this '" + fragmentNode.nodeName +"'")
             .click(function () {gs.Pekoe.merger.Utility.deleteMe(formEl[0]);})
             .appendTo(legend);
+
+    } else { // existing fragment.
+        if (isSingleUse) {
+            // add nothing except 'copy values'. Possibly Disable
+            console.log('single-use',this.nodeName);
+        } else {
+            if (isRepeating) {
+                // addMe
+                jQuery("<span class='btn'><img src='css/graphics/icons/add.png' class='tool-icon' /></span>")
+                    .attr("title", "Add another '" + fragmentNode.nodeName +"'")
+                    .click(function () {gs.Pekoe.merger.Utility.addMe(formEl[0],false);})
+                    .appendTo(legend);
+                // copy Me
+                jQuery("<span class='btn'><img src='css/graphics/icons/page_copy.png' class='tool-icon' /></span>")
+                    .attr("title", "Add a Copy of '" + fragmentNode.nodeName +"'")
+                    .click(function () {gs.Pekoe.merger.Utility.addMe(formEl[0],true);})
+                    .appendTo(legend);
+            }
+            if (isDeletable) {
+                // deleteMe - if you just added it, you can also delete it
+                jQuery("<span class='btn'><img src='css/graphics/icons/delete.png' class='tool-icon' /></span>")
+                    .attr("title", "Delete this '" + fragmentNode.nodeName + "'")
+                    .click(function () {
+                        gs.Pekoe.merger.Utility.deleteMe(formEl[0]);
+                    })
+                    .appendTo(legend);
+            }
+        }
+
     }
 
     // merger-utils.applyenhancments is a one-shot search for all the things to be added after the initial form generation

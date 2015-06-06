@@ -326,7 +326,7 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 
 		 jQuery("<img src='css/graphics/icons/delete.png' class='tool-icon' />")
 			 .click(function () {
-				 if (confirm("Do you want to delete this element?")) {
+				 if (pekoeNode.textContent === '' || confirm("Do you want to delete this element?")) {
 					 $finalE.hide('slow',function () {
 						 $finalE.trigger("dirty").remove();
 						 //TODO  this shouldn't be a straight remove - it should be a "field-choice" added back here.
@@ -362,7 +362,7 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 			commandState(); // update visibility
 		});
 		return {
-			init : commandState,
+			_init : function () {commandState(); delete this._init;},
 			pkn: pekoeNode, // closure
 			get value() {return $fe.val(); },
 			set value(newV) {$fe.val(newV); $fe.trigger('change'); },
@@ -375,22 +375,26 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 	var wrappedFormInput = inputWrapper(pekoeNode.formElement); // this object will be available to the command-button code.
 	$fieldDef.find('command-button').each(function () {
 		var $command = $(this);
-		if (!$command.attr('name')) { return; } // empty command-buttons will exist.
+		var cname = $command.find('name').text();
+		var cscript = $command.find('javascript').text();
+		var cenable = $command.find('enabled-state').text();
+		// a command should have a command-button/name /state and /javascript
+		if (!cname) { return; } // empty command-buttons will exist.
 		// this gets me a clean function with global scope. Somehow that seems better than getting the current scope.
 		// Crockford calls this a 'bad part of Javascript'
-		var commandFnMaker = new Function("wrappedFormInput", "return function () {" + $command.text() + "}");
+		var commandFnMaker = new Function("wrappedFormInput", "return function () {" + cscript + "}");
 		var commandFn = commandFnMaker(wrappedFormInput);
 		var b = $('<button class="command-button"></button>')
-			.text($command.attr('name'))
+			.text(cname)
 			.on('click',
 				function(e){
 					e.preventDefault();
 					commandFn();
 				})
-			.addClass($command.attr('enabled-state'))
+			.addClass(cenable)
 			.appendTo($finalE);
 	});
-	wrappedFormInput.init(); // set the initial visibility of the buttons.
+	wrappedFormInput._init(); // set the initial visibility of the button.
 	// ------------------------------------------------------------------------------------------ end of command-button
 
 	if (pekoeNode.nw) {$finalE.addClass('new-field');} // .nw added by displayTemplateContent if the field or fs is not in the tree.
@@ -751,14 +755,18 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 			//console.log('REPLACE CHOICE?',options.has('only-one-of'));
 			var fragment = schema.getTemplateFragment('/fragments/' + newNodeName);
 			if (fragment) { // if there is a fragment for this, then use it.
+				// too much of this is replicating the behaviour of other functions like 'addMe'
 
 				var nn = od.importNode(fragment,true);
+				nn.pekoeEmpty = true; // it's new so its empty
 				pkn.parentNode.insertBefore(nn,pkn);
 				nn.ph = field;
 				// make a fragment
 				gs.Pekoe.merger.Utility.enhanceSubtree(schema, nn, newNodeName);
 				nn.toForm = gs.Pekoe.fragmentNodeForm;
 				var newFS = nn.toForm();
+
+				console.log('adding fragment',nn);
 				// if options only-one-of then the select must go away.
 				// my naming is wrong.
 				// the options are

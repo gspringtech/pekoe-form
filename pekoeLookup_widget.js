@@ -64,8 +64,10 @@
 		// In the url-params case, there is NO query.
 		var data = {"_howmany": 100 ,"_wrap": "yes"}; // When is _wrap=no??
 		// simple closure/curry. Not hugely useful.
-
-		if (lookupType === "url-params") {
+		if (lookupType === "javascript") {
+			// this is to lookup stuff locally - like fragment/@names to use in a fragment-ref.
+			// TODO make this work.
+		} else if (lookupType === "url-params") {
 			//for each use of $i in the script, replace it with a value
 			// Oh tricky dicky. I'm going to make data["schoolname"] = "$0". So how do I "replace term" 
 			//split the script on &
@@ -208,7 +210,7 @@
             var $element = $(this); // an input or fieldset ("formEl")
             var pekoeNode = this.pekoeNode; // this is my xml element OR MAYBE NOT - maybe it's an ATTRIBUTE - which IS NOT A NODE anymore. which means pekoeNode.nodeType IS NO GOOD.
 
-            var isAttribute = this.pekoeNode.myParent !== undefined;
+            var isAttribute = this.pekoeNode.myParent !== undefined; // I have attached a myParent property to the pekoeNode if it's an attribute.
 
 			/*
 			 field (@path)
