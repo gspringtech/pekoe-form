@@ -377,7 +377,7 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 
 		var nodeAccessor = function(nodeArr) { // will provide get/set .value and .arr to return an array of the nodes.
 			if (nodeArr.length === 0) return null;
-			var nodes = (Array.isArray(nodeArr)) ? nodeArr : [nodeArr];
+			var _nodes = (Array.isArray(nodeArr)) ? nodeArr : [nodeArr];
 			var makeAccessor = function (_node) {
 				var $fe = $(_node.formElement);
 				return {
@@ -385,7 +385,7 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 					set value(v) {if ($fe.length) {$fe.val(v); $fe.trigger('change'); } else {_node.textContent = v;} }
 				};
 			};
-			var accessors = nodes.map(makeAccessor);
+			var accessors = _nodes.map(makeAccessor);
 			return {
 				get value()  { return (accessors.length > 1) ? accessors.map(function (n) {return n.value;})  : accessors[0].value},
 				set value(v) {
@@ -393,7 +393,7 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 						accessors[i].value = v;
 					}
 				},
-				arr : accessors
+				nodes : _nodes
 			};
 		};
 
