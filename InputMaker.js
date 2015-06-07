@@ -361,8 +361,46 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 			}
 			commandState(); // update visibility
 		});
+
+		var  xPath = function(contextNode) { // create an xpath evaluator from the context node
+			return function(path) {
+				var theDoc = contextNode.ownerDocument;
+				var iterator = theDoc.evaluate(path, contextNode, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+				var found = [];
+				var res;
+				while (res = iterator.iterateNext()){
+					found.push(res);
+				}
+				return found;
+			}
+		};
+
+		var nodeAccessor = function(nodeArr) { // will provide get/set .value and .arr to return an array of the nodes.
+			if (nodeArr.length === 0) return null;
+			var nodes = (Array.isArray(nodeArr)) ? nodeArr : [nodeArr];
+			var makeAccessor = function (_node) {
+				var $fe = $(_node.formElement);
+				return {
+					get value() { return _node.textContent; },
+					set value(v) {if ($fe.length) {$fe.val(v); $fe.trigger('change'); } else {_node.textContent = v;} }
+				};
+			};
+			var accessors = nodes.map(makeAccessor);
+			return {
+				get value()  { return (accessors.length > 1) ? accessors.map(function (n) {return n.value;})  : accessors[0].value},
+				set value(v) {
+					for (var i = 0; i < accessors.length; i++ ) {
+						accessors[i].value = v;
+					}
+				},
+				arr : accessors
+			};
+		};
+
 		return {
 			_init : function () {commandState(); delete this._init;},
+			xpe : xPath(pekoeNode), // closure
+			nodeAccessor : nodeAccessor,
 			pkn: pekoeNode, // closure
 			get value() {return $fe.val(); },
 			set value(newV) {$fe.val(newV); $fe.trigger('change'); },
@@ -382,7 +420,7 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 		if (!cname) { return; } // empty command-buttons will exist.
 		// this gets me a clean function with global scope. Somehow that seems better than getting the current scope.
 		// Crockford calls this a 'bad part of Javascript'
-		var commandFnMaker = new Function("wrappedFormInput", "return function () {" + cscript + "}");
+		var commandFnMaker = new Function("theInput", "return function () {" + cscript + "}");
 		var commandFn = commandFnMaker(wrappedFormInput);
 		var b = $('<button class="command-button"></button>')
 			.text(cname)
