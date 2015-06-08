@@ -27,10 +27,10 @@ if (!gs.Pekoe.merger) {gs.Pekoe.merger = {}; }
 
 /*
 
- * 
+ *
  * Everything is dependent on the fieldDefinition - which has been attached to the pekoeNode:
  *          pekoeNode.ph (it needs to be renamed, and attached via .data() )
- * Every decision. 
+ * Every decision.
  * It is a kind of "spec" object. The pekoeNode itself is the State object
  * SO - I should be using the PH as the config object in a Functional Constructor.
  * AND create the SPEC object ONCE when needed - not for each field as is current.
@@ -48,44 +48,44 @@ if (!gs.Pekoe.merger) {gs.Pekoe.merger = {}; }
  * BUT it's called for every INPUT. Which means I'm reconstructing all this stuff every time.
  *
  * Each of the input-type functions below should be in their own functional constructor
- * 
+ *
  * pekoeComponent = {docNode:docNode, pekoeNode: pekoeNode, parentElement: parentElement};
- * 
+ *
  * textInputMaker = function (spec, pekoeComponent) {
  *   return that
  * }
  *
  * ALSO REMEMBER DEPENDENCY INJECTION like Angular as a way of providing access to services
  *
- * The field types determine the end result. Some of the functions here only apply to dates.  
+ * The field types determine the end result. Some of the functions here only apply to dates.
 
- * Really should be approaching this from the jQuery angle. Plugins! Instead of this enormous structure, attached (via closure) to 
+ * Really should be approaching this from the jQuery angle. Plugins! Instead of this enormous structure, attached (via closure) to
  * each node in the document, there should be a jQuery "live" function that applies schema data only when needed.
- * 
+ *
  * What happens here, and why?
- * 
+ *
  * We're creating the HTML Input field and any associated elements such as label.
  * We're attaching the pekoeNode (from the sourceDoc) to the element - with an updater function
  * We're enhancing the element by adding actions as needed.
- * 
- * 
+ *
+ *
  * REFACTORING IDEAS ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
  * Put the common functions into one object.
  * Use the extend method (or object creator) to turn that object into the individual field types
- * 
+ *
  * OR make this a singleton constructor so that "class" methods and variables are separate.
  * Then identify all instance variables and places where closure is used. (!! hard!!)
- * 
- * ElementMaker then creates an Object of one of these types. 
- * 
- * +++ ElementMaker calls itself if the current Node contains any Attributes that are pekoeNodes. +++ 
+ *
+ * ElementMaker then creates an Object of one of these types.
+ *
+ * +++ ElementMaker calls itself if the current Node contains any Attributes that are pekoeNodes. +++
 
  */
 // ------------------------------------------------------------------------------   BEGINNING of elementMaker ---------------------------------
 gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 	"use strict"; // EC5 Directive.
-	// what does it return? - the formElement along with an enormous stack for closure. 
-	// there's an indirect function call about half-way down (line 380) which selects the element type and processes the docNode and pekoeNode. 
+	// what does it return? - the formElement along with an enormous stack for closure.
+	// there's an indirect function call about half-way down (line 380) which selects the element type and processes the docNode and pekoeNode.
 	// there are a bunch of large private methods (private functions)
 	// the docNode is normally a documentFragment - but if the pekoeNode is an attribute-node, then it will be the parent element's input
 //	console.log("ElementMaker for",pekoeNode.nodeName);
@@ -96,10 +96,10 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 
 	var mergerUtilities = gs.Pekoe.merger.Utility;
 	var elementTypes = {};
-	
+
 	// What is this pattern, and can I use it better?
 	register("text",textInput); // Seriously dumb - this is called for every element. It should be part of a SETUP or INIT function.
-	register("date",dateInput); 
+	register("date",dateInput);
 	register("dateTime",dateInput);
 	register("time",dateInput);
 	register("radio",radioInput);
@@ -109,10 +109,10 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 	register("multicheckbox",multiCheckBox);
 	register("richtext",richTextInput);
 	register("field-choice",fieldChoiceInput);
-	
-	
-/* 
- * VARIABLES: 
+
+
+/*
+ * VARIABLES:
  * docNode 		- usually a fieldset element within the HTML form we're creating
  * pekoeNode 	- an XML DOM element from the source tree
  * fieldDef - shortcut to pekoeNode.ph
@@ -129,15 +129,15 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 			has: function (what) { return opts.indexOf(what) > -1;}
 		};
 	};
-	
-	
+
+
 	var fieldDef = pekoeNode.ph; // INSTANCE - Shortcut
     var pekoeNodeName = (isAttribute) ? pekoeNode.name : pekoeNode.nodeName;
 	var $fieldDef = jQuery(fieldDef); // INSTANCE - shortcut
-	
+
 	if (fieldDef == null) { // INSTANCE - initialisation check
 		console.warn("missing definition for " + pekoeNodeName);
-		return; 
+		return;
 	}
 	var $inp = jQuery($fieldDef.find("input")[0]); // INSTANCE - NO This is NOT an instance - this is a SPEC item
 	var defaultValue = $fieldDef.find("defaultValue").text();
@@ -168,7 +168,7 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
             };
         }
     })(isAttribute);
-	
+
 
 	// KEY FEATURE: direct link from form element to xTree node content
     // but only one-way. Consider the other direction.
@@ -196,29 +196,29 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 
 	};
 
-	
+
 	// Date Stamp
 	function showDS(formEl,pekoeNode){
 		// no point using this if the node IS an attribute!
 		if (pekoeNode.nodeType == Node.ATTRIBUTE_NODE) return;
-		var ds = pekoeNode.getAttribute("date-stamp");	
+		var ds = pekoeNode.getAttribute("date-stamp");
 		if (ds !== null) {
 			jQuery("<span class='date-stamp'></span>").text(Date.fromISO(ds).toAustDate()).appendTo(formEl);
 		}
-		var ts = pekoeNode.getAttribute("time-stamp");		
+		var ts = pekoeNode.getAttribute("time-stamp");
 		if (ts !== null) {
-			jQuery("<span class='date-stamp'></span>").text(ts).appendTo(formEl);	
+			jQuery("<span class='date-stamp'></span>").text(ts).appendTo(formEl);
 		}
 		var dts = pekoeNode.getAttribute("dateTime-stamp");
 		if (dts !== null) {
 			jQuery("<span class='date-stamp'></span>").text(dts).appendTo(formEl);
 		}
 	}
-	
+
 
 	var formEl = null;
-	
-	gs.Pekoe.nodeId ++; // provide a counter as an ID for field inputs 
+
+	gs.Pekoe.nodeId ++; // provide a counter as an ID for field inputs
 
 	var inptype = $inp.attr("type");
 	if (inptype == ""){
@@ -262,15 +262,15 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 	//}
 
 	if (pekoeNode.attributes) {
-		// create a fieldset 
+		// create a fieldset
 //		console.log("handling attributes");
-		var fs = document.createElement("fieldset"); // a little awkward. 
-		// this would be better... 
+		var fs = document.createElement("fieldset"); // a little awkward.
+		// this would be better...
 //		jQuery(pekoeNode.attributes).each(function (){
 //
 //		});
-		
-		jQuery.map(pekoeNode.attributes, function (a) { 
+
+		jQuery.map(pekoeNode.attributes, function (a) {
 			if ((a.ph) && (a.ph != null)) {
 				// maybe this should do a lookup first? test to see if the attribute is of any interest?
 				//console.warn("Calling InputMaker on attribute:",a.nodeName);
@@ -282,13 +282,13 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 			fs.appendChild(formEl);
 			fs.pekoeNode = pekoeNode;
 			docNode.appendChild(fs);
-			formEl = fs; // will this change the object 
+			formEl = fs; // will this change the object
 		} else {
 			docNode.appendChild(formEl);
 		}
-		
-	} else {	
-		docNode.appendChild(formEl); 
+
+	} else {
+		docNode.appendChild(formEl);
 	}
 	// this should be treated as an enhancement. All of these things should be applied after - BUT, I want to put this BUTTON after the Label, not the field.
 	// Technically, my Label is incorrect, because it contains the button. Oh well. Fix it another day.
@@ -296,28 +296,28 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
     // ------------------------  ADD REPLICATE AND DELETE BUTTONS IF REQUIRED ------------------------------------------
 	var $finalE = $(formEl); // such a mess.
 
-	// working on the assumption that the only deletable fields are repeating. (but the input checkbox doesn't indicate this) 
-	// the key issue with "deletable" is that there must be one item left 
+	// working on the assumption that the only deletable fields are repeating. (but the input checkbox doesn't indicate this)
+	// the key issue with "deletable" is that there must be one item left
 	// TODO if "singleUse" then it shouldn't be deletable after being saved.
  	 if (options.has('repeating') && !isAttribute) { // Can't replicate an Attribute.
 	  	$finalE.addClass("repeating");
 	  	// Sortable??? - Would require these elements to be within a container.
 	  	// At the same time, change the appearance so they're in a vertical list, and hide the LABEL on all but the first.
 	  	// I tried this with CSS - but couldn't get it right. Worth another play sometime - but even nth-of-type isn't helpful because the class is not counted in the type.
-	  	
+
 		var nn = pekoeNodeName;
 		jQuery("<img src='css/graphics/icons/delete.png' class='tool-icon' />")
 				.click(function () {
 					var hasSib =  gs.Pekoe.oEvaluator.evaluate("count(parent::node()/*[name(.) = '" + nn + "']) > 1", pekoeNode ,null, XPathResult.BOOLEAN_TYPE, null);
 					if (!hasSib.booleanValue) {alert("Can't delete the last of these elements"); return; }
-					if (confirm("Do you want to delete this element?")) {   
+					if (confirm("Do you want to delete this element?")) {
 						$finalE.hide('slow',function () {
 							$finalE.trigger("dirty").remove();
 							jQuery(pekoeNode).remove();
 						});
 					}
 				}).appendTo(formEl);
-		
+
 		jQuery("<img src='css/graphics/icons/add.png' class='tool-icon add' />")
 			.click(function () {
 				mergerUtilities.replicateElement(pekoeNode,formEl);
@@ -345,94 +345,103 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 	 So consider adding access to the document via the form element.
 	 */
 	// TODO Add the PekoeNode and the file info.
-	var inputWrapper = function(_fe) { // state management for the form element and the command-buttons
-		var $fe = $(_fe);
-		var _state = $fe.val() === '' ? 'initially-empty' : 'initially-set';
-		var commandState = function () {
-			$fe.siblings('.command-button').hide(); // first, hide all buttons
-			var activeStateClass = ".always, ." + _state;
-			$fe.siblings(activeStateClass).show(); // show those buttons that match the current state or 'always'
-		};
-		$fe.on('change', function (){  // if the form element is changed by the user, update the state.
-			if ($fe.val() === ''){
-				_state = 'currently-empty';
-			} else {
-				_state = 'currently-set'
-			}
-			commandState(); // update visibility
-		});
+	//var inputWrapper = function(_fe) { // state management for the form element and the command-buttons
+	//	var $fe = $(_fe);
+	//	var _state = $fe.val() === '' ? 'initially-empty' : 'initially-set';
+	//	var commandState = function () {
+	//		$fe.siblings('.command-button').hide(); // first, hide all buttons
+	//		var activeStateClass = ".always, ." + _state;
+	//		$fe.siblings(activeStateClass).show(); // show those buttons that match the current state or 'always'
+	//	};
+	//	$fe.on('change', function (){  // if the form element is changed by the user, update the state.
+	//		if ($fe.val() === ''){
+	//			_state = 'currently-empty';
+	//		} else {
+	//			_state = 'currently-set'
+	//		}
+	//		commandState(); // update visibility
+	//	});
+	//
+	//	var  xPath = function(contextNode) { // create an xpath evaluator from the context node
+	//		return function(path) {
+	//			var theDoc = contextNode.ownerDocument;
+	//			var iterator = theDoc.evaluate(path, contextNode, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+	//			var found = [];
+	//			var res;
+	//			while (res = iterator.iterateNext()){
+	//				found.push(res);
+	//			}
+	//			return found;
+	//		}
+	//	};
+	//
+	//	var nodeAccessor = function(nodeArr) { // will provide get/set .value and .arr to return an array of the nodes.
+	//		if (nodeArr.length === 0) return null;
+	//		var _nodes = (Array.isArray(nodeArr)) ? nodeArr : [nodeArr];
+	//		var makeAccessor = function (_node) {
+	//			var $fe = $(_node.formElement);
+	//			return {
+	//				get value() { return _node.textContent; },
+	//				set value(v) {if ($fe.length) {$fe.val(v); $fe.trigger('change'); } else {_node.textContent = v;} }
+	//			};
+	//		};
+	//		var accessors = _nodes.map(makeAccessor);
+	//		return {
+	//			get value()  { return (accessors.length > 1) ? accessors.map(function (n) {return n.value;})  : accessors[0].value},
+	//			set value(v) {
+	//				for (var i = 0; i < accessors.length; i++ ) {
+	//					accessors[i].value = v;
+	//				}
+	//			},
+	//			nodes : _nodes
+	//		};
+	//	};
+	//
+	//	return {
+	//		_init : function () {commandState(); delete this._init;},
+	//		xpe : xPath(pekoeNode), // closure
+	//		nodeAccessor : nodeAccessor,
+	//		pkn: pekoeNode, // closure
+	//		get value() {return $fe.val(); },
+	//		set value(newV) {$fe.val(newV); $fe.trigger('change'); },
+	//		get state () {return _state;},
+	//		set state (newS) {_state = newS; commandState();},
+	//		get lock () { $fe.attr('disabled') && fe.attr('disabled') === 'disabled';},
+	//		set lock (newTruthy) {if (newTruthy) {$fe.attr('disabled','disabled');}}
+	//	};
+	//};
 
-		var  xPath = function(contextNode) { // create an xpath evaluator from the context node
-			return function(path) {
-				var theDoc = contextNode.ownerDocument;
-				var iterator = theDoc.evaluate(path, contextNode, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
-				var found = [];
-				var res;
-				while (res = iterator.iterateNext()){
-					found.push(res);
-				}
-				return found;
-			}
-		};
+	//console.log('pekoeNode',pekoeNode.formElement);
 
-		var nodeAccessor = function(nodeArr) { // will provide get/set .value and .arr to return an array of the nodes.
-			if (nodeArr.length === 0) return null;
-			var _nodes = (Array.isArray(nodeArr)) ? nodeArr : [nodeArr];
-			var makeAccessor = function (_node) {
-				var $fe = $(_node.formElement);
-				return {
-					get value() { return _node.textContent; },
-					set value(v) {if ($fe.length) {$fe.val(v); $fe.trigger('change'); } else {_node.textContent = v;} }
-				};
-			};
-			var accessors = _nodes.map(makeAccessor);
-			return {
-				get value()  { return (accessors.length > 1) ? accessors.map(function (n) {return n.value;})  : accessors[0].value},
-				set value(v) {
-					for (var i = 0; i < accessors.length; i++ ) {
-						accessors[i].value = v;
-					}
-				},
-				nodes : _nodes
-			};
-		};
-
-		return {
-			_init : function () {commandState(); delete this._init;},
-			xpe : xPath(pekoeNode), // closure
-			nodeAccessor : nodeAccessor,
-			pkn: pekoeNode, // closure
-			get value() {return $fe.val(); },
-			set value(newV) {$fe.val(newV); $fe.trigger('change'); },
-			get state () {return _state;},
-			set state (newS) {_state = newS; commandState();},
-			get lock () { $fe.attr('disabled') && fe.attr('disabled') === 'disabled';},
-			set lock (newTruthy) {if (newTruthy) {$fe.attr('disabled','disabled');}}
-		};
-	};
-	var wrappedFormInput = inputWrapper(pekoeNode.formElement); // this object will be available to the command-button code.
-	$fieldDef.find('command-button').each(function () {
-		var $command = $(this);
-		var cname = $command.find('name').text();
-		var cscript = $command.find('javascript').text();
-		var cenable = $command.find('enabled-state').text();
-		// a command should have a command-button/name /state and /javascript
-		if (!cname) { return; } // empty command-buttons will exist.
-		// this gets me a clean function with global scope. Somehow that seems better than getting the current scope.
-		// Crockford calls this a 'bad part of Javascript'
-		var commandFnMaker = new Function("theInput", "return function () {" + cscript + "}");
-		var commandFn = commandFnMaker(wrappedFormInput);
-		var b = $('<button class="command-button"></button>')
-			.text(cname)
-			.on('click',
+	var commands = $fieldDef.find('command-button');
+	if (commands.length > 0) {
+		var wrappedFormInput = gs.inputWrapper(pekoeNode.formElement); // this object will be available to the command-button code.
+		// note that pekoeNode.formElement = null for SELECT.
+		$fieldDef.find('command-button').each(function () {
+			var $command = $(this);
+			var cname = $command.find('name').text();
+			var cscript = $command.find('javascript').text();
+			var cenable = $command.find('enabled-state').text();
+			// a command should have a command-button/name /state and /javascript
+			if (!cname) { return; } // empty command-buttons will exist.
+			// this gets me a clean function with global scope. Somehow that seems better than getting the current scope.
+			// Crockford calls this a 'bad part of Javascript'
+			var commandFnMaker = new Function("theInput", "return function () {" + cscript + "}"); // 'theInput' is the 'wrappedFormInput'...
+			var commandFn = commandFnMaker(wrappedFormInput);
+			var b = $('<button class="command-button"></button>')
+				.text(cname)
+				.on('click',
 				function(e){
 					e.preventDefault();
 					commandFn();
 				})
-			.addClass(cenable)
-			.appendTo($finalE);
-	});
-	wrappedFormInput._init(); // set the initial visibility of the button.
+				.addClass(cenable)
+				.appendTo($finalE);
+		});
+
+		wrappedFormInput._init(); // set the initial visibility of the button.
+	}
+
 	// ------------------------------------------------------------------------------------------ end of command-button
 
 	if (pekoeNode.nw) {$finalE.addClass('new-field');} // .nw added by displayTemplateContent if the field or fs is not in the tree.
@@ -440,7 +449,7 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 
 
 	// --------------------------- THE WORK IS DONE. FROM HERE ON ARE THE INDIVIDUAL COMPONENTS ...
-	
+
 	function makeLabelText (n) { // if the node is an attribute, get the parent-Element's name
         if ($fieldDef.find('help')) {}
         if (isAttribute) {
@@ -449,17 +458,17 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
             return n.nodeName;
         }
 	}
-	
+
 	function textInput() {
 		var $formEl = jQuery("<span class='label'></span>").text(makeLabelText(pekoeNode));
 		formEl = $formEl.get(0);
 		showDS(formEl,pekoeNode);
 		$formEl.append("<br />")
-		
+
 		var inp = document.createElement("input");
 		inp.setAttribute("type","text");
 		var pth = $fieldDef.attr("path");
-		var uniqueName = pth + "-" + gs.Pekoe.nodeId; // this makes the id unique		
+		var uniqueName = pth + "-" + gs.Pekoe.nodeId; // this makes the id unique
 		if ((options.has('singleUse') === true) && (currentValue()  !== "")) {
 			jQuery(inp).attr("disabled","disabled");
 		}
@@ -469,13 +478,13 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 		if (options.has("repeating")) {
 			inp.setAttribute('title','shift-enter to add another');
 		}
-		
+
 		formEl.appendChild(inp);
 		inp.setAttribute("name",uniqueName);   // but does the name need to be unique?
 		inp.setAttribute("placeholder",$fieldDef.find("example").text());
 		inp.setAttribute("size", $inp.attr("size"));
-		
-		// set the value as either the pre-existing value, or the default provided by the "inputValue" 
+
+		// set the value as either the pre-existing value, or the default provided by the "inputValue"
 		if (currentValue() !== "") {
 			// it might need manipulating ??
 			var size = $inp.attr("size");
@@ -495,46 +504,46 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
         }
 
 		inp.onchange = updateTree; // should be a listener - not like this!
-		inp.pekoeNode = pekoeNode; 
+		inp.pekoeNode = pekoeNode;
 		if (isEnhanced) {
 			jQuery(inp).addClass("pekoe-enhancement");
 		}
 		pekoeNode.formElement = inp;
 	 }
-	 
-	function dateInput() { 		
+
+	function dateInput() {
 		var $f = jQuery("<span class='label'/>")
 			.text(makeLabelText(pekoeNode))
 			.append("<br />");
 		var uniqueName = $fieldDef.attr("path") + "-" + gs.Pekoe.nodeId; // this makes the id unique
 		var size = $inp.attr("size"); // this check should be performed elsewhere and should apply to all field types.
-		
+
 		var $i = jQuery("<input type='date' />")
 			.attr("id",uniqueName)
 			.attr("name",uniqueName)
 			.attr("size", size || "10")
 			.addClass("date-picker")
 			.appendTo($f);
-			
+
 		formEl = $f.get(0);
 		try {
-		showDS(formEl,pekoeNode);	
+		showDS(formEl,pekoeNode);
 		} catch (se) {console.error("showDS error");}
 		if ((options.has('singleUse') === true) && (currentValue()  !== "")) {$i.attr("disabled","disabled");}
 
 		$i.attr("value",currentValue());
-		var inp = $i.get(0); 
+		var inp = $i.get(0);
 
 		inp.onchange = updateTree; // TODO remove this
-		inp.pekoeNode = pekoeNode; 
+		inp.pekoeNode = pekoeNode;
 		pekoeNode.formElement = inp;
 
 		if (isEnhanced) {
 			$i.addClass("pekoe-enhancement"); // current approach to date/time picker
 		}
 	 }
-	 
-	function radioInput(  ) { 
+
+	function radioInput(  ) {
 		formEl = document.createElement("span"); // a span because we need to label the radio-buttons
 		formEl.setAttribute("class","label");
 		formEl.textContent = makeLabelText(pekoeNode);
@@ -544,10 +553,10 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 			var value = document.createTextNode(currentValue());
 			formEl.appendChild((value));
 		} else {
-			
+
 			var vals = jQuery($inp.find("list")[0]).text().split(/\s*\n\s*/); // separated by line-breaks. possibly CRLF
 			var inpName = $fieldDef.attr("path") + "-" + gs.Pekoe.nodeId++;
-			// the values can be simple strings or colon separated value:name 
+			// the values can be simple strings or colon separated value:name
 			jQuery.map(vals, function(valueColonName) {
 				var split = valueColonName.split(":");
 				var n = (split.length === 2) ? split[1] : split[0];
@@ -556,7 +565,7 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 				var item = document.createTextNode(n);
 				var inp = document.createElement("input");
 				inp.setAttribute("type","radio");
-				
+
 				inp.setAttribute("name",inpName);
 	//			inp.setAttribute("id",inpName + "-" + gs.Pekoe.nodeId++); // doesn't matter if the name is different to the id
 				inp.setAttribute("value", v);
@@ -570,7 +579,7 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 		}
 		pekoeNode.formElement = null; //TODO (2012-01-14: work out why null here?) probably need to create a getter/setter for radios and selects
 	 }
-	
+
 	function checkboxInput(  ) { formEl = document.createElement("label");
 		formEl.textContent = makeLabelText(pekoeNode);
 		showDS(formEl,pekoeNode);
@@ -578,10 +587,10 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 			var inp = $i.get(0);
 			var uniqueName = $fieldDef.attr("path") + "-" + gs.Pekoe.nodeId; // this makes the id unique
 			if ((options.has('singleUse') === true) && (currentValue()  !== "")) $i.attr('disabled',true);
-			
+
 			$i.attr("name", uniqueName);   // but does the name need to be unique?
 			if (currentValue() === "1") {
-				$i.attr("checked",""); // how does this work? 
+				$i.attr("checked",""); // how does this work?
 			}
 			$i.on("change", function () {
 				var $this = jQuery(this); // This looks like it could get mixed up TODO - this needs testing URGENT.
@@ -592,7 +601,7 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 				}
 				$this.trigger("dirty");
 			});
-			inp.pekoeNode = pekoeNode; 
+			inp.pekoeNode = pekoeNode;
 			pekoeNode.formElement = inp;
 			formEl.appendChild(inp);
 	 }
@@ -601,13 +610,13 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 		var $formEl = jQuery("<span class='label' />").text(makeLabelText(pekoeNode));
 		formEl = $formEl.get(0);
 
-		
+
 		showDS(formEl,pekoeNode);
 		jQuery("<br />").appendTo($formEl);
 		var vals = jQuery($inp.find("list")[0]).text().split(/\s*\n\s*/); // separated by line-breaks. possibly CRLF
 		var inpName = $fieldDef.attr("path") + "-" + gs.Pekoe.nodeId++;
 		var currentValues = currentValue().split(/\s*\n\s*/);
-		jQuery.map(vals,function(n) { 
+		jQuery.map(vals,function(n) {
 			var $l = jQuery("<label />").text(n);
 			var $i = jQuery("<input type='checkbox' />").attr('name',inpName);
 			$i.attr("value", n);
@@ -616,8 +625,8 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 			$i.on("change", function () {
 				// the values are the same as the labels.
 				// they are separated by line-breaks.
-				// 
-				var $this = jQuery(this); // get handle on the checkbox that has changed 
+				//
+				var $this = jQuery(this); // get handle on the checkbox that has changed
 				var vals = currentValue().split(/\s*\n\s*/); // Values may contain spaces. This returns an array - possibly containing an empty string
 //				// NOTE the return value from splice is the value removed from the array - not the (modified) array itself
 				var isSet = jQuery.inArray($this.val(), vals);
@@ -631,17 +640,17 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 				}
 				$this.trigger("dirty");
 			});
-			$i.get(0).pekoeNode = pekoeNode; // we're attaching the same pekoenode to each checkbox 
+			$i.get(0).pekoeNode = pekoeNode; // we're attaching the same pekoenode to each checkbox
 			$formEl.append($l.append($i));
 		});
 		pekoeNode.formElement = null; // probably need to create a getter/setter for radios and selects
 	}
 
-	function textareaInput(  ) { 
+	function textareaInput(  ) {
 		if (options.has("htmledit")) { //TODO  HUH? What does this do?
-			
+
 			formEl = jQuery("<div class='read-only'></div>").get();
-			
+
 			jQuery(pekoeNode).children().each(function () {
 				formEl.appendChild(this);
 			});
@@ -660,7 +669,7 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 		} else {
 			formEl = document.createElement("label");
 			formEl.textContent = makeLabelText(pekoeNode);
-			
+
 			showDS(formEl,pekoeNode);
 			formEl.appendChild(document.createElement("br"));
 			var inp = document.createElement("textarea");
@@ -692,7 +701,7 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 			inp.setAttribute("cols",size);
 			inp.onchange = updateTree;
 			inp.pekoeNode = pekoeNode;
-			
+
 		}
 		pekoeNode.formElement = inp;
 	 }
@@ -716,7 +725,7 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 	 }
 
 	// TODO - make input LOOKUP work here.
-	function selectInput(  ) { 
+	function selectInput(  ) {
 		formEl = document.createElement("label");
 		formEl.textContent = makeLabelText(pekoeNode);
 		showDS(formEl,pekoeNode);
@@ -730,7 +739,7 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 		var selectList = jQuery($inp.find("list")[0]).text();
 		if ((currentValue() !== "") && (selectList.indexOf(currentValue()) == -1)){selectList += "\n"+currentValue();} // make sure list contains the value
 		var vals = selectList.split(/\s*\n\s*/); // separated by line-breaks. possibly CRLF
-		
+
 		jQuery.map(vals, function(n) {
 			var inp = document.createElement("option");
 			inp.setAttribute("value", n);
@@ -738,7 +747,7 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 			if (n == currentValue()) { inp.setAttribute("selected","selected");}
 			select.appendChild(inp);
 		});
-		pekoeNode.formElement = null;
+		pekoeNode.formElement = null; // why?
 	 }
 
 
@@ -841,7 +850,7 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 				var parentN = formEl.parentNode;
 				var parentN = formEl.parentNode.insertBefore(newFS,formEl);
 				//parentN.appendChild(newFS);
-				gs.Pekoe.merger.Utility.applyEnhancements(newFS);
+				gs.Pekoe.merger.Utility.applyEnhancements(newFS); // I have the context wrong.
 				jQuery(newFS).show('slow');
 
 			} else if (field !== "") {
@@ -893,17 +902,17 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 	}
 
 	function register(fnName, fn) {elementTypes[fnName] = fn;}
-	function constructElement(fnName) { 
-		if (elementTypes[fnName]){ 
-			return elementTypes[fnName]; 
+	function constructElement(fnName) {
+		if (elementTypes[fnName]){
+			return elementTypes[fnName];
 		} else {
 			console.warn("No Element type ",fnName, " for ", pekoeNodeName); // relates to previous warning about missing field/input/@type
 			return elementTypes["text"];
 		}
 	}
-		
-	
-	
- 	
+
+
+
+
 };
 // ---------------------------------------------------------- END of elementMaker -------------------------------------------------------------

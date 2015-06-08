@@ -68,7 +68,8 @@ gs.Pekoe.merger.Utility = function () {
 					var fragmentName = last_two_steps.join("/");
 
  					
-					if (this.fieldDefsByPath[fragmentName]) { 
+					if (this.fieldDefsByPath[fragmentName]) {
+						console.log('found fragmentpath',fragmentName, 'from',f);
 						return this.fieldDefsByPath[fragmentName];
 					} else if (this.fieldDefsByPath[last_two_steps[1]]) {
 						console.log("found single-step field",last_two_steps[1]);
@@ -117,13 +118,15 @@ gs.Pekoe.merger.Utility = function () {
 	// ONE simplistic approach would be to remove the class from each one.
 
 
-	function applyEnhancements(mform) {
+	function applyEnhancements(mform) { //
 
 		/*
 		Here's an idea.
 		Why not link the option-click "close folds" to ordering. Turn on the dragger
 		OR
 		make the sorting dependent on the dragger - in which case only the peers of 'this' element can be sorted.
+
+		That might be the answer. Instead of enabling Sorting by default, make it only
 
 
 		For some strange reason, an element can be dragged INSIDE another. (e.g. allowing a field to become a child of a field.)
@@ -190,10 +193,24 @@ gs.Pekoe.merger.Utility = function () {
 		// Beautiful.
 		jQuery(".rte").each(applyRTE);
 
-	    // Perhaps a better approach would be to apply widgets by searching for elements with a pekoe-enhancement class, then evaluating the widget data
+		// when this is called by the field-choice - adding a fragment, the 'mform' IS the fragment (not the whole page.)
+
+	    // TODO fix this silly hack - it's because the 'mform' IS the fragment when called from the 'field-choice' input.
+		if ($(mform).hasClass('pekoe-enhancement')) {
+			var enhancement = $.find("enhancement",mform.pekoeNode.ph)[0];
+			if (enhancement) {
+				var theInput = gs.inputWrapper(mform); // will this get the last value of the inputWrapper?
+				var $field = $(mform);
+				try {
+					eval($(enhancement).text());
+				} catch (e) {console.warn("ENHANCEMENT ERROR:",e); }
+			}
+		}
+		// Perhaps a better approach would be to apply widgets by searching for elements with a pekoe-enhancement class, then evaluating the widget data
 	    jQuery(".pekoe-enhancement", mform).each (function () {
-	    	var enhancement = jQuery.find("input enhancement",this.pekoeNode.ph)[0];
+	    	var enhancement = jQuery.find("enhancement",this.pekoeNode.ph)[0];
 	    	if (enhancement) {
+				var theInput = gs.inputWrapper(this); // will this get the last value of the inputWrapper?
 		    	var $field = $(this);
 		    	try {
 		    		eval(jQuery(enhancement).text());
@@ -225,7 +242,7 @@ gs.Pekoe.merger.Utility = function () {
             $pekoeNode.empty().append(jQuery(this.getData()).clone());
         });
     }
-	
+
 //	If a field is marked as "repeating" then this method is attached to a button next to the field. WILL NOT BE APPLIED TO Attributes.
 mergerUtils.replicateElement = function (pkn, formEl) {
 		// this procedure creates a new  pekoeNode in the the document
@@ -346,7 +363,8 @@ mergerUtils.addMe = function (fieldset, isCopy) {
 	} else {
 			parentN.appendChild(newNode);
 	}		
-
+	newNode.pekoeEmpty = true;
+	console.log('add pekoeEmpty to',newNode);
 	var newFS = newNode.toForm();
 	jQuery(newFS).hide();
 	sib = fieldset.nextSibling;
@@ -364,6 +382,7 @@ mergerUtils.addMe = function (fieldset, isCopy) {
 mergerUtils.duplicate = duplicate;
 
 function duplicate(source, dest) {
+
 	// what happens if source is an attribute and dest hasn't been constructed?
 	if (!dest) {console.warn("form Utility duplicate No dest for source",source.nodeName,source);}
 	// assume the trees have been constructed (using a clone operation) and that source and dest are a single node
@@ -868,6 +887,7 @@ mergerUtils.loadSchema = function (doctype) {
     // this is run by Lookup.
     function mirrorNodes(fragment, source) {
         // import a complete copy of the fragment
+		console.log('mirrorNodes',fragment.nodeName);
         var nn = source.ownerDocument.importNode(fragment,true);
         // for every child node, see if it exists in the source. If so, move it to the nn
         var fragmentChildren = nn.childNodes;
@@ -922,7 +942,8 @@ mergerUtils.loadSchema = function (doctype) {
                 var phDef =  schema.getFragmentDefsByPath(pathToHere);
                 // USING jQuery(gs.defaultField).attr("path",f).get(0) here will cause the attribute to be displayed as a field
                 if (phDef == null) {
-                    console.warn("No definition for fragment attribute: ",pathToHere);
+					// maybe have a list of valid attributes so I can warn on real problems...
+                    //console.warn("No definition for fragment attribute: ",pathToHere);
                 }
                 else { // a phDef exists for this node
                     a.ph = phDef;

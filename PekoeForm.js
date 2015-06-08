@@ -52,13 +52,13 @@ gs.Pekoe.evaluateXPath = function (aNode, aExpr) {
 
 // this is a possible solution to the Attribute problem above: curry a getter
 
-var attrOrNodeGetter = function(aExpr) {
-    if (aExpr.contains("@")) {
-        return function (node) { return node;}
-    } else {
-        return function (node) { return node[attr];}
-    }
-}
+//var attrOrNodeGetter = function(aExpr) {
+//    if (aExpr.contains("@")) {
+//        return function (node) { return node;}
+//    } else {
+//        return function (node) { return node[attr];}
+//    }
+//}
 
 // Merger Constructor.   2011-02-12 It doesn't look like a real constructor
 if (!gs.Pekoe.Form) gs.Pekoe.Form = function (options) {
@@ -557,7 +557,7 @@ gs.Pekoe.pekoeNodeForm = function () {
 gs.Pekoe.fragmentNodeForm = function () {
 	var fragmentNode = this;
 	if (fragmentNode.getAttribute("deleted")) return null; // TODO is this used?
-	var formEl = jQuery("<fieldset />"); // this will contain the fields
+	var formEl = $("<fieldset />"); // this will contain the fields
 	//if (jQuery(fragmentNode.ph).attr('optional') === 'yes') {
 	//	console.log("OPTIONAL field", formEl);
 	//	jQuery('<select name="frag"><option>-</option><option>Frag1</option><option>Frag2</option></select>').appendTo(formEl);
@@ -575,7 +575,9 @@ gs.Pekoe.fragmentNodeForm = function () {
 
      */
 
-    var options = jQuery(fragmentNode.ph).find("options").text();
+    var options = $(fragmentNode.ph).find("options").text();
+    var enhancement = $(fragmentNode.ph).find("enhancement").text();
+    if (enhancement != '') {formEl.addClass('pekoe-enhancement');}
 	var isRepeating = options.indexOf("repeating") !== -1;
     var isDeletable = options.indexOf('deletable') !== -1;
     if (isRepeating) formEl.addClass('repeating');

@@ -37,6 +37,7 @@
 
     <script src="bureau-a-gradin.js"></script>
     <script src="utilities.js"></script>
+    <script src="nodeAccessor.js"></script>
     <script src="Utility.js"></script>
     <script src="pekoeForm_widget.js"></script>
     <script src="pekoeFile.js"></script>
@@ -78,7 +79,7 @@
             })();
             gs.openItem = function() {
                 if (gs.scope) {
-                    console.log('using angular scope version')
+                    
                     return function (tab, inNewTab) {
                         if (tab.type === 'folder' || inNewTab) {
                             gs.scope.addTab(tab); //
@@ -129,13 +130,13 @@
                 args.template = tPath;
                 history.replaceState(null,null,location.origin + location.pathname + '?' + $.param(args)); // update the location to include the current template
                 if (e.metaKey) {
-                    var filepath = $span.data('path').split('/'); // '/db/pekoe/tenants/cm/templates/AD-Bookings/Thank-you.odt'
-                    filepath.pop(); // /db/pekoe/tenants/cm/templates/AD-Bookings
-                    filepath.splice(0,5); // templates/AD-Bookings
-                    filepath.unshift(''); // /templates/AD-Bookings
-                    var folderName = filepath[filepath.length-1]; // 'AD-Bookings'
+                    var filePath = $span.data('path').split('/'); // '/db/pekoe/tenants/cm/templates/AD-Bookings/Thank-you.odt'
+                    filePath.pop(); // /db/pekoe/tenants/cm/templates/AD-Bookings
+                    filePath.splice(0,5); // templates/AD-Bookings
+                    filePath.unshift(''); // /templates/AD-Bookings
+                    var folderName = filePath[filePath.length-1]; // 'AD-Bookings'
                     // TODO create a unified view of Templates and change this ...
-                    var t = {path: filepath.join('/'), href: "/exist/pekoe-app/files.xql?collection=" + filepath.join('/'), type:"folder", title:folderName + "-folder"}
+                    var t = {path: filePath.join('/'), href: "/exist/pekoe-app/files.xql?collection=" + filePath.join('/'), type:"folder", title:folderName + "-folder"}
                     gs.openItem(t,true);
                     return;
                 }
