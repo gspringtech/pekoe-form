@@ -813,7 +813,6 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 				nn.toForm = gs.Pekoe.fragmentNodeForm;
 				var newFS = nn.toForm();
 
-				console.log('adding fragment',nn);
 				// if options only-one-of then the select must go away.
 				// my naming is wrong.
 				// the options are

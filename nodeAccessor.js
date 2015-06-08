@@ -42,7 +42,7 @@ gs.inputWrapper = function(_fe) { // state management for the form element and t
 
 			return {
 				get value() { return _node.textContent; },
-				set value(v) {if ($fe.length) { console.log('set',v); $fe.val(v); $fe.trigger('change'); } else {_node.textContent = v;} }
+				set value(v) {if ($fe.length) { $fe.val(v); $fe.trigger('change'); } else {_node.textContent = v;} }
 			};
 		};
 		var accessors = _nodes.map(makeAccessor);

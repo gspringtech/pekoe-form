@@ -754,6 +754,7 @@ gs.Pekoe.fragmentNodeForm = function () {
         if (isSingleUse) {
             // add nothing except 'copy values'. Possibly Disable
             console.log('single-use',this.nodeName);
+            formEl.addClass('single-use');
         } else {
             if (isRepeating) {
                 // addMe

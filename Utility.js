@@ -119,6 +119,7 @@ gs.Pekoe.merger.Utility = function () {
 
 
 	function applyEnhancements(mform) { //
+		$('fieldset.single-use *:input').attr('disabled','disabled');
 
 		/*
 		Here's an idea.
