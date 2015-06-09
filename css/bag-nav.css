@@ -188,31 +188,31 @@ color:inherit;
 }
 
 
-.odt{
+.t-odt{
     background-image:url(graphics/Galaxy_OOo3_writer-doc_16.png);
     background-color:#5FA1FF;
     color:inherit;
 }
 
-.ods{
+.t-ods{
     background-image:url(graphics/Galaxy_OOo3_calc-doc_16.png);
     background-color: #5DC841;
     color:inherit;
 }
 
-.docx{
+.t-docx{
     background-image:url(graphics/docx.jpg);
     background-color: #99FFFF;
     color:inherit;
 }
 
-.mail{
+.t-mail{
     background-color: wheat;
     background-image: url(graphics/icons/email.png);
     color: black;
 }
 
-.txt, .text{
+.t-txt, .t-text{
     background-color: white;
     background-image: url(graphics/icons/page_white_text.png);
     color: black;
