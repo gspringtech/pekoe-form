@@ -752,8 +752,7 @@ gs.Pekoe.fragmentNodeForm = function () {
 
     } else { // existing fragment.
         if (isSingleUse) {
-            // add nothing except 'copy values'. Possibly Disable
-            console.log('single-use',this.nodeName);
+            // add nothing except 'copy values'. Fields will be disabled during enhancement process.
             formEl.addClass('single-use');
         } else {
             if (isRepeating) {
