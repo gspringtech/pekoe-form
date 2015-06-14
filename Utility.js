@@ -887,9 +887,9 @@ mergerUtils.loadSchema = function (doctype) {
     mergerUtils.mirrorNodes = mirrorNodes;
     // this function probably needs replacing with the one from PekoeForm.js
     // this is run by Lookup.
-    function mirrorNodes(fragment, source) {
+    function mirrorNodes(fragment, source) { // I think this is cruft
         // import a complete copy of the fragment
-		console.log('mirrorNodes',fragment.nodeName);
+		console.log('utility.mirrorNodes',source);
         var nn = source.ownerDocument.importNode(fragment,true);
         // for every child node, see if it exists in the source. If so, move it to the nn
         var fragmentChildren = nn.childNodes;
