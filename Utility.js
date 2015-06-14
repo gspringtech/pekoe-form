@@ -490,6 +490,7 @@ mergerUtils.addMeInTheRightPartOfTheTree = addMeInTheRightPartOfTheTree;
      */
 
 function addMeInTheRightPartOfTheTree(tree, schema, pathParts, child) {
+
 	// Add to the tree, using the field ordering obtained from the sampleTree. 
 	// Note - the sample tree consists of top-level elements only (ie first-children of root element)
 	// An ad-hoc field will be prepended to the existing parent. It is possible to change this behaviour (see below)

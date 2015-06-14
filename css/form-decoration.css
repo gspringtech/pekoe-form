@@ -232,3 +232,11 @@ div.read-only {
 .field-choice{
     background-color: orange;
 }
+
+.help {
+    background-color: orange;
+    float: right;
+    font-weight: bold;
+    padding-left: 5px;
+    padding-right: 5px;
+}
