@@ -508,14 +508,14 @@ gs.Pekoe.mirrorNodes = function (fragment, source) {// would be better named (so
 			nn.setAttribute(source.attributes[i].name, source.attributes[i].value);
 		}
 	}
-	
-	var mark = jQuery(source).first(); // will only be here if there ARE children
+	var first = jQuery(source).first(); // will only be here if there ARE children
+	var mark = first;
 	jQuery(nn).children().each(function () {
 		var matching = jQuery(source).find(this.nodeName);
 		if (matching.length > 0) { 
-		    mark = matching.last(); // found some of those, so save the position for ...
+		    mark = matching.last(); // found some of those, so save the position for the next check
 		} else { 
-		    if (!mark.nodeName) { // must be at the beginning
+		    if (mark === first) { // must be at the beginning
 			mark = jQuery(this).prependTo(source);
 		    } else {
 			mark = jQuery(this).insertAfter(mark); 

@@ -215,6 +215,13 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 		}
 	}
 
+	function showHelp(formEl,pekoeNode){
+		var help = $fieldDef.find('help');
+		if (help.length && help.text() !== '') {
+			jQuery('<span class="help">?</span>').attr('title',help.text()).appendTo(formEl);
+		}
+	}
+
 
 	var formEl = null;
 
@@ -388,6 +395,7 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 		var $formEl = jQuery("<span class='label'></span>").text(makeLabelText(pekoeNode));
 		formEl = $formEl.get(0);
 		showDS(formEl,pekoeNode);
+		if (currentValue() === "") {showHelp(formEl,pekoeNode);}
 		$formEl.append("<br />")
 
 		var inp = document.createElement("input");
