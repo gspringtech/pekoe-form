@@ -240,9 +240,8 @@ getData : function () {
     jQuery.each(links,function(key,item) {
 
         var $item = jQuery(item); // a <link>
-        var isDefault = $item.parent().is("default-links"); // beautiful
-        // TODO remove the "path" option when all templates are updated
-        var fieldpath = ($item.attr("field-path")!== undefined) ?  $item.attr("field-path") : $item.attr("path"); // ...  to a field like /txo/property/address or /schema/field-or-fragmentRef
+        var isDefault = $item.parent().is("default-links"); // beautiful. Mark a field as being listed in the Default-links for this Doctype.
+        var fieldpath = $item.attr("field-path"); // ...  to a field like /txo/property/address or /schema/field-or-fragmentRef
         if (fieldpath === undefined) { // this should never happen. The Link IS the path
             console.warn("Can't process link without path",key,item);
             return ;

@@ -886,38 +886,32 @@ mergerUtils.loadSchema = function (doctype) {
  
     mergerUtils.mirrorNodes = mirrorNodes;
     // this function probably needs replacing with the one from PekoeForm.js
-    // this is run by Lookup.
-    function mirrorNodes(fragment, source) { // I think this is cruft
-        // import a complete copy of the fragment
+    // this is only used by pekoeLookup_widget 189.
+	// A better version is found in PekoeForm.
+    function mirrorNodes(fragment, source) {
+        // import a complete copy of the fragment, MAKE SURE IT'S COMPLETE AND RETURN IT
 		console.log('utility.mirrorNodes',source);
         var nn = source.ownerDocument.importNode(fragment,true);
         // for every child node, see if it exists in the source. If so, move it to the nn
         var fragmentChildren = nn.childNodes;
         var fcCount = fragmentChildren.length;
-    //	console.log("found ", fcCount, "children");
         for (var i = 0; i < fcCount; i++){
-    //		console.log("processing ", i);
             var fragChild = fragmentChildren[i];
             var matchingNodes = source.getElementsByTagName(fragChild.tagName); // THIS is fatal
-    //		console.log("matchingNodes",matchingNodes);
             if (matchingNodes.length > 0) {
-
                 for (var m = 0; m < matchingNodes.length; m++ ) {
-    //				console.log("going to insert",matchingNodes[m])
                     nn.insertBefore(matchingNodes[m], fragChild);
                 }
                 nn.removeChild(fragChild);
             }
         }
         // then, append any remaining source children to the fragment,
-    //	console.log("source childnodes now",source.childNodes);
         var remaining = source.childNodes;
         for (var n = 0; n < remaining.length; n++ ) {
                 nn.appendChild(remaining[n]);
         }
         //finally replace the source with the fragment.
         var p = source.parentNode;
-    //	console.log("about to replace",source, "with",nn);
         p.replaceChild(nn,source);
         return nn;
     }
