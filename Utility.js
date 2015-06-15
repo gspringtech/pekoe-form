@@ -494,12 +494,6 @@ function addMeInTheRightPartOfTheTree(tree, schema, pathParts, child) {
 	// Add to the tree, using the field ordering obtained from the sampleTree. 
 	// Note - the sample tree consists of top-level elements only (ie first-children of root element)
 	// An ad-hoc field will be prepended to the existing parent. It is possible to change this behaviour (see below)
-//    console.log('addMeInTheRightPartOfTheTree',pathParts,child); // ['schema', 'fragment'] <fragment>
-
-	var fieldInSampleTree = jQuery(pathParts.join(" > "), schema.sampleTree); // <fragment>. (I would prefer an XPath.)
-
-    pathParts.pop();
-	var parentPath = pathParts.join(" > ");
 
 	// easier to use this recursive function than write a complex loop
 	// TODO except when it doesn't terminate
@@ -516,19 +510,31 @@ function addMeInTheRightPartOfTheTree(tree, schema, pathParts, child) {
 		}
 		return null; // no preceding sib
 	}
+
+	var fieldInSampleTree = jQuery(pathParts.join(" > "), schema.sampleTree); // <fragment>. (I would prefer an XPath.)
 	// --- use it...
+
     if (fieldInSampleTree.length === 0) {
-        console.warn('field not found in sampletree',pathParts.join(' > '));
-        return null;
+	// Maybe it's a fragment-ref-child, so pop the path, but wrap the child
+	pathParts.pop(); // the last part should also be the name of the child.
+	if (pathParts.length > 0) { 
+	    var newChild = tree.createElement(pathParts[pathParts.length - 1]);
+	    jQuery(newChild).append(child)
+	    addMeInTheRightPartOfTheTree(tree, schema, pathParts, newChild); 
+	    return;
+	} else {
+	    return null;
+	}
     }
+    pathParts.pop();
+    var parentPath = pathParts.join(" > ");
+
 	var prevSib = precedent(fieldInSampleTree.prev());
 	if (prevSib) { // did we find one?
 		jQuery(prevSib).after(child);
 	} else {
         // didn't find a previous sibling so perhaps just add at the beginning.
-//		console.log("didn't find prevSib. Looking for parentPath",parentPath);
 		var parent = jQuery(parentPath, tree); // selector
-//        console.log('parent',parent);
 		if (parent.length > 0) { // why length? This is the recursion gate
 			// might shift ad-hoc fields. 
 			jQuery(parent).prepend(child); // if desired, ad-hoc field could be .appended after testing child.isDefault.

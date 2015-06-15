@@ -497,26 +497,29 @@ getData : function () {
  * and compare its structure to the prototype in the "fragments". Missing fields are added to this structure.
  * NOTE: this version has been pulled into Pekoe 4
  */
-gs.Pekoe.mirrorNodes = function (fragment, source) {// would be better named (source, target)
-	// import a complete copy of the fragment
-	var nn = source.ownerDocument.importNode(fragment,true);
-	// for every child node, see if it exists in the source. If so, move it to the nn 
+gs.Pekoe.mirrorNodes = function (fragmentTemplate, target) {// would be better named (target, target)
+	// import a complete copy of the fragmentTemplate
+	var nn = target.ownerDocument.importNode(fragmentTemplate,true);
+	// for every child node, see if it exists in the target. If so, move it to the nn 
 	// must copy attributes here...
-	if (source.attributes && source.attributes.length > 0) {
-		// The attributes of an xTree node can have field-info ,
-		for (var i = 0; i < source.attributes.length; i++) {
-			nn.setAttribute(source.attributes[i].name, source.attributes[i].value);
-		}
+    if (fragmentTemplate.attributes && fragmentTemplate.attributes.length > 0) {
+	// copy any missing attributes from the template to the currentFragRef
+	for (var i = 0; i < fragmentTemplate.attributes.length; i++) {
+            var nm = fragmentTemplate.attributes[i].name;
+            if (!target.hasAttribute(nm)) {
+                target.setAttribute(nm,fragmentTemplate.attributes[i].value);
+            }
 	}
-	var first = jQuery(source).first(); // will only be here if there ARE children
+    }
+	var first = jQuery(target).first(); // will only be here if there ARE children
 	var mark = first; 
 	jQuery(nn).children().each(function () {
-		var matching = jQuery(source).find(this.nodeName);
+		var matching = jQuery(target).find(this.nodeName);
 		if (matching.length > 0) { 
 		    mark = matching.last(); // found some of those, so save the position for the next check
 		} else { 
 		    if (mark === first) { // must be at the beginning
-			mark = jQuery(this).prependTo(source);
+			mark = jQuery(this).prependTo(target);
 		    } else {
 			mark = jQuery(this).insertAfter(mark); 
 		    }
