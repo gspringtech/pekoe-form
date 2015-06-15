@@ -377,7 +377,7 @@ mergerUtils.addMe = function (fieldset, isCopy) {
 		parentN.appendChild(newFS);
 	}	
 	applyEnhancements(newFS);
-	jQuery(newFS).show('slow'); 
+	jQuery(newFS).show('slow').find('input').first().focus(); 
 };
 
 mergerUtils.duplicate = duplicate;
