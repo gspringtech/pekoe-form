@@ -181,7 +181,7 @@ gs.Pekoe.merger.Utility = function () {
 			if (event.which === 13) {
 				event.preventDefault();
 				if (event.shiftKey) {
-					$(this).siblings('.add').click(); // Click the 'add' button on return-in-field for simple repeating fields
+					$(this).siblings('.add').click();
 				}
 			}
 		});
@@ -244,7 +244,7 @@ gs.Pekoe.merger.Utility = function () {
         });
     }
 
-//	If a simple field is marked as "repeating" then this method is attached to a button next to the field. WILL NOT BE APPLIED TO Attributes.
+//	If a field is marked as "repeating" then this method is attached to a button next to the field. WILL NOT BE APPLIED TO Attributes.
 mergerUtils.replicateElement = function (pkn, formEl) {
 		// this procedure creates a new  pekoeNode in the the document
 		// and renders a new form element by directly calling ElementMaker
@@ -377,7 +377,7 @@ mergerUtils.addMe = function (fieldset, isCopy) {
 		parentN.appendChild(newFS);
 	}	
 	applyEnhancements(newFS);
-	jQuery(newFS).show('slow').find('input').focus();
+	jQuery(newFS).show('slow').find('input').first().focus(); 
 };
 
 mergerUtils.duplicate = duplicate;

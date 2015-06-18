@@ -42,7 +42,12 @@ gs.inputWrapper = function(_fe) { // state management for the form element and t
 
 			return {
 				get value() { return _node.textContent; },
-				set value(v) {if ($fe.length) { $fe.val(v); $fe.trigger('change'); } else {_node.textContent = v;} }
+				set value(v) {
+				    if ($fe.length) {
+					$fe.val(v); 
+					_node.textContent = v; // Don't trigger a change here - it will cause recursion
+				    } else {_node.textContent = v;} 
+				}
 			};
 		};
 		var accessors = _nodes.map(makeAccessor);
@@ -63,10 +68,10 @@ gs.inputWrapper = function(_fe) { // state management for the form element and t
 		nodeAccessor : nodeAccessor,
 		pkn: pekoeNode,
 		get value() {return $fe.val(); },
-		set value(newV) {$fe.val(newV); $fe.trigger('change'); },
+		set value(newV) {$fe.val(newV); $fe.trigger('change'); }, // I'm uncertain about this accessor here - the change trigger might cause recursion. 
 		get state () {return _state;},
 		set state (newS) {_state = newS; commandState();},
-		get lock () { $fe.attr('disabled') && fe.attr('disabled') === 'disabled';},
+		get lock () { return $fe.attr('disabled') && fe.attr('disabled') === 'disabled';},
 		set lock (newTruthy) {if (newTruthy) {$fe.attr('disabled','disabled');}}
 	};
 };
