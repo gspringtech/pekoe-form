@@ -71,7 +71,7 @@ gs.inputWrapper = function(_fe) { // state management for the form element and t
 		set value(newV) {$fe.val(newV); $fe.trigger('change'); }, // I'm uncertain about this accessor here - the change trigger might cause recursion. 
 		get state () {return _state;},
 		set state (newS) {_state = newS; commandState();},
-		get lock () { $fe.attr('disabled') && fe.attr('disabled') === 'disabled';},
+		get lock () { return $fe.attr('disabled') && fe.attr('disabled') === 'disabled';},
 		set lock (newTruthy) {if (newTruthy) {$fe.attr('disabled','disabled');}}
 	};
 };
