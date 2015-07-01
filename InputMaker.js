@@ -602,7 +602,7 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 		} else {
 			formEl = document.createElement("label");
 			formEl.textContent = makeLabelText(pekoeNode);
-
+	        if (currentValue() === "") {showHelp(formEl,pekoeNode);}
 			showDS(formEl,pekoeNode);
 			formEl.appendChild(document.createElement("br"));
 			var inp = document.createElement("textarea");
@@ -669,20 +669,25 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 		select.onchange = updateTree;
 		select.pekoeNode = pekoeNode;
 		formEl.appendChild(select);
-		var selectList = jQuery($inp.find("list")[0]).text();
-		if ((currentValue() !== "") && (selectList.indexOf(currentValue()) == -1)){selectList += "\n"+currentValue();} // make sure list contains the value
-		var vals = selectList.split(/\s*\n\s*/); // separated by line-breaks. possibly CRLF
+		var selectList = $inp.find("list").text();
+	        var selectProps = $inp.find("select-property-list").text();
+	        var $select = $(select);
+	        if (selectProps !== '') {
+		    $select.data('currentVal',currentValue());
+		    $select.addClass('property-list').data('property',selectProps);
+		} else {
+    	            if ((currentValue() !== "") && (selectList.indexOf(currentValue()) == -1)){selectList += "\n"+currentValue();} // make sure list contains the value
+		    var vals = selectList.split(/\s*\n\s*/); // separated by line-breaks. possibly CRLF
+		    $.each(vals, function(index,item) {
+			var $o = $("<option></option>").text(item);
+			if (currentValue() == item) {$o.attr('selected',true);}
+			$select.append($o);
+		    });
+		}		    
 
-		jQuery.map(vals, function(n) {
-			var inp = document.createElement("option");
-			inp.setAttribute("value", n);
-			inp.textContent=n;
-			if (n == currentValue()) { inp.setAttribute("selected","selected");}
-			select.appendChild(inp);
-		});
-		pekoeNode.formElement = $(select); // why?
+		pekoeNode.formElement = $select; // why?
 		if (isEnhanced) {
-			$(select).addClass("pekoe-enhancement");
+			$select.addClass("pekoe-enhancement");
 		}
 	 }
 
