@@ -121,6 +121,29 @@ gs.Pekoe.merger.Utility = function () {
 	function applyEnhancements(mform) { //
 		$('fieldset.single-use *:input').attr('disabled','disabled');
 
+	    // TODO - somehow cache and reuse this lookup.
+	    $('select.property-list',mform).each(function (){
+		// the only thing that will change is the property name "offices"
+		var $field = $(this);
+		var property = $field.data('property');
+		var currentVal = $field.data('currentVal'); // it's a hack.
+		// TODO create alternative with 'description','value'
+		$.getJSON('/exist/restxq/pekoe/properties/' + property,
+			  function (data){
+			      $field.find('option').remove(); // TODO consider making this a setting
+			      $field.append($("<option></option>")); // add blank item
+			      $.each(data.value, function(index,item) {
+				  var $o = $("<option></option>").text(item);
+				  if (currentVal == item) {$o.attr('selected',true);}
+				  $field.append($o);
+			      });
+			      if (currentVal != "" && data.value.indexOf(currentVal) == -1) {
+				  // this has the advantage of putting the missing value at the top - with a gap to follow
+				  console.log('adding currentVal option',currentVal,'for', this);
+				  $field.prepend($("<option selected></option>").text(currentVal));
+			      }
+			  });
+	    });
 		/*
 		Here's an idea.
 		Why not link the option-click "close folds" to ordering. Turn on the dragger

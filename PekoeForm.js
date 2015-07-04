@@ -241,6 +241,7 @@ getData : function () {
 
         var $item = jQuery(item); // a <link>
         var isDefault = $item.parent().is("default-links"); // beautiful. Mark a field as being listed in the Default-links for this Doctype.
+	var isAdHoc = $item.attr("ad-hoc") === "1"; 
         var fieldpath = $item.attr("field-path"); // ...  to a field like /txo/property/address or /schema/field-or-fragmentRef
         if (fieldpath === undefined) { // this should never happen. The Link IS the path
             console.warn("Can't process link without path",key,item);
@@ -267,6 +268,7 @@ getData : function () {
 
         fields[field] = fieldDefinition; // will be defined once for unique field
         fields[field].isDefault = isDefault;
+	fields[field].isAdHoc = isAdHoc;
         var $el = $(fieldDefinition);
 
         var fieldChoice = $el.find('input').attr('type') === 'field-choice';
@@ -322,7 +324,10 @@ getData : function () {
         atLeastOneDefinedField = true;
         var fieldDefinition = fields[path]; // that.schema.getFieldDefByPath(path); // all the extra info
         var isAdHoc = jQuery(fieldDefinition).attr("ad-hoc") === true; //NOTE: these are ad-hoc, non-schema fields.
-
+	if (isAdHoc && !fieldDefinition.adHoc) {
+	    console.warn('Not processing unmarked ad-hoc field',path);
+	    continue;
+	}
         var selectStmt = path;
         // this is all about CREATING and PATCHING-UP the tree
 
@@ -683,7 +688,7 @@ gs.Pekoe.fragmentNodeForm = function () {
 
      */
     if (this.pekoeEmpty === undefined) {
-        console.error('missing pekoeEmpty on',this);
+//        console.error('missing pekoeEmpty on',this); 
         //return;
         // pekoeEmpty === undefined != pekoeEmpty === false
     }
