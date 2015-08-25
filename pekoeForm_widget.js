@@ -83,7 +83,7 @@
 				});
 			self.options.closeButton = closeBtn;
 	    	
-	    	var controls = $("<span class='ui-widget-header ui-corner-all' style='padding: 10px 4px;'></span>").append(closeBtn);
+	    	var controls = $("<div class='ui-widget-header ui-corner-all' style='padding: 10px 4px;'></div>").append(closeBtn);
 			self.options.controls = controls;
 			var $div = $("<div class='form-controls'></div>");
 	    	$div.append(controls);
@@ -158,10 +158,11 @@
 		save : function () {
 			var o = this.options; 
 			o.file.setData(o.formThing.getData());
-			o.file.save();
+			var promise = o.file.save();
 			$('.enable-when-clean').button("option","disabled",false);
 			$('.enable-when-dirty').button("option","disabled",true);
 			o.dirty = false;
+		        return promise;
 		},
 
 		
