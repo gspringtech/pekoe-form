@@ -596,7 +596,7 @@ gs.Pekoe.fragmentNodeForm = function () {
 	var t = (isRepeating) ? pathToHere : pathToHere.replace(re,""); // remove it if this is a non-repeating field (for the title attribute)
 	var fieldIndex = re.exec(t) || ""; // get that position filter and use it after the nodename as the text of the legend...
 	
-	formEl.attr("title",t);
+	formEl.attr("title",pathToHere);
 	
 	formEl[0].pekoeNode = fragmentNode; // !!!!
 
@@ -858,7 +858,7 @@ gs.Pekoe.baseForm = function () {
             console.error("Fragment", this.nodeName, "wasn't rendered using fragmentNodeForm");
             //} else if (jQuery(this.ph).attr("fieldType") == "simple") {
         } else if (this.ph.nodeName === 'field') {
-			console.error("PekoeNode",this.nodeName, "wasn't rendered using pekoeNodeForm");
+			console.error("PekoeNode",this.nodeName, this.ph, this, "wasn't rendered using pekoeNodeForm");
 		}
 	}
 	// the assumption is that this node is a branch and doesn't have any field info
