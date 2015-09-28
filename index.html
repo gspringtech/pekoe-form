@@ -145,7 +145,7 @@
                 panel.pekoeForm("setTemplate",$span.data()); // SET TEMPLATE
                 $('#templateItems .active').removeClass('active');
                 $span.addClass("active");
-                $('#bagstart').html('Templates (selected: <strong>' + tPath.substring(tPath.indexOf('/templates/') + '/templates/'.length) + '</strong>)');
+                $('#bagstart').html('<span>Templates</span> <span style="position:absolute; right:2em">Selected: <strong>' + tPath.substring(tPath.indexOf('/templates/') + '/templates/'.length).replace(/\//g,' / ') + '</strong></span>');
             });
 
             var panel = $("<div></div>").attr("id","formDiv").appendTo('#workarea');
@@ -212,7 +212,7 @@
 
     <div id="bagNav" style='clear:both;'></div><!-- clear the floats above -->
     <div id="templateItems"></div>
-
+    <div id='controls' class='ui-widget-header ui-corner-all' style='padding: 10px 4px; clear:both; display:none;'>controls</div>
 </div>
 <div id="workarea"></div>
 

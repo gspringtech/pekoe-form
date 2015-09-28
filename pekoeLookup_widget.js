@@ -32,6 +32,7 @@
         try {
             result = gs.Pekoe.evaluateXPath(pEl,xpath);
         } catch (e) {console.warn('XPath', xpath, 'failed on',pEl);}
+/*
         var r = result[0];
         // the DBA may not have asked for data(@param) or Element/string(.)
         if (r instanceof Attr) {
@@ -40,6 +41,19 @@
             r = r.textContent;
         }
         return r;
+*/
+	var res = [];
+	result.forEach(function (r){
+            if (r instanceof Attr) {
+		res.push(r.value);
+            } else if (r instanceof Element) {
+		res.push(r.textContent);
+            } else { res.push(r);}
+	    
+	});
+	    res.join(',')
+            return res;
+
 	};
 	
 

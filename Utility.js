@@ -69,10 +69,10 @@ gs.Pekoe.merger.Utility = function () {
 
  					
 					if (this.fieldDefsByPath[fragmentName]) {
-						console.log('found fragmentpath',fragmentName, 'from',f);
+//						console.log('found fragmentpath',fragmentName, 'from',f);
 						return this.fieldDefsByPath[fragmentName];
 					} else if (this.fieldDefsByPath[last_two_steps[1]]) {
-						console.log("found single-step field",last_two_steps[1]);
+//						console.log("found single-step field",last_two_steps[1]);
 						return this.fieldDefsByPath[last_two_steps[1]];
 					}
 					else{
@@ -261,8 +261,8 @@ gs.Pekoe.merger.Utility = function () {
         var editor = $this.ckeditor({'entities_processNumerical':'force', placeholder:'Editable text...'}).editor;
         var $pekoeNode = jQuery($this.data("pekoeNode"));
         // not receiving change after paste.
-        editor.on('change', function (){
-            console.log('got cke change');
+        editor.on('change', function (){ // this handler is called for every keystroke.
+//            console.log('got cke change');
             $pekoeNode.empty().append(jQuery(this.getData()).clone());
         });
     }
@@ -323,14 +323,29 @@ mergerUtils.replicateElement = function (pkn, formEl) {
 	};
 	
 mergerUtils.deleteMe = function (fieldset) {
-	var txt = "Do you want to delete " + fieldset.title;
-	if (confirm(txt)) {   // TODO assess consequences!						
-		jQuery(fieldset).hide('slow',function () {	
-			jQuery(fieldset.pekoeNode).remove();					
-			jQuery(fieldset).trigger("dirty");	
-			jQuery(fieldset).remove();						
-		});
-	}
+  var txt = "Do you want to delete " + fieldset.title;
+  var $d = $('<div></div>').text(txt);
+  $('body').append($d);
+  $d.dialog(
+    {
+      modal: true,
+      buttons: {
+        "OK" : function () {
+          $(fieldset).hide('slow',function () {
+            $(fieldset.pekoeNode).remove();
+            $(fieldset).trigger("dirty");
+            $(fieldset).remove();
+          });
+          $(this).dialog('close');
+          $d.remove();
+        },
+        "Cancel" : function (){
+          $(this).dialog('close');
+          $d.remove();
+        }
+      }
+    }
+  );
 };
 
 	

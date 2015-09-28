@@ -163,7 +163,8 @@ color:inherit;
    
 }
 #templateItems div span.active {
-    outline-color: #00AAFF;
+    outline-color: #FF6699;
+    outline-width: 3px;
     font-weight: bold;
     color: blue;
     /*background-color:inherit;*/

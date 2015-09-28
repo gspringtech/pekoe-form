@@ -110,8 +110,8 @@
 		} // end of load
 		
 		function save() {
-			console.log('going to save');
-			 	$.ajax({
+			
+			return $.ajax({
 			 		url: settings.path,
 			 		data:that.doc,
 			 		type: 'POST',
