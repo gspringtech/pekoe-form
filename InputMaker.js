@@ -172,27 +172,31 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 
 	// KEY FEATURE: direct link from form element to xTree node content
     // but only one-way. Consider the other direction.
-
+	var setDateTimeStamps = function(n) {
+		console.log('stamp on ',n,isAttribute,options.has('dateStamp'),$fieldDef.find("options").text());
+		if (!isAttribute) { // can't set attributes on an Attribute
+			var d = new Date();
+			if (options.has('dateStamp') === true) {
+				console.log('set date');
+				n.setAttribute("date-stamp", d.toISODate());
+			}
+			if (options.has('timeStamp') === true) {
+				n.setAttribute("time-stamp", d.toString().split(' ')[4]);
+			}
+			if (options.has('dateTimeStamp') === true) {
+				n.setAttribute("dateTime-stamp", d.toISODateTime());
+			}
+		}
+	};
 	// Could this be converted to an Accessor Wrapper without breaking things? Probably not.
 	var updateTree = function() { // INSTANCE - METHOD
 //		// this is a fairly hefty closure...
-//		console.log('Update Tree',this.value,currentValue());
 		if (currentValue() == this.value) {
 			return;
 		}
 		currentValue(this.value); // This is the "SET" function.
-		if (!isAttribute) { // can't set attributes on an Attribute
-            var d = new Date();
-            if (options.has('dateStamp') === true) {
-                pekoeNode.setAttribute("date-stamp", d.toISODate());
-            }
-            if (options.has('timeStamp') === true) {
-                pekoeNode.setAttribute("time-stamp", d.toString().split(' ')[4]);
-            }
-            if (options.has('dateTimeStamp') === true) {
-                pekoeNode.setAttribute("dateTime-stamp", d.toISODateTime());
-            }
-        }
+
+		setDateTimeStamps(pekoeNode);
 
 	};
 
@@ -532,6 +536,7 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 				} else {
 					currentValue("1");
 				}
+				setDateTimeStamps(pekoeNode);
 				$this.trigger("dirty");
 			});
 			inp.pekoeNode = pekoeNode;
@@ -554,7 +559,7 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 			var $i = jQuery("<input type='checkbox' />").attr('name',inpName);
 			$i.attr("value", n);
 			if (jQuery.inArray(n,currentValues) !== -1) { $i.attr("checked","");} // turn it on
-//	TODO THIS IS FAULTY
+
 			$i.on("change", function () {
 				// the values are the same as the labels.
 				// they are separated by line-breaks.
@@ -571,6 +576,7 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 					vals.splice(isSet, 1)
 					currentValue(vals.join("\n"));
 				}
+				setDateTimeStamps(pekoeNode);
 				$this.trigger("dirty");
 			});
 			$i.get(0).pekoeNode = pekoeNode; // we're attaching the same pekoenode to each checkbox
