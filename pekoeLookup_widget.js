@@ -208,7 +208,7 @@
 			    	formEl.replaceWith(newForm);
 				gs.Pekoe.merger.Utility.applyEnhancements(newForm);
 			    	$(newForm).pekoeLookup(); // reapply this
-			    	
+			    	$(newForm).find('input').last().focus();
 			    } catch (e) {
 			    	console.error(e);
 			    } 
