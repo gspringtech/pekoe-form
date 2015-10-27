@@ -206,6 +206,7 @@
 				
 			    	var newForm = nn.toForm();
 			    	formEl.replaceWith(newForm);
+				gs.Pekoe.merger.Utility.applyEnhancements(newForm);
 			    	$(newForm).pekoeLookup(); // reapply this
 			    	
 			    } catch (e) {
