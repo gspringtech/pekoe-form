@@ -20,7 +20,7 @@
     color:inherit;
     line-height:1.6em;
     overflow:hidden;
-    width: 102em;
+    /*width: 102em;*/
     font-size: 12px;
     font-family: "Trebuchet MS", "Arial", "Helvetica", "Verdana", "sans-serif";
 }

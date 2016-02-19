@@ -29,7 +29,7 @@ if (!gs.Pekoe.BureauAG) { gs.Pekoe.BureauAG = function (navPanelId) {
 		this.topList = null;
 		this.maxLevel = 0;
 		this.BAGPREFIX = "bagS"; // this must match the CSS div names
-		this.MAXLIST = 10; //gs.Pekoe.Config.get("BAG.MAXLIST");
+		this.MAXLIST = 7; //gs.Pekoe.Config.get("BAG.MAXLIST");
 //		this.observers = gs.Pekoe.Accessories.EventManager();
 }; }
 
@@ -50,6 +50,11 @@ gs.Pekoe.BureauAG.prototype = { // christ its a fucking prototype based thing. B
 		});
 	},
 	init : function (list) {
+		var ml = $(list).children('UL').children().length;
+		//console.log('Length of list is',ml,'and maxlist',this.MAXLIST);
+		if (ml > this.MAXLIST) {
+			this.MAXLIST = ml;
+		}
 //		this.attachmentPoint = jQuery(this.attachmentPointId).get();
 		try {
 		var startStuff = this.createSublists(list, 1, 4);  // (,level, pos) will also set maxLevel. Set pos to 4 for start in case small number of subfolders.
