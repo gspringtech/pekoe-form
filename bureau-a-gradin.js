@@ -40,7 +40,7 @@ if (!gs.Pekoe.BureauAG) { gs.Pekoe.BureauAG = function (navPanelId) {
  * Multitenancy means that the BAG will change according to the Tenant - for ME or other ADMIN users (or MULTI-TENANT clients)
  */
 
-gs.Pekoe.BureauAG.prototype = { // christ its a fucking prototype based thing. But there should only be one of them
+gs.Pekoe.BureauAG.prototype = { // christ its a  prototype based thing. But there should only be one of them
 
 	load : function (deferredLoad) {
 		var self = this;
@@ -50,11 +50,11 @@ gs.Pekoe.BureauAG.prototype = { // christ its a fucking prototype based thing. B
 		});
 	},
 	init : function (list) {
-		var ml = $(list).children('UL').children().length;
-		//console.log('Length of list is',ml,'and maxlist',this.MAXLIST);
-		if (ml > this.MAXLIST) {
-			this.MAXLIST = ml;
-		}
+	    var ml = $(list).children('UL').children('.sublist').length;
+	    console.log('Length of list is',ml,'and maxlist',this.MAXLIST);
+	    if (ml > this.MAXLIST) {
+		this.MAXLIST = ml;
+	    }
 //		this.attachmentPoint = jQuery(this.attachmentPointId).get();
 		try {
 		var startStuff = this.createSublists(list, 1, 4);  // (,level, pos) will also set maxLevel. Set pos to 4 for start in case small number of subfolders.
