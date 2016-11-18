@@ -365,7 +365,7 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 			// Crockford calls this a 'bad part of Javascript'
 			var commandFnMaker = new Function("theInput", "return function () {" + cscript + "}"); // 'theInput' is the 'wrappedFormInput'...
 			var commandFn = commandFnMaker(wrappedFormInput);
-			var b = $('<button class="command-button"></button>')
+			var b = $('<button type="button" class="command-button"></button>')
 				.text(cname)
 				.on('click',
 				function(e){

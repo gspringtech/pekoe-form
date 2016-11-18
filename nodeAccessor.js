@@ -8,9 +8,9 @@ gs.inputWrapper = function(_fe) { // state management for the form element and t
 	var pekoeNode = _fe.pekoeNode;
 	var _state = $fe.val() === '' ? 'initially-empty' : 'initially-set';
 	var commandState = function () {
-		$fe.siblings('.command-button').hide(); // first, hide all buttons
+		$fe.siblings('.command-button').attr("disabled","disabled").hide(); // first, hide all buttons
 		var activeStateClass = ".always, ." + _state;
-		$fe.siblings(activeStateClass).show(); // show those buttons that match the current state or 'always'
+		$fe.siblings(activeStateClass).removeAttr("disabled").show(); // show those buttons that match the current state or 'always'
 	};
 	$fe.on('change', function (){  // if the form element is changed by the user, update the state.
 		if ($fe.val() === ''){

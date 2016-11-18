@@ -110,7 +110,7 @@ background-color:inherit;
 
 .form-controls label, .form-controls span.label{
 float: left;
-border: 1px solid #999;
+outline: 1px solid #9C9;
 margin: 0 15px 5px 0;
 }
 .repeating {
