@@ -541,7 +541,7 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 				$this.trigger("dirty");
 			});
 			if (isEnhanced) {
-				$inp.addClass("pekoe-enhancement");
+				$i.addClass("pekoe-enhancement");
 			}
 			inp.pekoeNode = pekoeNode;
 			pekoeNode.formElement = inp;
