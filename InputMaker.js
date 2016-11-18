@@ -517,7 +517,8 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 		pekoeNode.formElement = null; //TODO (2012-01-14: work out why null here?) probably need to create a getter/setter for radios and selects
 	 }
 
-	function checkboxInput(  ) { formEl = document.createElement("label");
+	function checkboxInput(  ) {
+		formEl = document.createElement("label");
 		formEl.textContent = makeLabelText(pekoeNode);
 		showDS(formEl,pekoeNode);
 			var $i = jQuery("<input type='checkbox' value='1' />");
@@ -539,6 +540,9 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 				setDateTimeStamps(pekoeNode);
 				$this.trigger("dirty");
 			});
+			if (isEnhanced) {
+				$inp.addClass("pekoe-enhancement");
+			}
 			inp.pekoeNode = pekoeNode;
 			pekoeNode.formElement = inp;
 			formEl.appendChild(inp);
