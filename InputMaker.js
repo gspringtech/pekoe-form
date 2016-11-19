@@ -173,11 +173,9 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 	// KEY FEATURE: direct link from form element to xTree node content
     // but only one-way. Consider the other direction.
 	var setDateTimeStamps = function(n) {
-		console.log('stamp on ',n,isAttribute,options.has('dateStamp'),$fieldDef.find("options").text());
 		if (!isAttribute) { // can't set attributes on an Attribute
 			var d = new Date();
 			if (options.has('dateStamp') === true) {
-				console.log('set date');
 				n.setAttribute("date-stamp", d.toISODate());
 			}
 			if (options.has('timeStamp') === true) {
@@ -221,10 +219,10 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 
 
     function showHelp(formEl,pekoeNode){
-	var help = $fieldDef.find('help');
-	if (help.length && help.text() !== '') {
-	    jQuery('<span class="help">?</span>').attr('title',help.text()).appendTo(formEl);
-	}
+		var help = $fieldDef.find('help');
+		if (pekoeNode.textContent === "" && help.length && help.text() !== '') {
+	    	jQuery('<span class="help">?</span>').attr('title',help.text()).appendTo(formEl);
+		}
     }
 
 	var formEl = null;
@@ -521,31 +519,32 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 		formEl = document.createElement("label");
 		formEl.textContent = makeLabelText(pekoeNode);
 		showDS(formEl,pekoeNode);
-			var $i = jQuery("<input type='checkbox' value='1' />");
-			var inp = $i.get(0);
-			var uniqueName = $fieldDef.attr("path") + "-" + gs.Pekoe.nodeId; // this makes the id unique
-			if ((options.has('singleUse') === true) && (currentValue()  !== "")) $i.attr('disabled',true);
+		showHelp(formEl,pekoeNode);
+		var $i = jQuery("<input type='checkbox' value='1' />");
+		var inp = $i.get(0);
+		var uniqueName = $fieldDef.attr("path") + "-" + gs.Pekoe.nodeId; // this makes the id unique
+		if ((options.has('singleUse') === true) && (currentValue()  !== "")) $i.attr('disabled',true);
 
-			$i.attr("name", uniqueName);   // but does the name need to be unique?
+		$i.attr("name", uniqueName);   // but does the name need to be unique?
+		if (currentValue() === "1") {
+			$i.attr("checked",""); // how does this work?
+		}
+		$i.on("change", function () {
+			var $this = jQuery(this); // This looks like it could get mixed up TODO - this needs testing URGENT.
 			if (currentValue() === "1") {
-				$i.attr("checked",""); // how does this work?
+				currentValue("")
+			} else {
+				currentValue("1");
 			}
-			$i.on("change", function () {
-				var $this = jQuery(this); // This looks like it could get mixed up TODO - this needs testing URGENT.
-				if (currentValue() === "1") {
-					currentValue("")
-				} else {
-					currentValue("1");
-				}
-				setDateTimeStamps(pekoeNode);
-				$this.trigger("dirty");
-			});
-			if (isEnhanced) {
-				$i.addClass("pekoe-enhancement");
-			}
-			inp.pekoeNode = pekoeNode;
-			pekoeNode.formElement = inp;
-			formEl.appendChild(inp);
+			setDateTimeStamps(pekoeNode);
+			$this.trigger("dirty");
+		});
+		if (isEnhanced) {
+			$i.addClass("pekoe-enhancement");
+		}
+		inp.pekoeNode = pekoeNode;
+		pekoeNode.formElement = inp;
+		formEl.appendChild(inp);
 	 }
 
 	function multiCheckBox() {

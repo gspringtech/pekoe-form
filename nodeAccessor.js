@@ -1,5 +1,11 @@
 /**
  * Created by alisterpillow on 7/06/2015.
+ * This form-element wrapper is applied to every field with class "pekoe-enhancement". It is applied to the input element
+ * when the enhancement is called. The enhancement has access to "$field"
+ * It provides accessors for value, state and lock.
+ * It also provides an XPath evaluation function which has the field's pekoeNode as context.
+ * This makes it easy to update sibling elements - but also provides access to any part of the tree
+ * The
  */
 
 // consider this from the perspective of the field enhancement (which uses $field) and the javascript 'lookup'.
@@ -58,6 +64,7 @@ gs.inputWrapper = function(_fe) { // state management for the form element and t
 					accessors[i].value = v;
 				}
 			},
+            get field() {return $(nodeArr[0].formElement);}, // if this is a single element with a corresponding field, it will produce a value
 			nodes : _nodes
 		};
 	};
@@ -68,10 +75,10 @@ gs.inputWrapper = function(_fe) { // state management for the form element and t
 		nodeAccessor : nodeAccessor,
 		pkn: pekoeNode,
 		get value() {return $fe.val(); },
-		set value(newV) {$fe.val(newV); $fe.trigger('change'); }, // I'm uncertain about this accessor here - the change trigger might cause recursion. 
+		set value(newV) {$fe.val(newV); $fe.trigger('change'); }, // I'm uncertain about this accessor here - the change trigger might cause recursion.
 		get state () {return _state;},
 		set state (newS) {_state = newS; commandState();},
 		get lock () { return $fe.attr('disabled') && fe.attr('disabled') === 'disabled';},
-		set lock (newTruthy) {if (newTruthy) {$fe.attr('disabled','disabled');}}
+		set lock (newTruthy) {if (newTruthy) {$fe.attr('disabled','disabled');} else {$fe.removeAttr('disabled');}}
 	};
 };
