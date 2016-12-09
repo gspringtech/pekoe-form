@@ -199,7 +199,8 @@
 					
 					e.ph = fragmentNode.ph; 
 					var fragment = $(schema.fragmentsTree).find(nodeToFind).get(0);
-					gs.Pekoe.mirrorNodes(framentNode, e);
+					gs.Pekoe.mirrorNodes(fragmentNode, e);
+					var nn = e;
 					//var nn = gs.Pekoe.merger.Utility.mirrorNodes(fragmentNode,e); // new node? this should still be the
 					nn.ph = fragmentNode.ph;
 					nn.toForm = fragmentNode.toForm; // so it can be 'rendered'
