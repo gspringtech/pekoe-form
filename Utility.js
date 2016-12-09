@@ -121,28 +121,28 @@ gs.Pekoe.merger.Utility = function () {
 	function applyEnhancements(mform) { //
 		$('fieldset.single-use *:input').attr('disabled','disabled');
 
-	    // TODO - somehow cache and reuse this lookup.
+	    // Why is this happening here?
 	    $('select.property-list',mform).each(function (){
-		// the only thing that will change is the property name "offices"
-		var $field = $(this);
-		var property = $field.data('property');
-		var currentVal = $field.data('currentVal'); // it's a hack.
-		// TODO create alternative with 'description','value'
-		$.getJSON('/exist/restxq/pekoe/properties/' + property,
-			  function (data){
-			      $field.find('option').remove(); // TODO consider making this a setting
-			      $field.append($("<option></option>")); // add blank item
-			      $.each(data.value, function(index,item) {
-				  var $o = $("<option></option>").text(item);
-				  if (currentVal == item) {$o.attr('selected',true);}
-				  $field.append($o);
-			      });
-			      if (currentVal != "" && data.value.indexOf(currentVal) == -1) {
-				  // this has the advantage of putting the missing value at the top - with a gap to follow
-				  console.log('adding currentVal option',currentVal,'for', this);
-				  $field.prepend($("<option selected></option>").text(currentVal));
-			      }
-			  });
+			// the only thing that will change is the property name "offices"
+			var $field = $(this);
+			var property = $field.data('property');
+			var currentVal = $field.data('currentVal'); // it's a hack.
+			// TODO create alternative with 'description','value'
+			$.getJSON('/exist/restxq/pekoe/properties/' + property,
+				  function (data){
+					  $field.find('option').remove(); // TODO consider making this a setting
+					  $field.append($("<option></option>")); // add blank item
+					  $.each(data.value, function(index,item) {
+					  var $o = $("<option></option>").text(item);
+					  if (currentVal == item) {$o.attr('selected',true);}
+					  $field.append($o);
+					  });
+					  if (currentVal != "" && data.value.indexOf(currentVal) == -1) {
+					  // this has the advantage of putting the missing value at the top - with a gap to follow
+					  console.log('adding currentVal option',currentVal,'for', this);
+					  $field.prepend($("<option selected></option>").text(currentVal));
+					  }
+				  });
 	    });
 		/*
 		Here's an idea.
@@ -927,40 +927,7 @@ mergerUtils.loadSchema = function (doctype) {
         });
         }
     };
- 
-    mergerUtils.mirrorNodes = mirrorNodes;
-    // this function probably needs replacing with the one from PekoeForm.js
-    // this is only used by pekoeLookup_widget 189.
-	// A better version is found in PekoeForm.
-    function mirrorNodes(fragment, source) {
-        // import a complete copy of the fragment, MAKE SURE IT'S COMPLETE AND RETURN IT
-		console.log('utility.mirrorNodes',source);
-        var nn = source.ownerDocument.importNode(fragment,true);
-        // for every child node, see if it exists in the source. If so, move it to the nn
-        var fragmentChildren = nn.childNodes;
-        var fcCount = fragmentChildren.length;
-        for (var i = 0; i < fcCount; i++){
-            var fragChild = fragmentChildren[i];
-            var matchingNodes = source.getElementsByTagName(fragChild.tagName); // THIS is fatal
-            if (matchingNodes.length > 0) {
-                for (var m = 0; m < matchingNodes.length; m++ ) {
-                    nn.insertBefore(matchingNodes[m], fragChild);
-                }
-                nn.removeChild(fragChild);
-            }
-        }
-        // then, append any remaining source children to the fragment,
-        var remaining = source.childNodes;
-        for (var n = 0; n < remaining.length; n++ ) {
-                nn.appendChild(remaining[n]);
-        }
-        //finally replace the source with the fragment.
-        var p = source.parentNode;
-        p.replaceChild(nn,source);
-        return nn;
-    }
 
- 
     mergerUtils.enhanceSubtree = enhanceSubtree;
 
     // enhanceSubtree : function (subjectNode,currentPekoeNode, fragName) {

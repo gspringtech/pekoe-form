@@ -198,8 +198,9 @@
 					// This is NOT a MERGE. This is a replacement of a fragment followed by a check to ensure that any child elements, specified by the schema AND the template, are included.
 					
 					e.ph = fragmentNode.ph; 
-					var fragment = $(schema.fragmentsTree).find(nodeToFind).get(0); 
-					var nn = gs.Pekoe.merger.Utility.mirrorNodes(fragmentNode,e); // new node? this should still be the 
+					var fragment = $(schema.fragmentsTree).find(nodeToFind).get(0);
+					gs.Pekoe.mirrorNodes(framentNode, e);
+					//var nn = gs.Pekoe.merger.Utility.mirrorNodes(fragmentNode,e); // new node? this should still be the
 					nn.ph = fragmentNode.ph;
 					nn.toForm = fragmentNode.toForm; // so it can be 'rendered'
 					gs.Pekoe.merger.Utility.enhanceSubtree(schema, nn, nodeToFind); // Bloody BRILLIANT.
