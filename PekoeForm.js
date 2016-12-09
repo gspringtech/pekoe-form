@@ -113,6 +113,7 @@ pruneFormTree : function (startNode) {
 	var next = startNode.nextSibling;
 	var p = startNode.parentNode; 
 	if (startNode.pekoeEmpty == true ) {
+	    console.log("REMOVING",startNode);
 		p.removeChild(startNode);
 	} else {
 		this.pruneFormTree(startNode.firstChild);
@@ -688,47 +689,8 @@ gs.Pekoe.fragmentNodeForm = function () {
 
      */
     if (this.pekoeEmpty === undefined) {
-//        console.error('missing pekoeEmpty on',this); 
-        //return;
-        // pekoeEmpty === undefined != pekoeEmpty === false
+//        console.error('missing pekoeEmpty on',this);
     }
-    //if (this.pekoeEmpty)
-	//if (this.pekoeEmpty) { // must be a new fragment
-
-    //if (isRepeating) {
-    //    // addMe
-		//jQuery("<span class='btn'><img src='css/graphics/icons/add.png' class='tool-icon' /></span>")
-		//	.attr("title", "Add another '" + fragmentNode.nodeName +"'")
-		//	.click(function () {gs.Pekoe.merger.Utility.addMe(formEl[0],false);})
-		//	.appendTo(legend);
-		//// deleteMe
-		//jQuery("<span class='btn'><img src='css/graphics/icons/delete.png' class='tool-icon' /></span>")
-		//	.attr("title", "Delete this '" + fragmentNode.nodeName +"'")
-		//	.click(function () {gs.Pekoe.merger.Utility.deleteMe(formEl[0]);})
-		//	.appendTo(legend);
-		//// copy Me
-		//jQuery("<span class='btn'><img src='css/graphics/icons/page_copy.png' class='tool-icon' /></span>")
-		//	.attr("title", "Add a Copy of '" + fragmentNode.nodeName +"'")
-		//	.click(function () {gs.Pekoe.merger.Utility.addMe(formEl[0],true);})
-		//	.appendTo(legend);
-		//// copy my Values
-		//jQuery("<span class='btn'><img src='css/graphics/icons/pencil_add.png' class='tool-icon' /></span>")
-		//	.attr("title", "Copy values from this '" + fragmentNode.nodeName +"'")
-		//	.click(function () {gs.Pekoe.GlobalCopy.copyMe(legend[0]);})
-		//	.appendTo(legend);
-    //    jQuery("<i class='fa fa-sort pull-right' title='this item can be re-ordered among its peers.'></i>").appendTo(legend);
-    //} else if (fieldChoice) {
-    //    console.log('this field-choice is',this, 'and the options are',options,this.pekoeEmpty);
-    //    //this.pekoeEmpty is false if the element was previously defined
-    //    //this.pekoeEmpty is undefined if this element is NEW.
-	//
-    //    jQuery("<span class='btn'><img src='css/graphics/icons/delete.png' class='tool-icon' /></span>")
-    //        .attr("title", "Delete this '" + fragmentNode.nodeName +"'")
-    //        .click(function () {gs.Pekoe.merger.Utility.deleteMe(formEl[0]);})
-    //        .appendTo(legend);
-    //}
-
-
     // NEW approach
 
     // copy my Values always available
@@ -737,7 +699,7 @@ gs.Pekoe.fragmentNodeForm = function () {
         .click(function () {gs.Pekoe.GlobalCopy.copyMe(legend[0]);})
         .appendTo(legend);
 
-    if (this.pekoeEmpty) { // must be a new fragment because otherwise it would be deleted.
+    if (this.pekoeEmpty === true) { // must be a new fragment because otherwise it would be deleted.
         // don't care about single-use
         if (isRepeating) {
             // addMe

@@ -888,7 +888,11 @@ mergerUtils.loadSchema = function (doctype) {
         // If empty = true, walk up the tree, setting Node.empty=true. Stop if encountering "empty = false".
         var oResult = null;
         var collector = null;
-        var leafNodeCountXPath = "//*[count(child::*|@*) = 0]"; // find Leaf Nodes using XPath filter (any element without children must be a leaf-node)
+        //var leafNodeCountXPath = "//*[count(child::*|@*) = 0]"; // find Leaf Nodes using XPath filter (any element without children must be a leaf-node)
+		// the problem with notes/note was caused by the leafNodeCount which looked for elements having no children or child-attributes
+		// consequently, an EXISTING note was NOT considered a LEAF NODE because it had ATTRIBUTES
+		// BUT a NEW note didn't have ATTRIBUTES and so was seen as an empty element. None of its siblings had fired the "NotEmpty" function - so Notes was marked EMPTY and pruned.
+		var leafNodeCountXPath = "//*[not(*)]"; // the previous definition of "leaf node" somehow missed "note" "//*[count(child::*|@*) = 0]" PROBABLY because of the ATTRIBUTE TEST;
         try {
             oResult = gs.Pekoe.oEvaluator.evaluate(leafNodeCountXPath, theTree ,null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
         } catch (e) { console.warn("No leaf-nodes found in this tree!",e);}
