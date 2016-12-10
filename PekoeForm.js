@@ -590,7 +590,7 @@ gs.Pekoe.fragmentNodeForm = function () {
     var isDeletable = options.indexOf('deletable') !== -1;
     if (isRepeating) formEl.addClass('repeating');
 	var hideEmpty = options.indexOf("initially-closed") !== -1; //jQuery(fragmentNode.ph).find("options:contains('initially-closed')").length > 0;
-    var fieldChoice = options.indexOf("field-choice") !== -1;
+    //var fieldChoice = options.indexOf("field-choice") !== -1;
     var isSingleUse = options.indexOf("singleUse") !== -1;
     var pathToHere = gs.Utility.getElementTreeXPath(fragmentNode);
 	var re = /\[[\d]+\]$/; // match the position filter (e.g. "[2]") at the end of the path.  
@@ -634,7 +634,7 @@ gs.Pekoe.fragmentNodeForm = function () {
 				}
 		})
 		.appendTo(legend);
-    // TODO move this to some kind of Angular Directive.
+
     // for some bizarre reason, this doesn't consider the options.
     // In the field-choice case, I may want fields that can be added but not removed.
     /*
@@ -669,7 +669,7 @@ gs.Pekoe.fragmentNodeForm = function () {
     The user should be able to add and then delete (or 'undo' - wouldn't that be nice)
     But once it's SAVED, the fragment should not be editable. The whole fragment should be single-use.
 
-    Part of the problem here is that there's no distiction between New and existing data.
+    Part of the problem here is that there's no distinction between New and existing data.
      */
     /*
         Will always want Copy Values
@@ -700,7 +700,8 @@ gs.Pekoe.fragmentNodeForm = function () {
         .appendTo(legend);
 
     if (this.pekoeEmpty === true) { // must be a new fragment because otherwise it would be deleted.
-        // don't care about single-use
+        console.log('YES - EMPTY',this.nodeName);
+        // don't care about single-use here
         if (isRepeating) {
             // addMe
             jQuery("<span class='btn'><img src='css/graphics/icons/add.png' class='tool-icon' /></span>")
@@ -723,29 +724,30 @@ gs.Pekoe.fragmentNodeForm = function () {
         if (isSingleUse) {
             // add nothing except 'copy values'. Fields will be disabled during enhancement process.
             formEl.addClass('single-use');
-        } else {
-            if (isRepeating) {
-                // addMe
-                jQuery("<span class='btn'><img src='css/graphics/icons/add.png' class='tool-icon' /></span>")
-                    .attr("title", "Add another '" + fragmentNode.nodeName +"'")
-                    .click(function () {gs.Pekoe.merger.Utility.addMe(formEl[0],false);})
-                    .appendTo(legend);
-                // copy Me
-                jQuery("<span class='btn'><img src='css/graphics/icons/page_copy.png' class='tool-icon' /></span>")
-                    .attr("title", "Add a Copy of '" + fragmentNode.nodeName +"'")
-                    .click(function () {gs.Pekoe.merger.Utility.addMe(formEl[0],true);})
-                    .appendTo(legend);
-            }
-            if (isDeletable) {
-                // deleteMe - if you just added it, you can also delete it
-                jQuery("<span class='btn'><img src='css/graphics/icons/delete.png' class='tool-icon' /></span>")
-                    .attr("title", "Delete this '" + fragmentNode.nodeName + "'")
-                    .click(function () {
-                        gs.Pekoe.merger.Utility.deleteMe(formEl[0]);
-                    })
-                    .appendTo(legend);
-            }
         }
+
+        if (isRepeating) {
+            // addMe
+            jQuery("<span class='btn'><img src='css/graphics/icons/add.png' class='tool-icon' /></span>")
+                .attr("title", "Add another '" + fragmentNode.nodeName +"'")
+                .click(function () {gs.Pekoe.merger.Utility.addMe(formEl[0],false);})
+                .appendTo(legend);
+            // copy Me
+            jQuery("<span class='btn'><img src='css/graphics/icons/page_copy.png' class='tool-icon' /></span>")
+                .attr("title", "Add a Copy of '" + fragmentNode.nodeName +"'")
+                .click(function () {gs.Pekoe.merger.Utility.addMe(formEl[0],true);})
+                .appendTo(legend);
+        }
+        if (!isSingleUse && isDeletable) {
+            // deleteMe - if you just added it, you can also delete it
+            jQuery("<span class='btn'><img src='css/graphics/icons/delete.png' class='tool-icon' /></span>")
+                .attr("title", "Delete this '" + fragmentNode.nodeName + "'")
+                .click(function () {
+                    gs.Pekoe.merger.Utility.deleteMe(formEl[0]);
+                })
+                .appendTo(legend);
+        }
+
 
     }
 
