@@ -263,7 +263,7 @@
 			var $params = $lookup.find("param"); // :not(:empty)"); // any param other than $element.val() will be evaluated once at the start. The user can't type into another field
 			// while using this - so there's no point updating.
 			var $applyTo = (selector) ? $element.find("[name^='" + selector + "']") : $element;
-            //console.log('lookup found $lookup',$lookup,'selector',selector,'$applyTo',$applyTo);
+            console.log('lookup found $lookup',$lookup,'selector',selector,'$applyTo',$applyTo);
 			$applyTo.addClass('fragment-autocompleter').on("focus", function () {
 				var valueChosen = false;
                 // "oneShot" means there's a fixed list (not too big) to retrieve from the server. Alternative is to lookup after each keystroke.
@@ -316,7 +316,7 @@
 						},
 						
 						select: function (event, ui) {
-							_complexInsertion(ui.item, pekoeNode, $element);
+							_complexInsertion(ui.item, pekoeNode, $element, $applyTo);
 						},
 						change: function( event, ui ) { // from the Combobox example - prevent entry if not from list...
 							if ( !ui.item ) { // user has escaped or something to close the box without choosing something from the list
