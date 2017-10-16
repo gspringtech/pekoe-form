@@ -614,19 +614,17 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 	inp.textContent = currentText; // this has been extracted from the existing node or the default value
 	if (currentText.length > 0) {
 	    var lc = 0;
-	    var lines = currentText.split('\r');
+	    var lines = currentText.split('\n');
 	    for (var i = 0; i < lines.length; i++) {
-		lc += Math.ceil(lines[i].length / size);
+		lc += Math.ceil(lines[i].length / size) - 1; // only count the extra lines
 	    }
+	    lc += lines.length; 	// rows will be a sum of line-breaks and lines / size rounded up.
 	}
-
-	//console.log('size',size,'rows',rows,'lc',lc);
 	if (!rows || lc > rows) { rows = lc;}
 	inp.setAttribute("rows",rows);
 	inp.setAttribute("cols",size);
 	inp.onchange = updateTree;
 	inp.pekoeNode = pekoeNode;
-
 
 	pekoeNode.formElement = inp;
     }
