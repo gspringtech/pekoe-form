@@ -616,7 +616,9 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 	    var lc = 0;
 	    var lines = currentText.split('\n');
 	    for (var i = 0; i < lines.length; i++) {
-		lc += Math.ceil(lines[i].length / size) - 1; // only count the extra lines
+		if (lines[i].length > 0) {
+		    lc += Math.ceil(lines[i].length / size) - 1; // only count the extra lines
+		}
 	    }
 	    lc += lines.length; 	// rows will be a sum of line-breaks and lines / size rounded up.
 	}
