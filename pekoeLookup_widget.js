@@ -163,7 +163,7 @@
 		if (!item.hasChildren) {  // simple list
 			// if the lookup is applied to an attribute, then this is wrong. OR it was always wrong
 			$applyTo.val(item.value.trim()); // and that's it!
-			console.log('triggering change on',$applyTo); // this is the fieldset, not the element!
+		    //			console.log('triggering change on',$applyTo); // this is the fieldset, not the element!
 			$applyTo.trigger("change");
 			$applyTo.trigger("dirty");
 
@@ -263,7 +263,7 @@
 			var $params = $lookup.find("param"); // :not(:empty)"); // any param other than $element.val() will be evaluated once at the start. The user can't type into another field
 			// while using this - so there's no point updating.
 			var $applyTo = (selector) ? $element.find("[name^='" + selector + "']") : $element;
-            console.log('lookup found $lookup',$lookup,'selector',selector,'$applyTo',$applyTo);
+//            console.log('lookup found $lookup',$lookup,'selector',selector,'$applyTo',$applyTo);
 			$applyTo.addClass('fragment-autocompleter').on("focus", function () {
 				var valueChosen = false;
                 // "oneShot" means there's a fixed list (not too big) to retrieve from the server. Alternative is to lookup after each keystroke.
