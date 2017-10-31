@@ -305,7 +305,7 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 			docNode.appendChild(fs);
 			formEl = fs; // will this change the object
 		} else {
-			docNode.appendChild(formEl);
+    		    docNode.appendChild(formEl);
 		}
 
 	} else {
@@ -603,65 +603,48 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 		pekoeNode.formElement = null; // probably need to create a getter/setter for radios and selects
 	}
 
-	function textareaInput(  ) {
-		if (options.has("htmledit")) { //TODO  HUH? What does this do?
+    function textareaInput(  ) {
 
-			formEl = jQuery("<div class='read-only'></div>").get();
+	var readonly = ((options.has('singleUse') === true) && (currentValue()  !== ""));
+	formEl = document.createElement("label");
+	formEl.textContent = makeLabelText(pekoeNode);
+	if (currentValue() === "") {showHelp(formEl,pekoeNode);}
+	showDS(formEl,pekoeNode);
+	formEl.appendChild(document.createElement("br"));
+	var inp = document.createElement("textarea");
+	formEl.appendChild(inp);
+	if (readonly) {    inp.setAttribute("readonly","readonly"); }
+	inp.setAttribute("name", $fieldDef.attr("path") + "-" + gs.Pekoe.nodeId);
+	inp.setAttribute("id",  "te" + "-" + gs.Pekoe.nodeId);
+	/*
+	  Rows and cols. Size is cols. e.g. 60. A line break will possibly happen at 59 chars.
+	  For each line, count the chars. Divide by 60. Add to the total. Use this as the number of rows
+	*/
 
-			jQuery(pekoeNode).children().each(function () {
-				formEl.appendChild(this);
-			});
+	var rows = ($inp.attr("rows"))  ? $inp.attr("rows") : 3;
+	var size = ($inp.attr("size")) ? $inp.attr("size") : 60;
+	var currentText = currentValue();
+
+
+	inp.textContent = currentText; // this has been extracted from the existing node or the default value
+	if (currentText.length > 0) {
+	    var lc = 0;
+	    var lines = currentText.split('\n');
+	    for (var i = 0; i < lines.length; i++) {
+		if (lines[i].length > 0) {
+		    lc += Math.ceil(lines[i].length / size) - 1; // only count the extra lines
 		}
-		else if ((options.has('singleUse') === true) && (currentValue()  !== "")) {
+	    }
+	    lc += lines.length; 	// rows will be a sum of line-breaks and lines / size rounded up.
+	}
+	if (!rows || lc > rows) { rows = lc;}
+	inp.setAttribute("rows",rows);
+	inp.setAttribute("cols",size);
+	inp.onchange = updateTree;
+	inp.pekoeNode = pekoeNode;
 
-            // would be nice to gather similar children - perhaps at a higher level
-            formEl = jQuery("<div class='read-only'/>");
-            if (!isAttribute){
-                var dateStamp = pekoeNode.getAttribute("date-stamp");
-                var timeStamp = pekoeNode.getAttribute("time-stamp");
-                var dtString = (dateStamp !== null) ? "(" + Date.fromISO(dateStamp).toAustDate() + ((timeStamp != "") ? (" " + timeStamp) : "") + ") " : "";
-                jQuery("<span class='dt-stamp/>").text(dtString).appendTo(formEl);
-            }
-            jQuery("<span/>").html(pekoeNode);
-		} else {
-			formEl = document.createElement("label");
-			formEl.textContent = makeLabelText(pekoeNode);
-	        if (currentValue() === "") {showHelp(formEl,pekoeNode);}
-			showDS(formEl,pekoeNode);
-			formEl.appendChild(document.createElement("br"));
-			var inp = document.createElement("textarea");
-			formEl.appendChild(inp);
-			inp.setAttribute("name", $fieldDef.attr("path") + "-" + gs.Pekoe.nodeId);
-			inp.setAttribute("id",  "te" + "-" + gs.Pekoe.nodeId);
-			/*
-				Rows and cols. Size is cols. e.g. 60. A line break will possibly happen at 59 chars.
-				For each line, count the chars. Divide by 60. Add to the total. Use this as the number of rows
-			 */
-
-			var rows = ($inp.attr("rows"))  ? $inp.attr("rows") : 3;
-			var size = ($inp.attr("size")) ? $inp.attr("size") : 60;
-			var currentText = currentValue();
-
-
-			inp.textContent = currentText; // this has been extracted from the existing node or the default value
-			if (currentText.length > 0) {
-				var lc = 0;
-				var lines = currentText.split('\r');
-				for (var i = 0; i < lines.length; i++) {
-					lc += Math.ceil(lines[i].length / size);
-				}
-			}
-
-			//console.log('size',size,'rows',rows,'lc',lc);
-			if (!rows || lc > rows) { rows = lc;}
-			inp.setAttribute("rows",rows);
-			inp.setAttribute("cols",size);
-			inp.onchange = updateTree;
-			inp.pekoeNode = pekoeNode;
-
-		}
-		pekoeNode.formElement = inp;
-	 }
+	pekoeNode.formElement = inp;
+    }
 
 	 function richTextInput(  ) {
          // CKEDITOR is applied inline. See Utility.js - line 148 or thereabouts
