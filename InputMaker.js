@@ -251,6 +251,18 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 		ds = pekoeNode.getAttribute("date-stamp") || "";
 		if (ds !== ""){
 			formEl.title += " Modified: "+ ds;
+			var $formEl = $(formEl);
+			// console.log('$formEl',$formEl);
+			if ($formEl.hasClass('rt-box')) {
+                //console.log('$form el',$formEl);
+                $formEl.find('label').append('<span> - ' + ds + '</span>');
+                var ts = pekoeNode.getAttribute("time-stamp") || "";
+                if (ts !== "") {
+                	$formEl.find('label').append('<span> : ' + ts + '</span>');
+                }
+			}
+
+			//formEl.find('label').append(jQuery("<span>hello</span>"));
 		}
 	}
 	if (options.has('timeStamp') === true) {
@@ -309,7 +321,10 @@ gs.Pekoe.merger.InputMaker = function (docNode, pekoeNode, parentElement) {
 	// the key issue with "deletable" is that there must be one item left
 	// TODO if "singleUse" then it shouldn't be deletable after being saved.
  	 if (options.has('repeating') && !isAttribute) { // Can't replicate an Attribute.
-	  	$finalE.addClass("repeating");
+		 if (!$finalE.hasClass('rt-box')) {
+             $finalE.addClass("repeating"); // This causes the elements to be SORTABLE. It interferes with CKEditor
+		 }
+
 	  	// Sortable??? - Would require these elements to be within a container.
 	  	// At the same time, change the appearance so they're in a vertical list, and hide the LABEL on all but the first.
 	  	// I tried this with CSS - but couldn't get it right. Worth another play sometime - but even nth-of-type isn't helpful because the class is not counted in the type.

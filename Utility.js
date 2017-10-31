@@ -157,9 +157,11 @@ gs.Pekoe.merger.Utility = function () {
 		 */
 		// consider the possibility of dynamically adding .sortable to the parent of the click-handle. Then,
 		// the selected elements can be made more specific
-		jQuery("fieldset").sortable({
+
+		jQuery("fieldset:not(.rt-box)").sortable({
 			axis:'y',
-			items:'.repeating',
+			items:'> .repeating',
+			//start: function (e, ui) {if (!e.shiftKey)return false},
 			stop: function (e,ui) {
 				if (ui.item.is('fieldset')){ // needs a little refactoring...
 					var pkn = ui.item.get(0).pekoeNode;
@@ -264,6 +266,9 @@ gs.Pekoe.merger.Utility = function () {
         editor.on('change', function (){ // this handler is called for every keystroke.
 //            console.log('got cke change');
             $pekoeNode.empty().append(jQuery(this.getData()).clone());
+            var d = new Date();
+            $pekoeNode.attr("date-stamp", d.toISODate());
+            $pekoeNode.attr("time-stamp", d.toString().split(' ')[4]);
         });
     }
 
